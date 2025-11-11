@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot AI - Atención al Cliente 24/7 con Inteligencia Artificial</title>
+  <meta name="description" content="Crea chatbots personalizados con IA para tu sitio web. Responde automáticamente hasta el 80% de las consultas de tus clientes. Integración en minutos.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --secondary-color: #10b981;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --bg-light: #f9fafb;
+      --bg-white: #ffffff;
+      --border-color: #e5e7eb;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: var(--bg-white);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo i {
+      font-size: 1.75rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary-color);
+    }
+
+    .cta-button {
+      background: var(--primary-color);
+      color: white;
+      padding: 0.625rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .cta-button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .hero h1 .highlight {
+      color: var(--primary-color);
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-button-large {
+      background: var(--primary-color);
+      color: white;
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.125rem;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cta-button-large:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .cta-button-secondary {
+      background: white;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+    }
+
+    .cta-button-secondary:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .badge i {
+      color: var(--secondary-color);
+      font-size: 1.125rem;
+    }
+
+    /* Features Section */
+    .features {
+      padding: 5rem 2rem;
+      background: var(--bg-white);
+    }
+
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-tag {
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .section-description {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: var(--bg-white);
+      padding: 2rem;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      border-color: var(--primary-color);
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .feature-icon i {
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .feature-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* How It Works Section */
+    .how-it-works {
+      padding: 5rem 2rem;
+      background: var(--bg-light);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 3rem;
+      margin-top: 3rem;
+    }
+
+    .step-card {
+      text-align: center;
+      position: relative;
+    }
+
+    .step-number {
+      width: 64px;
+      height: 64px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .step-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .step-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Benefits Section */
+    .benefits {
+      padding: 5rem 2rem;
+      background: var(--bg-white);
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .benefit-card {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .benefit-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .benefit-card h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .benefit-card p {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Pricing Section */
+    .pricing {
+      padding: 5rem 2rem;
+      background: var(--bg-light);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 3rem auto 0;
+    }
+
+    .pricing-card {
+      background: var(--bg-white);
+      border-radius: 16px;
+      padding: 2.5rem;
+      border: 2px solid var(--border-color);
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+      border-color: var(--primary-color);
+    }
+
+    .pricing-card.featured {
+      border-color: var(--primary-color);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: var(--secondary-color);
+      color: white;
+      padding: 0.25rem 1rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .pricing-card h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .pricing-price {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      margin: 1rem 0;
+    }
+
+    .pricing-price span {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin: 2rem 0;
+    }
+
+    .pricing-features li {
+      padding: 0.75rem 0;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .pricing-features li i {
+      color: var(--secondary-color);
+      font-size: 1rem;
+    }
+
+    .pricing-button {
+      width: 100%;
+      padding: 1rem;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pricing-button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      text-align: center;
+      color: white;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+    }
+
+    .cta-button-white {
+      background: white;
+      color: var(--primary-color);
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.125rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .cta-button-white:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--text-primary);
+      color: white;
+      padding: 3rem 2rem 1.5rem;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h4 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .steps-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo">
+        <i class="fas fa-robot"></i>
+        Chatbot AI
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#features">Características</a></li>
+          <li><a href="#how-it-works">Cómo Funciona</a></li>
+          <li><a href="#pricing">Precios</a></li>
+        </ul>
+      </nav>
+      <a href="/dashboard.html" class="cta-button">Acceder al Dashboard</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <h1>
+        Chatbots Personalizados con <span class="highlight">IA</span><br>
+        para tu Sitio Web
+      </h1>
+      <p>
+        Crea un asistente virtual potenciado por ChatGPT que responde automáticamente 
+        hasta el 80% de las consultas de tus clientes. Disponible 24/7, integración en minutos.
+      </p>
+      <div class="hero-buttons">
+        <a href="/dashboard.html" class="cta-button-large">
+          Crear Mi Chatbot <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="#how-it-works" class="cta-button-large cta-button-secondary">
+          Ver Demo <i class="fas fa-play"></i>
+        </a>
+      </div>
+      <div class="hero-badges">
+        <div class="badge">
+          <i class="fas fa-check-circle"></i>
+          Sin tarjeta de crédito
+        </div>
+        <div class="badge">
+          <i class="fas fa-check-circle"></i>
+          Más de 80 idiomas
+        </div>
+        <div class="badge">
+          <i class="fas fa-check-circle"></i>
+          Integración inmediata
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="features">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-tag">Ventajas Principales</div>
+        <h2 class="section-title">Resuelve hasta el 80% de consultas con IA</h2>
+        <p class="section-description">
+          Añade el poder de ChatGPT a tu sitio web y responde a tus clientes 24/7, 
+          incluso mientras duermes. Sin necesidad de programación.
+        </p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+          <h3>Integración Sencilla</h3>
+          <p>
+            Simplemente añade una línea de código en tu sitio web para integrar 
+            el chatbot. Configuración en menos de 5 minutos.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-palette"></i>
+          </div>
+          <h3>Totalmente Personalizable</h3>
+          <p>
+            Personaliza tu chatbot en todos los aspectos, desde su estilo hasta 
+            su comportamiento, alineándolo con tu marca perfectamente.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <h3>Entrenamiento Inteligente</h3>
+          <p>
+            Entrena tu chatbot con contenido ilimitado de múltiples fuentes: 
+            archivos, URLs, documentos y más.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-comments"></i>
+          </div>
+          <h3>Respuestas Rápidas</h3>
+          <p>
+            Configura respuestas predefinidas con botones interactivos para 
+            guiar a tus usuarios hacia las respuestas más comunes.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3>Mejora Continua</h3>
+          <p>
+            Revisa las conversaciones de tus clientes con el chatbot para mejorar 
+            su conocimiento y precisión con el tiempo.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-globe"></i>
+          </div>
+          <h3>Multiidioma</h3>
+          <p>
+            Soporta más de 80 idiomas automáticamente. Tu chatbot puede 
+            comunicarse con clientes de todo el mundo.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>Captura de Leads</h3>
+          <p>
+            Recopila información de contacto de tus visitantes automáticamente 
+            durante las conversaciones para aumentar tus conversiones.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-plug"></i>
+          </div>
+          <h3>API Completa</h3>
+          <p>
+            Accede a nuestra API REST para integrar el chatbot en tus aplicaciones 
+            y sistemas personalizados.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3>Seguro y Confiable</h3>
+          <p>
+            Tus datos y los de tus clientes están protegidos con encriptación 
+            de nivel empresarial y cumplimiento de normativas.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="how-it-works">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-tag">Proceso Simple</div>
+        <h2 class="section-title">Integra tu chatbot en minutos</h2>
+        <p class="section-description">
+          La atención al cliente no tiene que ser difícil y consumir tiempo. 
+          Con nuestro sistema, puedes entrenar e integrar un chatbot en pocos clics.
+        </p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Conecta Fuentes de Datos</h3>
+          <p>
+            Alimenta la IA con tu sitio web, archivos o documentos para entrenar 
+            un chatbot con los detalles de tu negocio.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Personaliza y Configura</h3>
+          <p>
+            Ajusta el diseño, comportamiento y respuestas predefinidas para que 
+            se alinee perfectamente con tu marca.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Integra en tu Web</h3>
+          <p>
+            Copia el código de integración y pégalo en tu sitio web. 
+            Tu chatbot estará listo en segundos.
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3>Monitorea y Mejora</h3>
+          <p>
+            Revisa las interacciones de tus clientes con el chatbot para 
+            mejorar su conocimiento continuamente.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-tag">Ahorra Tiempo y Dinero</div>
+        <h2 class="section-title">Resultados que importan</h2>
+      </div>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">📈</div>
+          <h3>80%</h3>
+          <p>Consultas resueltas automáticamente</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">⚡</div>
+          <h3>24/7</h3>
+          <p>Disponibilidad continua sin descanso</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">💰</div>
+          <h3>-60%</h3>
+          <p>Reducción en costos de soporte</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">🌍</div>
+          <h3>80+</h3>
+          <p>Idiomas soportados nativamente</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-tag">Planes Flexibles</div>
+        <h2 class="section-title">Elige el plan perfecto para ti</h2>
+        <p class="section-description">
+          Comienza gratis y escala según tus necesidades. Sin compromisos, 
+          cancela cuando quieras.
+        </p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Gratis</h3>
+          <div class="pricing-price">$0<span>/mes</span></div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> 20 mensajes / mes</li>
+            <li><i class="fas fa-check"></i> 1 chatbot</li>
+            <li><i class="fas fa-check"></i> 10 contenidos de entrenamiento</li>
+            <li><i class="fas fa-check"></i> Captura de leads</li>
+            <li><i class="fas fa-check"></i> Integración ilimitada</li>
+          </ul>
+          <button class="pricing-button" onclick="window.location.href='/dashboard.html'">
+            Comenzar Gratis
+          </button>
+        </div>
+        
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Más Popular</div>
+          <h3>Starter</h3>
+          <div class="pricing-price">$29<span>/mes</span></div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> 2,000 mensajes / mes</li>
+            <li><i class="fas fa-check"></i> 5 chatbots</li>
+            <li><i class="fas fa-check"></i> 200 contenidos de entrenamiento</li>
+            <li><i class="fas fa-check"></i> Captura de leads</li>
+            <li><i class="fas fa-check"></i> Integración ilimitada</li>
+            <li><i class="fas fa-check"></i> Acceso API</li>
+            <li><i class="fas fa-check"></i> Sin marca de agua</li>
+          </ul>
+          <button class="pricing-button" onclick="window.location.href='/dashboard.html'">
+            Comenzar Ahora
+          </button>
+        </div>
+        
+        <div class="pricing-card">
+          <h3>Pro</h3>
+          <div class="pricing-price">$49<span>/mes</span></div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> 5,000 mensajes / mes</li>
+            <li><i class="fas fa-check"></i> 10 chatbots</li>
+            <li><i class="fas fa-check"></i> 500 contenidos de entrenamiento</li>
+            <li><i class="fas fa-check"></i> Captura de leads</li>
+            <li><i class="fas fa-check"></i> Integración ilimitada</li>
+            <li><i class="fas fa-check"></i> Acceso API completo</li>
+            <li><i class="fas fa-check"></i> Sin marca de agua</li>
+            <li><i class="fas fa-check"></i> Soporte prioritario</li>
+          </ul>
+          <button class="pricing-button" onclick="window.location.href='/dashboard.html'">
+            Comenzar Ahora
+          </button>
+        </div>
+        
+        <div class="pricing-card">
+          <h3>Enterprise</h3>
+          <div class="pricing-price">$89<span>/mes</span></div>
+          <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> Mensajes ilimitados</li>
+            <li><i class="fas fa-check"></i> Chatbots ilimitados</li>
+            <li><i class="fas fa-check"></i> Contenido ilimitado</li>
+            <li><i class="fas fa-check"></i> Captura de leads avanzada</li>
+            <li><i class="fas fa-check"></i> Integración ilimitada</li>
+            <li><i class="fas fa-check"></i> API empresarial</li>
+            <li><i class="fas fa-check"></i> Sin marca de agua</li>
+            <li><i class="fas fa-check"></i> Acceso a GPT-4</li>
+            <li><i class="fas fa-check"></i> Soporte dedicado</li>
+          </ul>
+          <button class="pricing-button" onclick="window.location.href='/dashboard.html'">
+            Comenzar Ahora
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="section-container">
+      <h2>¿Listo para transformar tu atención al cliente?</h2>
+      <p>
+        Únete a cientos de empresas que ya están usando IA para mejorar 
+        la experiencia de sus clientes.
+      </p>
+      <a href="/dashboard.html" class="cta-button-white">
+        Crear Mi Chatbot Gratis <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-section">
+        <h4>Producto</h4>
+        <ul class="footer-links">
+          <li><a href="#features">Características</a></li>
+          <li><a href="#how-it-works">Cómo Funciona</a></li>
+          <li><a href="#pricing">Precios</a></li>
+          <li><a href="/dashboard.html">Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Recursos</h4>
+        <ul class="footer-links">
+          <li><a href="#">Documentación</a></li>
+          <li><a href="#">API</a></li>
+          <li><a href="#">Guías</a></li>
+          <li><a href="#">Soporte</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Empresa</h4>
+        <ul class="footer-links">
+          <li><a href="#">Acerca de</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contacto</a></li>
+          <li><a href="#">Afiliados</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <ul class="footer-links">
+          <li><a href="#">Términos</a></li>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>2025 © Chatbot AI. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Chat Widget Demo -->
+  <script src="/chat-widget.js" 
+          data-api-url="http://localhost:3000/api"
+          data-api-key="demo_chatbot_001"
+          data-title="Asistente Virtual"
+          data-welcome="¡Hola! ¿En qué puedo ayudarte hoy?">
+  </script>
+</body>
+</html>

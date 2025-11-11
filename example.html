@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo - Chatbot Inteligente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .code {
+            background: #f1f3f4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ejemplo de Chatbot Inteligente</h1>
+        
+        <p>Esta página demuestra cómo integrar el chatbot inteligente en tu sitio web.</p>
+        
+        <div class="demo-section">
+            <h3>Características del chatbot:</h3>
+            <ul>
+                <li>✅ Chat en tiempo real</li>
+                <li>✅ Diseño responsive</li>
+                <li>✅ Entrenamiento personalizado</li>
+                <li>✅ Soporte para múltiples tipos de archivos</li>
+                <li>✅ Integración sencilla</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h3>Código de integración:</h3>
+            <div class="code">
+<!-- Agrega este código justo antes del </body> -->
+<script src="http://localhost:3000/widget.js" 
+        data-api-url="http://localhost:3000/api"
+        data-api-key="tu-api-key"
+        data-title="Asistente Virtual"
+        data-welcome="¡Hola! ¿En qué puedo ayudarte hoy?">
+</script>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>Personalización:</h3>
+            <p>Puedes personalizar el chatbot con estos parámetros:</p>
+            <ul>
+                <li><strong>data-title</strong>: Título del chat</li>
+                <li><strong>data-welcome</strong>: Mensaje de bienvenida</li>
+                <li><strong>data-position</strong>: bottom-right, bottom-left, top-right, top-left</li>
+                <li><strong>data-theme</strong>: default, dark, light</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h3>Instrucciones de uso:</h3>
+            <ol>
+                <li>Asegúrate de que el servidor esté ejecutándose en http://localhost:3000</li>
+                <li>Configura tu API key de OpenAI en el archivo .env</li>
+                <li>Entrena el modelo con tus documentos usando los endpoints de entrenamiento</li>
+                <li>Copia el código de integración arriba en tu sitio web</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Chatbot Widget - Descomenta para probar -->
+    <!--
+    <script src="http://localhost:3000/widget.js" 
+            data-api-url="http://localhost:3000/api"
+            data-api-key="tu-api-key"
+            data-title="Demo Chatbot"
+            data-welcome="¡Bienvenido! Este es un demo del chatbot inteligente.">
+    </script>
+    -->
+</body>
+</html>

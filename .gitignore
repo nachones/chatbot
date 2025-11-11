@@ -1,0 +1,51 @@
+# Dependencias
+node_modules/
+package-lock.json
+
+# Variables de entorno
+.env
+
+# Base de datos local
+database.sqlite
+*.db
+
+# Archivos de log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos subidos
+uploads/*
+!uploads/.gitkeep
+training-data/*
+!training-data/.gitkeep
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+
+# Temporales
+*.tmp
+*.temp
+.cache/
+
+# Builds
+dist/
+build/
+
+# Documentación de desarrollo (solo en dev)
+*.PNG
+*.png
+*.jpg
+*.jpeg
+Panel de configuracion/

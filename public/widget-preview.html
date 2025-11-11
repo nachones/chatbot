@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Preview</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+        }
+        .preview-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-info">
+        <h2>Widget Preview</h2>
+        <p>This is how your chatbot widget will appear on your website. Click the button in the bottom right corner to test it.</p>
+    </div>
+
+    <!-- Load the chatbot widget -->
+    <script src="/widget.js" 
+            data-api-url="http://localhost:3000/api"
+            data-title="Mi Asistente"
+            data-welcome="¡Hola! ¿En qué puedo ayudarte?">
+    </script>
+</body>
+</html>
