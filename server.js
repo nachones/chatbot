@@ -8,6 +8,16 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Crear directorios necesarios si no existen
+const requiredDirs = ['uploads', 'logs', 'training-data'];
+requiredDirs.forEach(dir => {
+  const dirPath = path.join(__dirname, dir);
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+    console.log(`✓ Directorio creado: ${dir}/`);
+  }
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
