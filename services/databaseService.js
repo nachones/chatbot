@@ -473,6 +473,39 @@ class DatabaseService {
     });
   }
 
+  async saveLead(leadData) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        `INSERT INTO leads (chatbot_id, name, email, phone, created_at) 
+         VALUES (?, ?, ?, ?, ?)`,
+        [
+          leadData.chatbot_id,
+          leadData.name,
+          leadData.email,
+          leadData.phone,
+          leadData.created_at || new Date().toISOString()
+        ],
+        function(err) {
+          if (err) reject(err);
+          else resolve(this.lastID);
+        }
+      );
+    });
+  }
+
+  async getLead(leadId) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT * FROM leads WHERE id = ?',
+        [leadId],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+  }
+
   async getLeads(chatbotId = null) {
     return new Promise((resolve, reject) => {
       const query = chatbotId
@@ -484,6 +517,19 @@ class DatabaseService {
         if (err) reject(err);
         else resolve(rows || []);
       });
+    });
+  }
+
+  async deleteLead(leadId) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'DELETE FROM leads WHERE id = ?',
+        [leadId],
+        function(err) {
+          if (err) reject(err);
+          else resolve({ deleted: this.changes });
+        }
+      );
     });
   }
 

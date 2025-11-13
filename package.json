@@ -4,8 +4,8 @@
   "description": "Sistema completo de chatbots multicliente con IA potenciados por ChatGPT",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node --max-old-space-size=4096 server.js",
+    "dev": "nodemon --max-old-space-size=4096 server.js",
     "test": "echo \"No tests configured yet\" && exit 0"
   },
   "dependencies": {

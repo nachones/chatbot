@@ -18,7 +18,12 @@ const trainingStorage = multer.diskStorage({
   }
 });
 
-const trainingUpload = multer({ storage: trainingStorage });
+const trainingUpload = multer({ 
+  storage: trainingStorage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // Límite de 10MB por archivo
+  }
+});
 
 // Instanciar servicios
 const trainingService = new TrainingService();

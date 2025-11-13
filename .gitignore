@@ -1,51 +1,88 @@
-# Dependencias
+# Dependencies
 node_modules/
-package-lock.json
-
-# Variables de entorno
-.env
-
-# Base de datos local
-database.sqlite
-*.db
-
-# Archivos de log
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Archivos subidos
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.sqlite
+*.sqlite-journal
+*.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+server.log
+
+# Uploads and training data
 uploads/*
 !uploads/.gitkeep
 training-data/*
 !training-data/.gitkeep
 
-# Sistema operativo
-.DS_Store
-Thumbs.db
-desktop.ini
+# Test files
+test-*.js
+test-*.json
+test-*.txt
+test-*.ps1
+*.test.js
+*.spec.js
 
-# IDE
+# Build and deployment
+dist/
+build/
+*.zip
+*.tar.gz
+*.rar
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp
 *.swo
-*.swn
 *~
+.DS_Store
+Thumbs.db
 
-# Temporales
+# Temporary files
 *.tmp
 *.temp
-.cache/
+*.bak
+*.backup
+*-old.*
+*-new.*
+*-complete.*
+*-simple.*
 
-# Builds
-dist/
-build/
+# Documentation drafts
+TODO.md
+CHECKLIST.md
+ESTADO_*.md
+NOTAS_*.md
 
-# Documentación de desarrollo (solo en dev)
-*.PNG
-*.png
-*.jpg
-*.jpeg
-Panel de configuracion/
+# Deployment scripts (keep only essential ones)
+build-*.ps1
+download.ps1
+*.sh
+
+# PM2
+.pm2/
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Debug
+debug-*.js

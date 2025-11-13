@@ -1151,6 +1151,12 @@
             console.error('Error:', error);
             uploadStatus.textContent = 'Subida fallida';
             showToast('Error al subir archivos', 'error');
+            
+            // Ocultar progreso después de 3 segundos en caso de error
+            setTimeout(() => {
+                progressContainer.classList.add('hidden');
+                progressFill.style.width = '0%';
+            }, 3000);
         }
     }
 

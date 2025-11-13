@@ -86,25 +86,70 @@ class TrainingService {
     }
   }
 
-  async searchRelevantContent(query, limit = 5) {
+  async searchRelevantContent(query, limit = 5, chatbotId = null) {
     try {
-      // Obtener todos los datos de entrenamiento
-      const allData = await this.db.getAvailableTrainingData();
+      // Obtener todos los datos de entrenamiento del chatbot específico
+      const allData = await this.db.getAvailableTrainingData(chatbotId);
       
-      // Implementar búsqueda básica por similitud
-      // En producción usaría embeddings y búsqueda vectorial
+      if (!allData || allData.length === 0) {
+        return [];
+      }
+      
+      // Implementar búsqueda mejorada por similitud
       const relevantContent = [];
+      const queryLower = query.toLowerCase();
+      const queryWords = queryLower.split(/\s+/).filter(word => word.length > 3);
       
       for (const training of allData) {
         const data = await this.db.getTrainingData(training.training_id);
-        const relevantChunks = data.filter(chunk => 
-          chunk.content.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, limit);
+        
+        // Calcular relevancia de cada chunk
+        const scoredChunks = data.map(chunk => {
+          const contentLower = chunk.content.toLowerCase();
+          let score = 0;
+          
+          // Búsqueda exacta de la query completa (mayor peso)
+          if (contentLower.includes(queryLower)) {
+            score += 10;
+          }
+          
+          // Búsqueda por palabras individuales
+          queryWords.forEach(word => {
+            if (contentLower.includes(word)) {
+              score += 2;
+            }
+          });
+          
+          // Bonus por palabras al inicio del chunk (más relevante)
+          const firstWords = contentLower.substring(0, 200);
+          queryWords.forEach(word => {
+            if (firstWords.includes(word)) {
+              score += 1;
+            }
+          });
+          
+          return {
+            ...chunk,
+            relevanceScore: score
+          };
+        });
+        
+        // Filtrar chunks con score > 0 y ordenar por relevancia
+        const relevantChunks = scoredChunks
+          .filter(chunk => chunk.relevanceScore > 0)
+          .sort((a, b) => b.relevanceScore - a.relevanceScore);
         
         relevantContent.push(...relevantChunks);
       }
       
-      return relevantContent.slice(0, limit);
+      // Ordenar todos los chunks por relevancia y limitar
+      const sortedContent = relevantContent
+        .sort((a, b) => b.relevanceScore - a.relevanceScore)
+        .slice(0, limit);
+      
+      console.log(`Búsqueda: "${query}" - Encontrados ${sortedContent.length} chunks relevantes`);
+      
+      return sortedContent;
     } catch (error) {
       console.error('Error buscando contenido relevante:', error);
       return [];

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Pruebas Locales - MIABOT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 3em;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .test-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        
+        .test-card h2 {
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .test-card p {
+            color: #666;
+            margin-bottom: 16px;
+            font-size: 0.95em;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+        
+        .test-button:hover {
+            opacity: 0.9;
+        }
+        
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .summary {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .summary h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 3em;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .success-color { color: #28a745; }
+        .error-color { color: #dc3545; }
+        
+        .run-all {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin: 30px auto;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .run-all:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Pruebas Locales MIABOT</h1>
+        
+        <button class="run-all" onclick="runAllTests()">▶️ Ejecutar Todas las Pruebas</button>
+        
+        <div class="test-grid" id="testGrid"></div>
+        
+        <div class="summary">
+            <h2>📊 Resumen de Pruebas</h2>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-value success-color" id="passedCount">0</span>
+                    <span class="stat-label">Exitosas</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value error-color" id="failedCount">0</span>
+                    <span class="stat-label">Fallidas</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="totalCount">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tests = [
+            {
+                name: '🏠 Landing Page',
+                description: 'Verifica que la página principal cargue correctamente',
+                endpoint: '/',
+                method: 'GET'
+            },
+            {
+                name: '📊 Dashboard',
+                description: 'Verifica acceso al panel de administración',
+                endpoint: '/dashboard',
+                method: 'GET'
+            },
+            {
+                name: '💬 Widget JavaScript',
+                description: 'Verifica que el script del widget esté disponible',
+                endpoint: '/chat-widget.js',
+                method: 'GET'
+            },
+            {
+                name: '📋 Lista de Chatbots',
+                description: 'Obtiene la lista de todos los chatbots',
+                endpoint: '/api/chatbots',
+                method: 'GET',
+                isJson: true
+            },
+            {
+                name: '🎨 CSS Dashboard',
+                description: 'Verifica que los estilos del dashboard carguen',
+                endpoint: '/css/dashboard.css',
+                method: 'GET'
+            },
+            {
+                name: '⚡ JS Dashboard',
+                description: 'Verifica que el JavaScript del dashboard cargue',
+                endpoint: '/js/dashboard.js',
+                method: 'GET'
+            },
+            {
+                name: '🎯 Respuestas Rápidas',
+                description: 'API de respuestas rápidas (puede fallar si no hay chatbots)',
+                endpoint: '/api/quick-prompts/1',
+                method: 'GET',
+                isJson: true,
+                allowFail: true
+            },
+            {
+                name: '📝 Widget Preview',
+                description: 'Vista previa del widget de chat',
+                endpoint: '/widget-preview.html',
+                method: 'GET'
+            },
+            {
+                name: '🧪 Página de Ejemplo',
+                description: 'Página de demostración del widget',
+                endpoint: '/example',
+                method: 'GET'
+            }
+        ];
+
+        let passedCount = 0;
+        let failedCount = 0;
+
+        function createTestCard(test, index) {
+            return `
+                <div class="test-card" id="test-${index}">
+                    <h2>${test.name}</h2>
+                    <p>${test.description}</p>
+                    <button class="test-button" onclick="runTest(${index})">Probar</button>
+                    <div class="result" id="result-${index}"></div>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('passedCount').textContent = passedCount;
+            document.getElementById('failedCount').textContent = failedCount;
+            document.getElementById('totalCount').textContent = passedCount + failedCount;
+        }
+
+        async function runTest(index) {
+            const test = tests[index];
+            const resultDiv = document.getElementById(`result-${index}`);
+            const button = document.getElementById(`test-${index}`).querySelector('.test-button');
+            
+            button.disabled = true;
+            button.textContent = '⏳ Probando...';
+            resultDiv.className = 'result info';
+            resultDiv.textContent = 'Ejecutando prueba...';
+
+            try {
+                const response = await fetch(test.endpoint, { method: test.method });
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ OK - Status: ${response.status}`;
+                    
+                    if (test.isJson) {
+                        const data = await response.json();
+                        resultDiv.textContent += ` | Datos: ${JSON.stringify(data).substring(0, 100)}...`;
+                    }
+                    
+                    passedCount++;
+                } else if (test.allowFail) {
+                    resultDiv.className = 'result info';
+                    resultDiv.textContent = `ℹ️ Status ${response.status} - Puede ser normal si no hay datos`;
+                } else {
+                    throw new Error(`Status ${response.status}`);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+                failedCount++;
+            }
+
+            button.disabled = false;
+            button.textContent = 'Probar de nuevo';
+            updateStats();
+        }
+
+        async function runAllTests() {
+            passedCount = 0;
+            failedCount = 0;
+            
+            for (let i = 0; i < tests.length; i++) {
+                await runTest(i);
+                await new Promise(resolve => setTimeout(resolve, 300)); // Pequeña pausa entre pruebas
+            }
+            
+            alert(`Pruebas completadas!\n✅ Exitosas: ${passedCount}\n❌ Fallidas: ${failedCount}`);
+        }
+
+        // Inicializar el grid de pruebas
+        document.getElementById('testGrid').innerHTML = tests.map((test, index) => 
+            createTestCard(test, index)
+        ).join('');
+    </script>
+</body>
+</html>

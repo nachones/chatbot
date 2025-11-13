@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
@@ -8,102 +7,142 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Crear directorios necesarios si no existen
+console.log('Inicializando servidor MIABOT...\n');
+
+// Crear directorios necesarios
 const requiredDirs = ['uploads', 'logs', 'training-data'];
 requiredDirs.forEach(dir => {
-  const dirPath = path.join(__dirname, dir);
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
     console.log(`✓ Directorio creado: ${dir}/`);
   }
 });
 
-// Middleware
+// Middleware básico
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static('public'));
 
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
-// Configuración de multer para subida de archivos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = 'uploads/';
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+// Rutas básicas
+app.get('/', (req, res) => {
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.send('<h1>MIABOT Server</h1><p>El servidor está funcionando correctamente.</p>');
   }
 });
 
-const upload = multer({ storage: storage });
-
-// Importar rutas
-const apiRoutes = require('./routes/api');
-const trainingRoutes = require('./routes/training');
-const dashboardRoutes = require('./routes/dashboard');
-const chatbotsRoutes = require('./routes/chatbots');
-
-// Importar rutas de funciones
-const functionsRoutes = require('./routes/functions');
-const quickPromptsRoutes = require('./routes/quickPrompts');
-const usageRoutes = require('./routes/usage');
-
-// Usar rutas
-app.use('/api', apiRoutes);
-app.use('/api/training', trainingRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/chatbots', chatbotsRoutes);
-app.use('/api/functions', functionsRoutes);
-app.use('/api/quick-prompts', quickPromptsRoutes);
-app.use('/api/usage', usageRoutes);
-
-// Servir el widget
-app.get('/widget.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'chat-widget.js'));
-});
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Servir landing page principal
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Servir página de ejemplo
-app.get('/example', (req, res) => {
-  res.sendFile(path.join(__dirname, 'example.html'));
-});
-
-// Servir dashboard
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
-// Servir widget preview
-app.get('/widget-preview.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'widget-preview.html'));
+app.get('/widget.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'chat-widget.js'));
 });
 
-// Servir archivos estáticos adicionales
-app.use(express.static(__dirname));
+app.get('/example.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'example.html'));
+});
 
-// Manejo de errores global
+// Cargar rutas con manejo de errores
+console.log('\nCargando rutas...');
+
+try {
+  const apiRoutes = require('./routes/api');
+  app.use('/api', apiRoutes);
+  console.log('✓ API routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando API routes:', error.message);
+}
+
+try {
+  const chatbotsRoutes = require('./routes/chatbots');
+  app.use('/api/chatbots', chatbotsRoutes);
+  console.log('✓ Chatbots routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Chatbots routes:', error.message);
+}
+
+try {
+  const dashboardRoutes = require('./routes/dashboard');
+  app.use('/api/dashboard', dashboardRoutes);
+  console.log('✓ Dashboard routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Dashboard routes:', error.message);
+}
+
+try {
+  const trainingRoutes = require('./routes/training');
+  app.use('/api/training', trainingRoutes);
+  console.log('✓ Training routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Training routes:', error.message);
+}
+
+try {
+  const functionsRoutes = require('./routes/functions');
+  app.use('/api/functions', functionsRoutes);
+  console.log('✓ Functions routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Functions routes:', error.message);
+}
+
+try {
+  const quickPromptsRoutes = require('./routes/quickPrompts');
+  app.use('/api/quick-prompts', quickPromptsRoutes);
+  console.log('✓ Quick Prompts routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Quick Prompts routes:', error.message);
+}
+
+try {
+  const usageRoutes = require('./routes/usage');
+  app.use('/api/usage', usageRoutes);
+  console.log('✓ Usage routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Usage routes:', error.message);
+}
+
+// Manejo de errores
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ error: 'Error interno del servidor' });
+  console.error('Error en request:', err);
+  res.status(500).json({ error: 'Error interno del servidor', message: err.message });
 });
 
-
-
+// 404
+app.use((req, res) => {
+  res.status(404).json({ error: 'Ruta no encontrada' });
+});
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+console.log(`\nIniciando servidor en puerto ${PORT}...\n`);
+
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log('✓ Servidor MIABOT ejecutándose correctamente');
+  console.log(`  - http://localhost:${PORT}`);
+  console.log(`  - http://127.0.0.1:${PORT}`);
+  console.log(`  - PID: ${process.pid}\n`);
 });
+
+server.on('error', (error) => {
+  console.error('✗ Error en servidor:', error);
+  process.exit(1);
+});
+
+// Mantener el proceso vivo y loguear cada 30 segundos
+setInterval(() => {
+  console.log(`[${new Date().toLocaleTimeString()}] Servidor activo - Uptime: ${Math.floor(process.uptime())}s`);
+}, 30000);
+
+module.exports = app;

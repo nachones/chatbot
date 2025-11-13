@@ -19,6 +19,14 @@ class DocumentProcessor {
 
   async processFile(filePath, mimeType) {
     try {
+      // Verificar tamaño del archivo (límite 10MB)
+      const stats = await fs.stat(filePath);
+      const fileSizeInMB = stats.size / (1024 * 1024);
+      
+      if (fileSizeInMB > 10) {
+        throw new Error(`El archivo es demasiado grande (${fileSizeInMB.toFixed(2)}MB). Límite: 10MB`);
+      }
+
       const processor = this.supportedTypes[mimeType];
       if (!processor) {
         throw new Error(`Tipo de archivo no soportado: ${mimeType}`);
@@ -96,10 +104,21 @@ class DocumentProcessor {
 
   chunkContent(content, chunkSize = 1000, overlap = 200) {
     const chunks = [];
+    
+    // Limitar contenido a 100,000 caracteres para evitar memory overflow
+    const maxContentLength = 100000;
+    if (content.length > maxContentLength) {
+      content = content.substring(0, maxContentLength);
+      console.warn(`Contenido truncado a ${maxContentLength} caracteres para evitar problemas de memoria`);
+    }
+    
     const words = content.split(/\s+/);
     
+    // Limitar número de chunks para evitar consumir toda la memoria
+    const maxChunks = 50;
+    
     let start = 0;
-    while (start < words.length) {
+    while (start < words.length && chunks.length < maxChunks) {
       const end = Math.min(start + chunkSize, words.length);
       const chunk = words.slice(start, end).join(' ');
       

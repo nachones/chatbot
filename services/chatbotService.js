@@ -1,10 +1,12 @@
 const OpenAI = require('openai');
 const DatabaseService = require('./databaseService');
+const TrainingService = require('./trainingService');
 
 class ChatbotService {
   constructor() {
     this.openai = null;
     this.db = new DatabaseService();
+    this.trainingService = new TrainingService();
     this.systemPrompt = 'Eres un asistente inteligente y útil. Responde de manera clara y concisa.';
   }
 
@@ -43,10 +45,41 @@ class ChatbotService {
       const history = await this.db.getConversationHistory(sessionId);
       
       // Usar el system prompt del chatbot o el por defecto
-      const systemPrompt = chatbotConfig?.system_prompt || this.systemPrompt;
+      let systemPrompt = chatbotConfig?.system_prompt || this.systemPrompt;
       const model = chatbotConfig?.model || 'gpt-3.5-turbo';
       const temperature = chatbotConfig?.temperature || 0.7;
       const maxTokens = chatbotConfig?.max_tokens || 500;
+      
+      // 🔥 BUSCAR CONTENIDO RELEVANTE EN TRAINING DATA
+      let contextText = '';
+      if (chatbotId) {
+        try {
+          const relevantChunks = await this.trainingService.searchRelevantContent(
+            message, 
+            5, 
+            chatbotId
+          );
+          
+          if (relevantChunks && relevantChunks.length > 0) {
+            contextText = relevantChunks
+              .map(chunk => chunk.content)
+              .join('\n\n---\n\n');
+            
+            // Enriquecer el system prompt con el contexto
+            systemPrompt = `${systemPrompt}
+
+CONTEXTO RELEVANTE DE LA BASE DE CONOCIMIENTOS:
+${contextText}
+
+Usa esta información para responder de manera precisa y detallada. Si la pregunta del usuario está relacionada con este contexto, úsalo en tu respuesta. Si no está relacionado, responde normalmente basándote en tu conocimiento general.`;
+            
+            console.log(`✓ Encontrados ${relevantChunks.length} chunks relevantes para la consulta`);
+          }
+        } catch (error) {
+          console.error('Error buscando contenido relevante:', error);
+          // Continuar sin contexto si hay error
+        }
+      }
       
       // Construir mensajes para OpenAI
       const messages = [

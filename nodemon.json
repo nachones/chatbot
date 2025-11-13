@@ -1,0 +1,34 @@
+{
+  "verbose": false,
+  "ignore": [
+    "*.sqlite",
+    "*.sqlite-journal",
+    "*.log",
+    "logs/*",
+    "uploads/*",
+    "training-data/*",
+    "node_modules/*",
+    ".git/*",
+    "*.md",
+    "*.txt",
+    "test-*.js",
+    "test-*.json",
+    "*.zip",
+    "*.ps1",
+    ".env",
+    ".env.*"
+  ],
+  "watch": [
+    "server.js",
+    "routes/**/*.js",
+    "services/**/*.js",
+    "public/**/*.js",
+    "public/**/*.html",
+    "public/**/*.css"
+  ],
+  "ext": "js,json,html,css",
+  "delay": 1000,
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
