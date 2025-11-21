@@ -7,143 +7,182 @@ class DatabaseService {
     this.initTables();
   }
 
-  initTables() {
-    // Tabla de chatbots (clientes)
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS chatbots (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        description TEXT,
-        api_key TEXT,
-        model TEXT DEFAULT 'gpt-3.5-turbo',
-        system_prompt TEXT,
-        temperature REAL DEFAULT 0.7,
-        max_tokens INTEGER DEFAULT 500,
-        widget_color TEXT DEFAULT '#007bff',
-        widget_position TEXT DEFAULT 'bottom-right',
-        widget_title TEXT DEFAULT 'Chat Assistant',
-        welcome_message TEXT DEFAULT '¡Hola! ¿En qué puedo ayudarte?',
-        appearance_settings TEXT,
-        is_active INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+  async tableExists(tableName) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+        [tableName],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(!!row);
+        }
+      );
+    });
+  }
 
-    // Agregar columna appearance_settings si no existe (para bases de datos existentes)
-    this.db.run(`
-      ALTER TABLE chatbots ADD COLUMN appearance_settings TEXT
-    `, (err) => {
-      // Ignorar error si la columna ya existe
-      if (err && !err.message.includes('duplicate column name')) {
-        console.error('Error adding appearance_settings column:', err);
+  safeAddColumn(tableName, columnName, columnDef) {
+    this.db.all(`PRAGMA table_info(${tableName})`, (err, rows) => {
+      if (err) {
+        console.error(`Error checking table info for ${tableName}:`, err);
+        return;
+      }
+      const exists = rows.some(row => row.name === columnName);
+      if (!exists) {
+        this.db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`, (err) => {
+          if (err) console.error(`Error adding column ${columnName} to ${tableName}:`, err);
+          else console.log(`✓ Columna ${columnName} agregada a ${tableName}`);
+        });
       }
     });
+  }
 
-    // Agregar columnas de uso y plan
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN plan TEXT DEFAULT 'free'`, () => { });
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN tokens_used INTEGER DEFAULT 0`, () => { });
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN tokens_limit INTEGER DEFAULT 7000`, () => { });
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN messages_used INTEGER DEFAULT 0`, () => { });
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN reset_date TEXT`, () => { });
+  async initTables() {
+    try {
+      // Tabla de chatbots
+      if (!(await this.tableExists('chatbots'))) {
+        this.db.run(`
+          CREATE TABLE chatbots (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            description TEXT,
+            api_key TEXT,
+            model TEXT DEFAULT 'gpt-3.5-turbo',
+            system_prompt TEXT,
+            temperature REAL DEFAULT 0.7,
+            max_tokens INTEGER DEFAULT 500,
+            widget_color TEXT DEFAULT '#007bff',
+            widget_position TEXT DEFAULT 'bottom-right',
+            widget_title TEXT DEFAULT 'Chat Assistant',
+            welcome_message TEXT DEFAULT '¡Hola! ¿En qué puedo ayudarte?',
+            appearance_settings TEXT,
+            is_active INTEGER DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+      }
 
-    // Tabla de conversaciones (ahora con chatbot_id)
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS conversations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chatbot_id TEXT,
-        session_id TEXT NOT NULL,
-        role TEXT NOT NULL,
-        content TEXT NOT NULL,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+      // Columnas adicionales para chatbots
+      this.safeAddColumn('chatbots', 'appearance_settings', 'TEXT');
+      this.safeAddColumn('chatbots', 'plan', "TEXT DEFAULT 'free'");
+      this.safeAddColumn('chatbots', 'tokens_used', "INTEGER DEFAULT 0");
+      this.safeAddColumn('chatbots', 'tokens_limit', "INTEGER DEFAULT 7000");
+      this.safeAddColumn('chatbots', 'messages_used', "INTEGER DEFAULT 0");
+      this.safeAddColumn('chatbots', 'reset_date', "TEXT");
 
-    // Tabla de configuración
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS config (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+      // Tabla de conversaciones
+      if (!(await this.tableExists('conversations'))) {
+        this.db.run(`
+          CREATE TABLE conversations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chatbot_id TEXT,
+            session_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+      }
 
-    // Tabla de datos de entrenamiento (ahora con chatbot_id y embedding)
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS training_data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chatbot_id TEXT,
-        training_id TEXT NOT NULL,
-        content TEXT NOT NULL,
-        metadata TEXT,
-        embedding TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+      // Tabla de configuración
+      if (!(await this.tableExists('config'))) {
+        this.db.run(`
+          CREATE TABLE config (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+      }
 
-    // Agregar columna embedding si no existe
-    this.db.run(`ALTER TABLE training_data ADD COLUMN embedding TEXT`, () => { });
+      // Tabla de datos de entrenamiento
+      if (!(await this.tableExists('training_data'))) {
+        this.db.run(`
+          CREATE TABLE training_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chatbot_id TEXT,
+            training_id TEXT NOT NULL,
+            content TEXT NOT NULL,
+            metadata TEXT,
+            embedding TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+      }
+      this.safeAddColumn('training_data', 'embedding', 'TEXT');
 
-    // Tabla de trabajos de entrenamiento (ahora con chatbot_id)
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS training_jobs (
-        id TEXT PRIMARY KEY,
-        chatbot_id TEXT,
-        status TEXT NOT NULL,
-        training_id TEXT NOT NULL,
-        model_type TEXT,
-        started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        completed_at DATETIME,
-        error_message TEXT
-      )
-    `);
+      // Tabla de trabajos de entrenamiento
+      if (!(await this.tableExists('training_jobs'))) {
+        this.db.run(`
+          CREATE TABLE training_jobs (
+            id TEXT PRIMARY KEY,
+            chatbot_id TEXT,
+            status TEXT NOT NULL,
+            training_id TEXT NOT NULL,
+            model_type TEXT,
+            started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            completed_at DATETIME,
+            error_message TEXT
+          )
+        `);
+      }
 
-    // Tabla de leads (ahora con chatbot_id)
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS leads (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chatbot_id TEXT,
-        name TEXT,
-        email TEXT,
-        phone TEXT,
-        source TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+      // Tabla de leads
+      if (!(await this.tableExists('leads'))) {
+        this.db.run(`
+          CREATE TABLE leads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chatbot_id TEXT,
+            name TEXT,
+            email TEXT,
+            phone TEXT,
+            source TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+      }
 
-    // Tabla de funciones personalizadas
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS functions (
-        id TEXT PRIMARY KEY,
-        chatbot_id TEXT NOT NULL,
-        name TEXT NOT NULL,
-        description TEXT NOT NULL,
-        endpoint TEXT NOT NULL,
-        method TEXT DEFAULT 'POST',
-        headers TEXT,
-        parameters TEXT,
-        enabled INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (chatbot_id) REFERENCES chatbots(id)
-      )
-    `);
+      // Tabla de funciones
+      if (!(await this.tableExists('functions'))) {
+        this.db.run(`
+          CREATE TABLE functions (
+            id TEXT PRIMARY KEY,
+            chatbot_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            endpoint TEXT NOT NULL,
+            method TEXT DEFAULT 'POST',
+            headers TEXT,
+            parameters TEXT,
+            enabled INTEGER DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (chatbot_id) REFERENCES chatbots(id)
+          )
+        `);
+      }
 
-    // Tabla de Quick Prompts (Respuestas Rápidas)
-    this.db.run(`
-      CREATE TABLE IF NOT EXISTS quick_prompts (
-        id TEXT PRIMARY KEY,
-        chatbot_id TEXT NOT NULL,
-        button_title TEXT NOT NULL,
-        link TEXT,
-        prompt TEXT,
-        order_index INTEGER DEFAULT 0,
-        enabled INTEGER DEFAULT 1,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (chatbot_id) REFERENCES chatbots(id)
-      )
-    `);
+      // Tabla de Quick Prompts
+      if (!(await this.tableExists('quick_prompts'))) {
+        this.db.run(`
+          CREATE TABLE quick_prompts (
+            id TEXT PRIMARY KEY,
+            chatbot_id TEXT NOT NULL,
+            button_title TEXT NOT NULL,
+            link TEXT,
+            prompt TEXT,
+            order_index INTEGER DEFAULT 0,
+            enabled INTEGER DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (chatbot_id) REFERENCES chatbots(id)
+          )
+        `);
+      }
+
+    } catch (error) {
+      console.error('Error initializing tables:', error);
+    }
   }
 
   async saveMessage(sessionId, role, content, chatbotId = null) {
@@ -804,205 +843,6 @@ class DatabaseService {
         }
       );
     });
-  }
-
-  // ============================================
-  // Quick Prompts Methods
-  // ============================================
-
-  async createQuickPrompt(promptData) {
-    return new Promise((resolve, reject) => {
-      const id = `prompt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const { chatbotId, buttonTitle, link, prompt, orderIndex = 0 } = promptData;
-
-      this.db.run(
-        `INSERT INTO quick_prompts (id, chatbot_id, button_title, link, prompt, order_index) 
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [id, chatbotId, buttonTitle, link || null, prompt || null, orderIndex],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ id, ...promptData });
-        }
-      );
-    });
-  }
-
-  async getQuickPrompts(chatbotId) {
-    return new Promise((resolve, reject) => {
-      this.db.all(
-        `SELECT * FROM quick_prompts 
-         WHERE chatbot_id = ? AND enabled = 1 
-         ORDER BY order_index ASC, created_at ASC`,
-        [chatbotId],
-        (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows || []);
-        }
-      );
-    });
-  }
-
-  async getQuickPrompt(promptId) {
-    return new Promise((resolve, reject) => {
-      this.db.get(
-        'SELECT * FROM quick_prompts WHERE id = ?',
-        [promptId],
-        (err, row) => {
-          if (err) reject(err);
-          else resolve(row);
-        }
-      );
-    });
-  }
-
-  async updateQuickPrompt(promptId, promptData) {
-    return new Promise((resolve, reject) => {
-      const fields = [];
-      const values = [];
-
-      if (promptData.buttonTitle !== undefined) {
-        fields.push('button_title = ?');
-        values.push(promptData.buttonTitle);
-      }
-      if (promptData.link !== undefined) {
-        fields.push('link = ?');
-        values.push(promptData.link || null);
-      }
-      if (promptData.prompt !== undefined) {
-        fields.push('prompt = ?');
-        values.push(promptData.prompt || null);
-      }
-      if (promptData.orderIndex !== undefined) {
-        fields.push('order_index = ?');
-        values.push(promptData.orderIndex);
-      }
-      if (promptData.enabled !== undefined) {
-        fields.push('enabled = ?');
-        values.push(promptData.enabled ? 1 : 0);
-      }
-
-      fields.push('updated_at = CURRENT_TIMESTAMP');
-      values.push(promptId);
-
-      this.db.run(
-        `UPDATE quick_prompts SET ${fields.join(', ')} WHERE id = ?`,
-        values,
-        function (err) {
-          if (err) reject(err);
-          else resolve({ promptId, ...promptData });
-        }
-      );
-    });
-  }
-
-  async deleteQuickPrompt(promptId) {
-    return new Promise((resolve, reject) => {
-      this.db.run(
-        'DELETE FROM quick_prompts WHERE id = ?',
-        [promptId],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ deleted: this.changes });
-        }
-      );
-    });
-  }
-
-  // Métodos para gestión de uso de tokens
-  async updateTokenUsage(chatbotId, tokensUsed) {
-    return new Promise((resolve, reject) => {
-      // Convertir tokens a mensajes equivalentes (1 mensaje = 350 tokens)
-      const messagesEquivalent = Math.ceil(tokensUsed / 350);
-
-      this.db.run(
-        `UPDATE chatbots 
-         SET tokens_used = tokens_used + ?,
-             messages_used = messages_used + ?,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?`,
-        [tokensUsed, messagesEquivalent, chatbotId],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ tokensUsed, messagesEquivalent });
-        }
-      );
-    });
-  }
-
-  async getUsageStats(chatbotId) {
-    return new Promise((resolve, reject) => {
-      this.db.get(
-        `SELECT 
-          plan,
-          tokens_used,
-          tokens_limit,
-          messages_used,
-          reset_date,
-          CASE plan
-            WHEN 'free' THEN 20
-            WHEN 'starter' THEN 2000
-            WHEN 'pro' THEN 5000
-            WHEN 'enterprise' THEN 10000
-            ELSE 20
-          END as messages_limit
-         FROM chatbots 
-         WHERE id = ?`,
-        [chatbotId],
-        (err, row) => {
-          if (err) reject(err);
-          else resolve(row);
-        }
-      );
-    });
-  }
-
-  async resetMonthlyUsage(chatbotId) {
-    return new Promise((resolve, reject) => {
-      const nextResetDate = new Date();
-      nextResetDate.setMonth(nextResetDate.getMonth() + 1);
-
-      this.db.run(
-        `UPDATE chatbots 
-         SET tokens_used = 0,
-             messages_used = 0,
-             reset_date = ?,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?`,
-        [nextResetDate.toISOString(), chatbotId],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ reset: true });
-        }
-      );
-    });
-  }
-
-  async updatePlan(chatbotId, plan) {
-    return new Promise((resolve, reject) => {
-      const limits = {
-        free: 7000,        // 20 mensajes * 350 tokens
-        starter: 700000,   // 2000 mensajes * 350 tokens
-        pro: 1750000,      // 5000 mensajes * 350 tokens
-        enterprise: 3500000 // 10000 mensajes * 350 tokens
-      };
-
-      this.db.run(
-        `UPDATE chatbots 
-         SET plan = ?,
-             tokens_limit = ?,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?`,
-        [plan, limits[plan] || 7000, chatbotId],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ plan, tokensLimit: limits[plan] });
-        }
-      );
-    });
-  }
-
-  close() {
-    this.db.close();
   }
 }
 
