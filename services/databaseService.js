@@ -41,11 +41,11 @@ class DatabaseService {
     });
 
     // Agregar columnas de uso y plan
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN plan TEXT DEFAULT 'free'`, () => {});
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN tokens_used INTEGER DEFAULT 0`, () => {});
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN tokens_limit INTEGER DEFAULT 7000`, () => {});
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN messages_used INTEGER DEFAULT 0`, () => {});
-    this.db.run(`ALTER TABLE chatbots ADD COLUMN reset_date TEXT`, () => {});
+    this.db.run(`ALTER TABLE chatbots ADD COLUMN plan TEXT DEFAULT 'free'`, () => { });
+    this.db.run(`ALTER TABLE chatbots ADD COLUMN tokens_used INTEGER DEFAULT 0`, () => { });
+    this.db.run(`ALTER TABLE chatbots ADD COLUMN tokens_limit INTEGER DEFAULT 7000`, () => { });
+    this.db.run(`ALTER TABLE chatbots ADD COLUMN messages_used INTEGER DEFAULT 0`, () => { });
+    this.db.run(`ALTER TABLE chatbots ADD COLUMN reset_date TEXT`, () => { });
 
     // Tabla de conversaciones (ahora con chatbot_id)
     this.db.run(`
@@ -68,7 +68,7 @@ class DatabaseService {
       )
     `);
 
-    // Tabla de datos de entrenamiento (ahora con chatbot_id)
+    // Tabla de datos de entrenamiento (ahora con chatbot_id y embedding)
     this.db.run(`
       CREATE TABLE IF NOT EXISTS training_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -76,9 +76,13 @@ class DatabaseService {
         training_id TEXT NOT NULL,
         content TEXT NOT NULL,
         metadata TEXT,
+        embedding TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Agregar columna embedding si no existe
+    this.db.run(`ALTER TABLE training_data ADD COLUMN embedding TEXT`, () => { });
 
     // Tabla de trabajos de entrenamiento (ahora con chatbot_id)
     this.db.run(`
@@ -147,7 +151,7 @@ class DatabaseService {
       this.db.run(
         'INSERT INTO conversations (chatbot_id, session_id, role, content) VALUES (?, ?, ?, ?)',
         [chatbotId, sessionId, role, content],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve(this.lastID);
         }
@@ -175,14 +179,14 @@ class DatabaseService {
           this.db.run(
             'INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)',
             [key, JSON.stringify(value)],
-            function(err) {
+            function (err) {
               if (err) rej(err);
               else res();
             }
           );
         });
       });
-      
+
       Promise.all(promises).then(resolve).catch(reject);
     });
   }
@@ -211,16 +215,22 @@ class DatabaseService {
       const promises = chunks.map(chunk => {
         return new Promise((res, rej) => {
           this.db.run(
-            'INSERT INTO training_data (chatbot_id, training_id, content, metadata) VALUES (?, ?, ?, ?)',
-            [chatbotId, trainingId, chunk.content, JSON.stringify(chunk.metadata)],
-            function(err) {
+            'INSERT INTO training_data (chatbot_id, training_id, content, metadata, embedding) VALUES (?, ?, ?, ?, ?)',
+            [
+              chatbotId,
+              trainingId,
+              chunk.content,
+              JSON.stringify(chunk.metadata),
+              chunk.embedding ? JSON.stringify(chunk.embedding) : null
+            ],
+            function (err) {
               if (err) rej(err);
               else res(this.lastID);
             }
           );
         });
       });
-      
+
       Promise.all(promises).then(resolve).catch(reject);
     });
   }
@@ -228,14 +238,15 @@ class DatabaseService {
   async getTrainingData(trainingId) {
     return new Promise((resolve, reject) => {
       this.db.all(
-        'SELECT content, metadata FROM training_data WHERE training_id = ?',
+        'SELECT content, metadata, embedding FROM training_data WHERE training_id = ?',
         [trainingId],
         (err, rows) => {
           if (err) reject(err);
           else {
             const data = rows.map(row => ({
               content: row.content,
-              metadata: JSON.parse(row.metadata)
+              metadata: JSON.parse(row.metadata),
+              embedding: row.embedding ? JSON.parse(row.embedding) : null
             }));
             resolve(data);
           }
@@ -249,7 +260,7 @@ class DatabaseService {
       this.db.run(
         'INSERT INTO training_jobs (id, chatbot_id, training_id, status, model_type) VALUES (?, ?, ?, ?, ?)',
         [jobId, chatbotId, trainingId, 'pending', modelType],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve();
         }
@@ -259,13 +270,13 @@ class DatabaseService {
 
   async updateTrainingJob(jobId, status, errorMessage = null) {
     return new Promise((resolve, reject) => {
-      const query = errorMessage 
+      const query = errorMessage
         ? 'UPDATE training_jobs SET status = ?, error_message = ?, completed_at = CURRENT_TIMESTAMP WHERE id = ?'
         : 'UPDATE training_jobs SET status = ?, completed_at = CURRENT_TIMESTAMP WHERE id = ?';
-      
+
       const params = errorMessage ? [status, errorMessage, jobId] : [status, jobId];
-      
-      this.db.run(query, params, function(err) {
+
+      this.db.run(query, params, function (err) {
         if (err) reject(err);
         else resolve();
       });
@@ -290,7 +301,7 @@ class DatabaseService {
       const query = chatbotId
         ? 'SELECT training_id, COUNT(*) as chunks, MIN(created_at) as created_at FROM training_data WHERE chatbot_id = ? GROUP BY training_id'
         : 'SELECT training_id, COUNT(*) as chunks, MIN(created_at) as created_at FROM training_data GROUP BY training_id';
-      
+
       const params = chatbotId ? [chatbotId] : [];
       this.db.all(query, params, (err, rows) => {
         if (err) reject(err);
@@ -303,10 +314,10 @@ class DatabaseService {
   async getStats(type, chatbotId = null) {
     return new Promise((resolve, reject) => {
       let query = '';
-      
-      switch(type) {
+
+      switch (type) {
         case 'messages':
-          query = chatbotId 
+          query = chatbotId
             ? 'SELECT COUNT(*) as count FROM conversations WHERE chatbot_id = ?'
             : 'SELECT COUNT(*) as count FROM conversations';
           break;
@@ -329,7 +340,7 @@ class DatabaseService {
           resolve(0);
           return;
       }
-      
+
       const params = chatbotId ? [chatbotId] : [];
       this.db.get(query, params, (err, row) => {
         if (err) reject(err);
@@ -341,14 +352,14 @@ class DatabaseService {
   async getChatHistory(period, chatbotId = null) {
     return new Promise((resolve, reject) => {
       let days = 7;
-      
-      switch(period) {
+
+      switch (period) {
         case '1w': days = 7; break;
         case '1m': days = 30; break;
         case '3m': days = 90; break;
         case '6m': days = 180; break;
       }
-      
+
       const query = chatbotId
         ? `SELECT DATE(timestamp) as date, COUNT(*) as count 
            FROM conversations 
@@ -360,7 +371,7 @@ class DatabaseService {
            WHERE timestamp >= datetime('now', '-${days} days')
            GROUP BY DATE(timestamp)
            ORDER BY date ASC`;
-      
+
       const params = chatbotId ? [chatbotId] : [];
       this.db.all(query, params, (err, rows) => {
         if (err) reject(err);
@@ -393,7 +404,7 @@ class DatabaseService {
            GROUP BY session_id
            ORDER BY last_message_time DESC
            LIMIT ?`;
-      
+
       const params = chatbotId ? [chatbotId, limit] : [limit];
       this.db.all(query, params, (err, rows) => {
         if (err) reject(err);
@@ -417,7 +428,7 @@ class DatabaseService {
   async getAllConversations(page = 1, limit = 20, search = '', chatbotId = null) {
     return new Promise((resolve, reject) => {
       const offset = (page - 1) * limit;
-      
+
       let query = `
         SELECT session_id, 
                MAX(timestamp) as last_message_time,
@@ -427,27 +438,27 @@ class DatabaseService {
                 ORDER BY timestamp DESC LIMIT 1) as last_message
         FROM conversations c1
       `;
-      
+
       const conditions = [];
       const params = [];
-      
+
       if (chatbotId) {
         conditions.push('chatbot_id = ?');
         params.push(chatbotId);
       }
-      
+
       if (search) {
         conditions.push("content LIKE ?");
         params.push(`%${search}%`);
       }
-      
+
       if (conditions.length > 0) {
         query += ' WHERE ' + conditions.join(' AND ');
       }
-      
+
       query += ` GROUP BY session_id ORDER BY last_message_time DESC LIMIT ? OFFSET ?`;
       params.push(limit, offset);
-      
+
       this.db.all(query, params, (err, rows) => {
         if (err) {
           reject(err);
@@ -455,12 +466,12 @@ class DatabaseService {
           // Get total count
           let countQuery = 'SELECT COUNT(DISTINCT session_id) as total FROM conversations';
           const countParams = [];
-          
+
           if (chatbotId) {
             countQuery += ' WHERE chatbot_id = ?';
             countParams.push(chatbotId);
           }
-          
+
           this.db.get(countQuery, countParams, (err2, countRow) => {
             if (err2) reject(err2);
             else resolve({
@@ -485,7 +496,7 @@ class DatabaseService {
           leadData.phone,
           leadData.created_at || new Date().toISOString()
         ],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve(this.lastID);
         }
@@ -511,7 +522,7 @@ class DatabaseService {
       const query = chatbotId
         ? 'SELECT * FROM leads WHERE chatbot_id = ? ORDER BY created_at DESC'
         : 'SELECT * FROM leads ORDER BY created_at DESC';
-      
+
       const params = chatbotId ? [chatbotId] : [];
       this.db.all(query, params, (err, rows) => {
         if (err) reject(err);
@@ -525,7 +536,7 @@ class DatabaseService {
       this.db.run(
         'DELETE FROM leads WHERE id = ?',
         [leadId],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ deleted: this.changes });
         }
@@ -539,7 +550,7 @@ class DatabaseService {
       const id = 'chatbot_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
       const nextResetDate = new Date();
       nextResetDate.setMonth(nextResetDate.getMonth() + 1);
-      
+
       this.db.run(
         `INSERT INTO chatbots (id, name, description, api_key, model, system_prompt, 
          temperature, max_tokens, widget_color, widget_position, widget_title, welcome_message,
@@ -562,7 +573,7 @@ class DatabaseService {
           7000,
           nextResetDate.toISOString()
         ],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ id, ...chatbotData });
         }
@@ -599,19 +610,19 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       const fields = [];
       const values = [];
-      
+
       Object.entries(chatbotData).forEach(([key, value]) => {
         fields.push(`${key} = ?`);
         values.push(value);
       });
-      
+
       fields.push('updated_at = CURRENT_TIMESTAMP');
       values.push(chatbotId);
-      
+
       this.db.run(
         `UPDATE chatbots SET ${fields.join(', ')} WHERE id = ?`,
         values,
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ chatbotId, ...chatbotData });
         }
@@ -625,7 +636,7 @@ class DatabaseService {
       this.db.run(
         'UPDATE chatbots SET is_active = 0 WHERE id = ?',
         [chatbotId],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ deleted: this.changes });
         }
@@ -642,8 +653,8 @@ class DatabaseService {
           if (err) reject(err);
           else {
             try {
-              const settings = row && row.appearance_settings 
-                ? JSON.parse(row.appearance_settings) 
+              const settings = row && row.appearance_settings
+                ? JSON.parse(row.appearance_settings)
                 : null;
               resolve(settings);
             } catch (parseErr) {
@@ -660,7 +671,7 @@ class DatabaseService {
       this.db.run(
         'UPDATE chatbots SET appearance_settings = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
         [JSON.stringify(settings), chatbotId],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ updated: this.changes });
         }
@@ -672,7 +683,7 @@ class DatabaseService {
   async createFunction(functionData) {
     return new Promise((resolve, reject) => {
       const functionId = `func_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      
+
       this.db.run(
         `INSERT INTO functions (id, chatbot_id, name, description, endpoint, method, headers, parameters, enabled) 
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -687,7 +698,7 @@ class DatabaseService {
           JSON.stringify(functionData.parameters || []),
           functionData.enabled ? 1 : 0
         ],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ id: functionId, ...functionData });
         }
@@ -738,7 +749,7 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       const fields = [];
       const values = [];
-      
+
       if (functionData.name !== undefined) {
         fields.push('name = ?');
         values.push(functionData.name);
@@ -767,14 +778,14 @@ class DatabaseService {
         fields.push('enabled = ?');
         values.push(functionData.enabled ? 1 : 0);
       }
-      
+
       fields.push('updated_at = CURRENT_TIMESTAMP');
       values.push(functionId);
-      
+
       this.db.run(
         `UPDATE functions SET ${fields.join(', ')} WHERE id = ?`,
         values,
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ functionId, ...functionData });
         }
@@ -787,7 +798,7 @@ class DatabaseService {
       this.db.run(
         'DELETE FROM functions WHERE id = ?',
         [functionId],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ deleted: this.changes });
         }
@@ -803,12 +814,12 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       const id = `prompt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const { chatbotId, buttonTitle, link, prompt, orderIndex = 0 } = promptData;
-      
+
       this.db.run(
         `INSERT INTO quick_prompts (id, chatbot_id, button_title, link, prompt, order_index) 
          VALUES (?, ?, ?, ?, ?, ?)`,
         [id, chatbotId, buttonTitle, link || null, prompt || null, orderIndex],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ id, ...promptData });
         }
@@ -848,7 +859,7 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       const fields = [];
       const values = [];
-      
+
       if (promptData.buttonTitle !== undefined) {
         fields.push('button_title = ?');
         values.push(promptData.buttonTitle);
@@ -869,14 +880,14 @@ class DatabaseService {
         fields.push('enabled = ?');
         values.push(promptData.enabled ? 1 : 0);
       }
-      
+
       fields.push('updated_at = CURRENT_TIMESTAMP');
       values.push(promptId);
-      
+
       this.db.run(
         `UPDATE quick_prompts SET ${fields.join(', ')} WHERE id = ?`,
         values,
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ promptId, ...promptData });
         }
@@ -889,7 +900,7 @@ class DatabaseService {
       this.db.run(
         'DELETE FROM quick_prompts WHERE id = ?',
         [promptId],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ deleted: this.changes });
         }
@@ -902,7 +913,7 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       // Convertir tokens a mensajes equivalentes (1 mensaje = 350 tokens)
       const messagesEquivalent = Math.ceil(tokensUsed / 350);
-      
+
       this.db.run(
         `UPDATE chatbots 
          SET tokens_used = tokens_used + ?,
@@ -910,7 +921,7 @@ class DatabaseService {
              updated_at = CURRENT_TIMESTAMP
          WHERE id = ?`,
         [tokensUsed, messagesEquivalent, chatbotId],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ tokensUsed, messagesEquivalent });
         }
@@ -949,7 +960,7 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       const nextResetDate = new Date();
       nextResetDate.setMonth(nextResetDate.getMonth() + 1);
-      
+
       this.db.run(
         `UPDATE chatbots 
          SET tokens_used = 0,
@@ -958,7 +969,7 @@ class DatabaseService {
              updated_at = CURRENT_TIMESTAMP
          WHERE id = ?`,
         [nextResetDate.toISOString(), chatbotId],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ reset: true });
         }
@@ -982,7 +993,7 @@ class DatabaseService {
              updated_at = CURRENT_TIMESTAMP
          WHERE id = ?`,
         [plan, limits[plan] || 7000, chatbotId],
-        function(err) {
+        function (err) {
           if (err) reject(err);
           else resolve({ plan, tokensLimit: limits[plan] });
         }
