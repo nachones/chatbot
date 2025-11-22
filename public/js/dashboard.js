@@ -1,18 +1,18 @@
 // Dashboard JavaScript
-(function() {
+(function () {
     'use strict';
 
     // Configuration
     const API_URL = '/api';
     let currentPage = 'dashboard';
     let charts = {};
-    
+
     // Multi-client variables
     let currentChatbotId = null;
     let allChatbots = [];
 
     // Initialize Dashboard
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         initNavigation();
         initModals();
         initChatbotSelector();
@@ -41,7 +41,7 @@
         // Token period selector
         const tokenPeriod = document.getElementById('token-period');
         if (tokenPeriod) {
-            tokenPeriod.addEventListener('change', function() {
+            tokenPeriod.addEventListener('change', function () {
                 loadTokenUsage();
             });
         }
@@ -49,7 +49,7 @@
         // Chart period tabs
         const chartTabs = document.querySelectorAll('.chart-tab');
         chartTabs.forEach(tab => {
-            tab.addEventListener('click', function() {
+            tab.addEventListener('click', function () {
                 chartTabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 const period = this.getAttribute('data-period');
@@ -100,6 +100,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: false, // Deshabilitar animación para evitar bucle infinito
                 plugins: {
                     legend: {
                         display: false
@@ -120,9 +121,9 @@
     // Navigation
     function initNavigation() {
         const navItems = document.querySelectorAll('.nav-item');
-        
+
         navItems.forEach(item => {
-            item.addEventListener('click', function(e) {
+            item.addEventListener('click', function (e) {
                 e.preventDefault();
                 const page = this.getAttribute('data-page');
                 if (page) {
@@ -173,13 +174,13 @@
         const btnNewChatbot = document.getElementById('btn-new-chatbot');
 
         // Toggle dropdown
-        chatbotCurrent?.addEventListener('click', function(e) {
+        chatbotCurrent?.addEventListener('click', function (e) {
             e.stopPropagation();
             chatbotDropdown.classList.toggle('hidden');
         });
 
         // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!e.target.closest('.chatbot-selector')) {
                 if (chatbotDropdown) {
                     chatbotDropdown.classList.add('hidden');
@@ -188,7 +189,7 @@
         });
 
         // New chatbot button
-        btnNewChatbot?.addEventListener('click', function(e) {
+        btnNewChatbot?.addEventListener('click', function (e) {
             e.stopPropagation();
             openNewChatbotModal();
             chatbotDropdown.classList.add('hidden');
@@ -253,9 +254,9 @@
         `).join('');
     }
 
-    window.selectChatbot = async function(chatbotId) {
+    window.selectChatbot = async function (chatbotId) {
         currentChatbotId = chatbotId;
-        
+
         // Update UI
         const chatbot = allChatbots.find(c => c.id === chatbotId);
         if (chatbot) {
@@ -273,19 +274,19 @@
 
         // Reload dashboard data
         await loadDashboardData();
-        
+
         showToast(`Cambiado a ${chatbot.name}`, 'success');
     };
 
     function openNewChatbotModal() {
         const modal = document.getElementById('new-chatbot-modal');
-        
+
         // Reset form
         document.getElementById('new-chatbot-name').value = '';
         document.getElementById('new-chatbot-description').value = '';
         document.getElementById('new-chatbot-model').value = 'gpt-3.5-turbo';
         document.getElementById('new-chatbot-prompt').value = 'Eres un asistente útil y amigable.';
-        
+
         modal.classList.add('active');
     }
 
@@ -335,7 +336,7 @@
         }
     }
 
-    window.editChatbot = function(chatbotId) {
+    window.editChatbot = function (chatbotId) {
         const chatbot = allChatbots.find(c => c.id === chatbotId);
         if (!chatbot) return;
 
@@ -394,18 +395,18 @@
                 </div>
             </div>
         `;
-        
+
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
+
         const modal = document.getElementById('edit-chatbot-modal');
         modal.querySelectorAll('.modal-close').forEach(btn => {
             btn.addEventListener('click', () => modal.classList.remove('active'));
         });
-        
+
         modal.addEventListener('click', (e) => {
             if (e.target === modal) modal.classList.remove('active');
         });
-        
+
         document.getElementById('update-chatbot-btn').addEventListener('click', updateChatbot);
     }
 
@@ -455,9 +456,9 @@
         }
     }
 
-    window.toggleChatbotStatus = async function(chatbotId, isActive) {
+    window.toggleChatbotStatus = async function (chatbotId, isActive) {
         const action = isActive ? 'suspend' : 'activate';
-        const confirmMsg = isActive 
+        const confirmMsg = isActive
             ? '¿Estás seguro de que quieres suspender este chatbot? Dejará de responder mensajes.'
             : '¿Estás seguro de que quieres activar este chatbot?';
 
@@ -484,12 +485,12 @@
         }
     };
 
-    window.deleteChatbot = async function(chatbotId) {
+    window.deleteChatbot = async function (chatbotId) {
         const chatbot = allChatbots.find(c => c.id === chatbotId);
         if (!chatbot) return;
 
         const confirmMsg = `¿Estás seguro de que quieres eliminar "${chatbot.name}"? Esta acción no se puede deshacer y eliminará todos los datos asociados (conversaciones, datos de entrenamiento, etc.).`;
-        
+
         if (!confirm(confirmMsg)) return;
 
         // Double confirmation for safety
@@ -508,12 +509,12 @@
 
             if (data.success) {
                 showToast('Chatbot eliminado correctamente', 'success');
-                
+
                 // If deleted chatbot was selected, select another one
                 if (currentChatbotId === chatbotId) {
                     currentChatbotId = null;
                 }
-                
+
                 await loadChatbots();
             } else {
                 throw new Error(data.error || 'Error al eliminar chatbot');
@@ -534,16 +535,16 @@
         try {
             // Load usage indicator in header
             await loadUsageIndicator();
-            
+
             // Load stats
             await loadStats();
-            
+
             // Load chart
             await loadChatHistory();
-            
+
             // Load recent conversations
             await loadRecentConversations();
-            
+
             // Load token usage
             await loadTokenUsage();
 
@@ -595,7 +596,7 @@
         // Get active period from tabs
         const activeTab = document.querySelector('.chart-tab.active');
         const period = activeTab ? activeTab.getAttribute('data-period') : '1w';
-        
+
         await loadChatHistoryForPeriod(period);
     }
 
@@ -618,7 +619,7 @@
                     const initials = conv.session_id.substring(0, 2).toUpperCase();
                     const timeAgo = getTimeAgo(new Date(conv.last_message_time));
                     const message = conv.last_message || 'No message';
-                    
+
                     return `
                         <div class="conversation-item" onclick="viewConversation('${conv.session_id}')">
                             <div class="conversation-avatar">${initials}</div>
@@ -702,6 +703,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: false, // Deshabilitar animación para evitar bucle infinito
                 scales: {
                     x: {
                         stacked: true
@@ -717,7 +719,7 @@
 
     // Load Page Data
     async function loadPageData(pageName) {
-        switch(pageName) {
+        switch (pageName) {
             case 'conversations':
                 await loadAllConversations();
                 break;
@@ -751,7 +753,7 @@
                     const sessionShort = conv.session_id.substring(0, 8);
                     const lastMessage = (conv.last_message || '').substring(0, 50);
                     const date = new Date(conv.last_message_time).toLocaleString();
-                    
+
                     return `
                         <tr>
                             <td>Sesión ${sessionShort}</td>
@@ -958,14 +960,14 @@
     function initModals() {
         // Close modals
         document.querySelectorAll('.modal-close').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 this.closest('.modal').classList.remove('active');
             });
         });
 
         // Close on outside click
         document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
+            modal.addEventListener('click', function (e) {
                 if (e.target === this) {
                     this.classList.remove('active');
                 }
@@ -976,7 +978,7 @@
     // Training
     function initTraining() {
         // Upload Files
-        document.getElementById('train-files')?.addEventListener('click', function() {
+        document.getElementById('train-files')?.addEventListener('click', function () {
             document.getElementById('upload-modal').classList.add('active');
         });
 
@@ -1007,11 +1009,11 @@
         });
 
         // Train from URL
-        document.getElementById('train-url')?.addEventListener('click', function() {
+        document.getElementById('train-url')?.addEventListener('click', function () {
             document.getElementById('url-modal').classList.add('active');
         });
 
-        document.getElementById('start-url-training')?.addEventListener('click', async function() {
+        document.getElementById('start-url-training')?.addEventListener('click', async function () {
             const url = document.getElementById('training-url').value;
             const crawl = document.getElementById('crawl-subpages').checked;
 
@@ -1054,11 +1056,11 @@
         });
 
         // Train from Text
-        document.getElementById('train-text')?.addEventListener('click', function() {
+        document.getElementById('train-text')?.addEventListener('click', function () {
             document.getElementById('text-modal').classList.add('active');
         });
 
-        document.getElementById('save-training-text')?.addEventListener('click', async function() {
+        document.getElementById('save-training-text')?.addEventListener('click', async function () {
             const text = document.getElementById('training-text').value;
 
             if (!text) {
@@ -1137,7 +1139,7 @@
                 progressFill.style.width = '100%';
                 uploadStatus.textContent = 'Subida completa!';
                 showToast('Archivos subidos correctamente', 'success');
-                
+
                 setTimeout(() => {
                     document.getElementById('upload-modal').classList.remove('active');
                     progressContainer.classList.add('hidden');
@@ -1200,7 +1202,7 @@
             const response = await fetch(`${API_URL}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     message,
                     chatbotId: currentChatbotId
                 })
@@ -1235,12 +1237,12 @@
         const tempSlider = document.getElementById('temperature');
         const tempValue = document.getElementById('temperature-value');
 
-        tempSlider?.addEventListener('input', function() {
+        tempSlider?.addEventListener('input', function () {
             tempValue.textContent = this.value;
         });
 
         // Save Settings
-        document.getElementById('save-settings')?.addEventListener('click', async function() {
+        document.getElementById('save-settings')?.addEventListener('click', async function () {
             const apiKey = document.getElementById('openai-api-key').value;
             const model = document.getElementById('openai-model').value;
             const systemPrompt = document.getElementById('system-prompt').value;
@@ -1280,7 +1282,7 @@
         });
 
         // Save Chatbot Settings
-        document.getElementById('save-chatbot-settings')?.addEventListener('click', function() {
+        document.getElementById('save-chatbot-settings')?.addEventListener('click', function () {
             const name = document.getElementById('chatbot-name-input').value;
             const welcome = document.getElementById('welcome-message').value;
 
@@ -1294,11 +1296,11 @@
 
     // Integrations
     function initIntegrations() {
-        document.getElementById('integrate-btn')?.addEventListener('click', function() {
+        document.getElementById('integrate-btn')?.addEventListener('click', function () {
             switchPage('integrations');
         });
 
-        document.getElementById('copy-integration-code')?.addEventListener('click', function() {
+        document.getElementById('copy-integration-code')?.addEventListener('click', function () {
             const code = document.getElementById('integration-code').textContent;
             navigator.clipboard.writeText(code).then(() => {
                 showToast('Código copiado al portapapeles', 'success');
@@ -1315,15 +1317,15 @@
         // Tab switching
         const tabs = document.querySelectorAll('.appearance-tab');
         const tabContents = document.querySelectorAll('.appearance-tab-content');
-        
+
         tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
+            tab.addEventListener('click', function () {
                 const targetTab = this.dataset.tab;
-                
+
                 // Update active tab
                 tabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                
+
                 // Update active content
                 tabContents.forEach(content => {
                     content.classList.remove('active');
@@ -1339,7 +1341,7 @@
         colorGroups.forEach(group => {
             const colorBtns = group.querySelectorAll('.color-btn:not(.color-picker-btn)');
             colorBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     colorBtns.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                 });
@@ -1351,13 +1353,13 @@
                 const pickerInput = pickerBtn.parentElement.querySelector('.color-picker-input');
                 if (pickerInput) {
                     // Click en el botón abre el selector
-                    pickerBtn.addEventListener('click', function(e) {
+                    pickerBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         pickerInput.click();
                     });
-                    
+
                     // Cuando cambia el color
-                    pickerInput.addEventListener('change', function() {
+                    pickerInput.addEventListener('change', function () {
                         pickerBtn.style.background = this.value;
                         colorBtns.forEach(b => b.classList.remove('active'));
                         pickerBtn.classList.add('active');
@@ -1369,7 +1371,7 @@
         // Icon selector
         const iconBtns = document.querySelectorAll('.icon-btn');
         iconBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 iconBtns.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
             });
@@ -1381,13 +1383,13 @@
             const uploadBtn = box.querySelector('.btn-upload');
             const fileInput = box.querySelector('input[type="file"]');
             const fileName = box.querySelector('.file-name');
-            
+
             if (uploadBtn && fileInput) {
-                uploadBtn.addEventListener('click', function() {
+                uploadBtn.addEventListener('click', function () {
                     fileInput.click();
                 });
-                
-                fileInput.addEventListener('change', function() {
+
+                fileInput.addEventListener('change', function () {
                     if (this.files && this.files[0]) {
                         fileName.textContent = this.files[0].name;
                     } else {
@@ -1433,7 +1435,7 @@
         if (settings.inputPlaceholder) {
             document.getElementById('input-placeholder').value = settings.inputPlaceholder;
         }
-        
+
         // Apply toggles
         document.getElementById('display-prompts-vertical').checked = settings.displayPromptsVertical || false;
         document.getElementById('hide-bot-avatar').checked = settings.hideBotAvatar || false;
@@ -1476,7 +1478,7 @@
             hideBotAvatar: document.getElementById('hide-bot-avatar').checked,
             hideSources: document.getElementById('hide-sources').checked,
             hideBranding: document.getElementById('hide-branding').checked,
-            
+
             // Colors
             primaryColor: getActiveColor('.color-group:nth-of-type(1)'),
             headerBg: getActiveColor('.color-group:nth-of-type(2)'),
@@ -1488,7 +1490,7 @@
             promptsBgHover: getActiveColor('.color-group:nth-of-type(8)'),
             promptsBorderHover: getActiveColor('.color-group:nth-of-type(9)'),
             promptsFontHover: getActiveColor('.color-group:nth-of-type(10)'),
-            
+
             // Chat Bubble
             chatIconSize: document.getElementById('chat-icon-size').value,
             positionScreen: document.getElementById('position-screen').value,
@@ -1508,32 +1510,32 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(settings)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showToast('Configuración de apariencia guardada', 'success');
-            } else {
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Configuración de apariencia guardada', 'success');
+                } else {
+                    showToast('Error al guardar la configuración', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
                 showToast('Error al guardar la configuración', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Error al guardar la configuración', 'error');
-        });
+            });
     }
 
     function getActiveColor(selector) {
         const group = document.querySelector(selector);
         if (!group) return null;
-        
+
         const activeBtn = group.querySelector('.color-btn.active');
         if (!activeBtn) return null;
-        
+
         if (activeBtn.classList.contains('color-picker-btn')) {
             const input = activeBtn.parentElement.querySelector('.color-picker-input');
             return input ? input.value : null;
         }
-        
+
         return activeBtn.dataset.color;
     }
 
@@ -1565,27 +1567,27 @@
 
     function getTimeAgo(date) {
         const seconds = Math.floor((new Date() - date) / 1000);
-        
+
         let interval = seconds / 31536000;
         if (interval > 1) return Math.floor(interval) + ' years ago';
-        
+
         interval = seconds / 2592000;
         if (interval > 1) return Math.floor(interval) + ' months ago';
-        
+
         interval = seconds / 86400;
         if (interval > 1) return Math.floor(interval) + ' days ago';
-        
+
         interval = seconds / 3600;
         if (interval > 1) return Math.floor(interval) + ' hours ago';
-        
+
         interval = seconds / 60;
         if (interval > 1) return Math.floor(interval) + ' minutes ago';
-        
+
         return Math.floor(seconds) + ' seconds ago';
     }
 
     // Export functions for global use
-    window.viewConversation = async function(sessionId) {
+    window.viewConversation = async function (sessionId) {
         try {
             const response = await fetch(`${API_URL}/dashboard/conversations/${sessionId}`);
             const data = await response.json();
@@ -1620,7 +1622,7 @@
             `;
             document.body.insertAdjacentHTML('beforeend', modalHTML);
             modal = document.getElementById('conversation-modal');
-            
+
             modal.querySelector('.modal-close').addEventListener('click', () => {
                 modal.classList.remove('active');
             });
@@ -1632,7 +1634,7 @@
         // Fill modal with conversation
         document.getElementById('conv-session-id').textContent = sessionId.substring(0, 8);
         const messagesContainer = document.getElementById('conversation-messages');
-        
+
         messagesContainer.innerHTML = messages.map(msg => `
             <div class="conversation-message ${msg.role}">
                 <div class="conversation-message-header">
@@ -1645,14 +1647,14 @@
         modal.classList.add('active');
     }
 
-    window.viewTrainingData = function(id) {
+    window.viewTrainingData = function (id) {
         console.log('View training data:', id);
         showToast('Visor de datos de entrenamiento próximamente', 'info');
     };
 
-    window.deleteTrainingData = async function(id) {
+    window.deleteTrainingData = async function (id) {
         if (!confirm('¿Estás seguro de que quieres eliminar estos datos de entrenamiento?')) return;
-        
+
         try {
             // Implement delete API call
             showToast('Datos de entrenamiento eliminados', 'success');
@@ -1737,7 +1739,7 @@
 
     function renderQuickPrompts() {
         const container = document.getElementById('prompts-list');
-        
+
         if (currentPrompts.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
@@ -1810,10 +1812,10 @@
         };
 
         try {
-            const url = currentEditingPromptId 
+            const url = currentEditingPromptId
                 ? `${API_URL}/quick-prompts/${currentEditingPromptId}`
                 : `${API_URL}/quick-prompts`;
-            
+
             const method = currentEditingPromptId ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
@@ -1840,10 +1842,10 @@
         }
     }
 
-    window.editQuickPrompt = async function(promptId) {
+    window.editQuickPrompt = async function (promptId) {
         currentEditingPromptId = promptId;
         const prompt = currentPrompts.find(p => p.id === promptId);
-        
+
         if (!prompt) return;
 
         document.getElementById('prompt-modal-title').textContent = 'Editar Respuesta Rápida';
@@ -1853,7 +1855,7 @@
         document.getElementById('prompt-modal').classList.add('active');
     };
 
-    window.deleteQuickPrompt = async function(promptId) {
+    window.deleteQuickPrompt = async function (promptId) {
         if (!confirm('¿Estás seguro de que deseas eliminar esta respuesta rápida?')) {
             return;
         }
@@ -1913,18 +1915,18 @@
     function openFunctionModal(functionData = null) {
         const modal = document.getElementById('function-modal');
         const title = document.getElementById('function-modal-title');
-        
+
         if (functionData) {
             title.textContent = 'Editar Función';
             currentEditingFunctionId = functionData.id;
-            
+
             document.getElementById('function-name').value = functionData.name;
             document.getElementById('function-description').value = functionData.description;
             document.getElementById('function-endpoint').value = functionData.endpoint;
             document.getElementById('function-method').value = functionData.method;
             document.getElementById('function-headers').value = functionData.headers || '';
             document.getElementById('function-enabled').checked = functionData.enabled;
-            
+
             // Load parameters
             const paramsList = document.getElementById('parameters-list');
             paramsList.innerHTML = '';
@@ -1936,24 +1938,24 @@
         } else {
             title.textContent = 'Crear Función';
             currentEditingFunctionId = null;
-            
+
             document.getElementById('function-name').value = '';
             document.getElementById('function-description').value = '';
             document.getElementById('function-endpoint').value = '';
             document.getElementById('function-method').value = 'POST';
             document.getElementById('function-headers').value = '';
             document.getElementById('function-enabled').checked = true;
-            
+
             document.getElementById('parameters-list').innerHTML = '';
         }
-        
+
         modal.classList.add('active');
     }
 
     function addParameterField(paramData = null) {
         const paramsList = document.getElementById('parameters-list');
         const paramId = Date.now();
-        
+
         const paramHTML = `
             <div class="parameter-item" data-param-id="${paramId}">
                 <div class="parameter-field">
@@ -1983,11 +1985,11 @@
                 </button>
             </div>
         `;
-        
+
         paramsList.insertAdjacentHTML('beforeend', paramHTML);
     }
 
-    window.removeParameter = function(paramId) {
+    window.removeParameter = function (paramId) {
         const paramItem = document.querySelector(`[data-param-id="${paramId}"]`);
         if (paramItem) {
             paramItem.remove();
@@ -2059,10 +2061,10 @@
         };
 
         try {
-            const url = currentEditingFunctionId 
+            const url = currentEditingFunctionId
                 ? `${API_URL}/functions/${currentEditingFunctionId}`
                 : `${API_URL}/functions`;
-            
+
             const response = await fetch(url, {
                 method: currentEditingFunctionId ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2166,14 +2168,14 @@
         `).join('');
     }
 
-    window.editFunction = function(functionId) {
+    window.editFunction = function (functionId) {
         const func = currentFunctions.find(f => f.id === functionId);
         if (func) {
             openFunctionModal(func);
         }
     };
 
-    window.deleteFunction = async function(functionId) {
+    window.deleteFunction = async function (functionId) {
         if (!confirm('¿Estás seguro de que quieres eliminar esta función?')) return;
 
         try {
@@ -2205,7 +2207,7 @@
 
             if (data.success) {
                 const { messagesUsed, messagesLimit, usagePercentage } = data.usage;
-                
+
                 // Update counter
                 const usageCount = document.getElementById('usage-count');
                 if (usageCount) {
@@ -2216,7 +2218,7 @@
                 const usageBarFill = document.getElementById('usage-bar-fill');
                 if (usageBarFill) {
                     usageBarFill.style.width = `${usagePercentage}%`;
-                    
+
                     // Change color based on usage
                     if (usagePercentage >= 90) {
                         usageBarFill.setAttribute('data-critical', 'true');
