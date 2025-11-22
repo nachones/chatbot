@@ -844,6 +844,130 @@ class DatabaseService {
       );
     });
   }
+
+  // Usage Stats Methods
+  async getUsageStats(chatbotId) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT plan, tokens_used, tokens_limit, messages_used, reset_date FROM chatbots WHERE id = ?',
+        [chatbotId],
+        (err, row) => {
+          if (err) reject(err);
+          else {
+            if (row) {
+              const limits = { 'free': 100, 'starter': 1000, 'pro': 5000, 'enterprise': 100000 };
+              row.messages_limit = limits[row.plan] || 100;
+            }
+            resolve(row);
+          }
+        }
+      );
+    });
+  }
+
+  async resetMonthlyUsage(chatbotId) {
+    return new Promise((resolve, reject) => {
+      const nextResetDate = new Date();
+      nextResetDate.setMonth(nextResetDate.getMonth() + 1);
+      this.db.run(
+        'UPDATE chatbots SET messages_used = 0, tokens_used = 0, reset_date = ? WHERE id = ?',
+        [nextResetDate.toISOString(), chatbotId],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ updated: this.changes });
+        }
+      );
+    });
+  }
+
+  async updatePlan(chatbotId, plan) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'UPDATE chatbots SET plan = ? WHERE id = ?',
+        [plan, chatbotId],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ updated: this.changes });
+        }
+      );
+    });
+  }
+
+  // Quick Prompts Methods
+  async getQuickPrompts(chatbotId) {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        'SELECT * FROM quick_prompts WHERE chatbot_id = ? ORDER BY order_index ASC',
+        [chatbotId],
+        (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows || []);
+        }
+      );
+    });
+  }
+
+  async getQuickPrompt(id) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT * FROM quick_prompts WHERE id = ?',
+        [id],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        }
+      );
+    });
+  }
+
+  async createQuickPrompt(data) {
+    return new Promise((resolve, reject) => {
+      const id = 'qp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      this.db.run(
+        `INSERT INTO quick_prompts (id, chatbot_id, button_title, link, prompt, order_index, enabled) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [id, data.chatbotId, data.buttonTitle, data.link || null, data.prompt || null, data.orderIndex || 0, data.enabled !== undefined ? (data.enabled ? 1 : 0) : 1],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ id, ...data });
+        }
+      );
+    });
+  }
+
+  async updateQuickPrompt(id, data) {
+    return new Promise((resolve, reject) => {
+      const fields = [];
+      const values = [];
+      if (data.buttonTitle !== undefined) { fields.push('button_title = ?'); values.push(data.buttonTitle); }
+      if (data.link !== undefined) { fields.push('link = ?'); values.push(data.link); }
+      if (data.prompt !== undefined) { fields.push('prompt = ?'); values.push(data.prompt); }
+      if (data.orderIndex !== undefined) { fields.push('order_index = ?'); values.push(data.orderIndex); }
+      if (data.enabled !== undefined) { fields.push('enabled = ?'); values.push(data.enabled ? 1 : 0); }
+      fields.push('updated_at = CURRENT_TIMESTAMP');
+      values.push(id);
+      this.db.run(
+        `UPDATE quick_prompts SET ${fields.join(', ')} WHERE id = ?`,
+        values,
+        function (err) {
+          if (err) reject(err);
+          else resolve({ id, ...data });
+        }
+      );
+    });
+  }
+
+  async deleteQuickPrompt(id) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'DELETE FROM quick_prompts WHERE id = ?',
+        [id],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ deleted: this.changes });
+        }
+      );
+    });
+  }
 }
 
 module.exports = DatabaseService;
