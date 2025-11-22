@@ -1,0 +1,11 @@
+{
+    "ignore": [
+        "**/*.sqlite",
+        "**/*.db",
+        "**/*.sqlite-journal",
+        "logs/**",
+        "uploads/**",
+        "training-data/**",
+        "node_modules/**"
+    ]
+}

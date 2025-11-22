@@ -464,6 +464,19 @@ class DatabaseService {
     });
   }
 
+  async updateTokenUsage(chatbotId, tokens) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'UPDATE chatbots SET tokens_used = tokens_used + ? WHERE id = ?',
+        [tokens, chatbotId],
+        function (err) {
+          if (err) reject(err);
+          else resolve(this.changes);
+        }
+      );
+    });
+  }
+
   async getAllConversations(page = 1, limit = 20, search = '', chatbotId = null) {
     return new Promise((resolve, reject) => {
       const offset = (page - 1) * limit;

@@ -1,4 +1,4 @@
-(function() {
+(function () {
   'use strict';
 
   // Cargar marked.js para soporte Markdown
@@ -18,12 +18,12 @@
         primaryColor: config.primaryColor || '#007bff',
         ...config
       };
-      
+
       this.sessionId = this.generateSessionId();
       this.isOpen = false;
       this.messages = [];
       this.quickPrompts = [];
-      
+
       // Esperar a que marked cargue antes de inicializar si es posible, 
       // pero no bloquear la UI
       this.init();
@@ -385,7 +385,7 @@
 
     // Helper para oscurecer colores
     adjustColor(color, amount) {
-      return '#' + color.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+      return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
     }
 
     createWidget() {
@@ -457,11 +457,11 @@
     open() {
       const window = document.getElementById('chat-widget-window');
       const button = document.getElementById('chat-widget-button');
-      
+
       window.classList.add('open');
       button.classList.add('hidden');
       this.isOpen = true;
-      
+
       setTimeout(() => {
         document.getElementById('chat-widget-input').focus();
       }, 300);
@@ -470,7 +470,7 @@
     close() {
       const window = document.getElementById('chat-widget-window');
       const button = document.getElementById('chat-widget-button');
-      
+
       window.classList.remove('open');
       button.classList.remove('hidden');
       this.isOpen = false;
@@ -480,10 +480,10 @@
       const messagesContainer = document.getElementById('chat-widget-messages');
       const messageDiv = document.createElement('div');
       messageDiv.className = `chat-widget-message ${role}`;
-      
+
       const contentDiv = document.createElement('div');
       contentDiv.className = 'chat-widget-message-content';
-      
+
       // Renderizar Markdown si es mensaje del bot y marked está disponible
       if (role === 'bot' && typeof marked !== 'undefined') {
         try {
@@ -495,12 +495,12 @@
       } else {
         contentDiv.textContent = content;
       }
-      
+
       messageDiv.appendChild(contentDiv);
       messagesContainer.appendChild(messageDiv);
-      
+
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      
+
       this.messages.push({ content, role, timestamp: new Date().toISOString() });
     }
 
@@ -508,18 +508,18 @@
       const input = document.getElementById('chat-widget-input');
       const send = document.getElementById('chat-widget-send');
       const message = text || input.value.trim();
-      
+
       if (!message) return;
-      
+
       input.disabled = true;
       send.disabled = true;
-      
+
       this.addMessage(message, 'user');
       if (!text) input.value = '';
-      
+
       const typing = document.getElementById('chat-widget-typing');
       typing.classList.add('show');
-      
+
       try {
         const response = await fetch(`${this.config.apiUrl}/chat`, {
           method: 'POST',
@@ -532,9 +532,9 @@
             sessionId: this.sessionId
           })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           this.addMessage(data.response, 'bot');
         } else {
@@ -558,7 +558,7 @@
         const response = await fetch(
           `${this.config.apiUrl}/quick-prompts?chatbotId=${this.config.apiKey}`
         );
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.prompts && data.prompts.length > 0) {
@@ -576,12 +576,12 @@
       if (!container || this.quickPrompts.length === 0) return;
 
       container.innerHTML = '';
-      
+
       this.quickPrompts.forEach(prompt => {
         const button = document.createElement('button');
         button.className = 'chat-widget-prompt-btn';
         button.textContent = prompt.button_title;
-        
+
         button.addEventListener('click', () => {
           if (prompt.link) {
             window.open(prompt.link, '_blank');
@@ -589,7 +589,7 @@
             this.sendMessage(prompt.prompt);
           }
         });
-        
+
         container.appendChild(button);
       });
 
@@ -598,18 +598,38 @@
   }
 
   function initChatWidget() {
-    const script = document.currentScript;
+    // Intentar obtener el script actual o buscarlo por ID/src
+    let script = document.currentScript;
+
+    if (!script) {
+      script = document.querySelector('script[src*="chat-widget.js"]') ||
+        document.querySelector('script[id="chat-widget-script"]');
+    }
+
+    // Configuración por defecto si no se encuentra el script (caso raro)
     const config = {
-      apiUrl: script.getAttribute('data-api-url') || 'http://localhost:3000/api',
-      apiKey: script.getAttribute('data-api-key') || '',
-      position: script.getAttribute('data-position') || 'bottom-right',
-      theme: script.getAttribute('data-theme') || 'default',
-      title: script.getAttribute('data-title') || 'Asistente Virtual',
-      welcomeMessage: script.getAttribute('data-welcome') || '¡Hola! ¿En qué puedo ayudarte?',
-      primaryColor: script.getAttribute('data-primary-color') || '#007bff'
+      apiUrl: 'http://localhost:3000/api',
+      apiKey: '',
+      position: 'bottom-right',
+      theme: 'default',
+      title: 'Asistente Virtual',
+      welcomeMessage: '¡Hola! ¿En qué puedo ayudarte?',
+      primaryColor: '#007bff'
     };
-    
-    new ChatWidget(config);
+
+    if (script) {
+      config.apiUrl = script.getAttribute('data-api-url') || config.apiUrl;
+      config.apiKey = script.getAttribute('data-api-key') || config.apiKey;
+      config.position = script.getAttribute('data-position') || config.position;
+      config.theme = script.getAttribute('data-theme') || config.theme;
+      config.title = script.getAttribute('data-title') || config.title;
+      config.welcomeMessage = script.getAttribute('data-welcome') || config.welcomeMessage;
+      config.primaryColor = script.getAttribute('data-primary-color') || config.primaryColor;
+    }
+
+    // Evitar múltiples instancias
+    if (window.chatWidgetInstance) return;
+    window.chatWidgetInstance = new ChatWidget(config);
   }
 
   if (document.readyState === 'loading') {

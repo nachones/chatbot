@@ -1,1177 +1,347 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Chatbot</title>
-
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <i class="fas fa-robot"></i>
-                <span>CHATBOT</span>
-            </div>
-            <div class="chatbot-selector" id="chatbot-selector">
-                <div class="chatbot-current" id="chatbot-current">
-                    <span id="current-chatbot-name">Mi Chatbot</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="chatbot-dropdown hidden" id="chatbot-dropdown">
-                    <div class="chatbot-list" id="chatbot-list">
-                        <!-- Chatbots will be loaded here -->
-                    </div>
-                    <button class="btn-new-chatbot" id="btn-new-chatbot">
-                        <i class="fas fa-plus"></i> Nuevo Chatbot
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <a href="#dashboard" class="nav-item active" data-page="dashboard">
-                <i class="fas fa-chart-line"></i>
-                <span>Panel de Control</span>
-            </a>
-            <a href="#conversations" class="nav-item" data-page="conversations">
-                <i class="fas fa-comments"></i>
-                <span>Conversaciones</span>
-            </a>
-            <a href="#train" class="nav-item" data-page="train">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Entrenar Chatbot</span>
-            </a>
-            <a href="#test" class="nav-item" data-page="test">
-                <i class="fas fa-vial"></i>
-                <span>Probar Chatbot</span>
-            </a>
-            <a href="#leads" class="nav-item" data-page="leads">
-                <i class="fas fa-users"></i>
-                <span>Contactos</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-section">
-            <div class="section-title">PERSONALIZACIÓN</div>
-            <a href="#functions" class="nav-item" data-page="functions">
-                <i class="fas fa-code"></i>
-                <span>Funciones</span>
-                <span class="badge">NUEVO</span>
-            </a>
-            <a href="#prompts" class="nav-item" data-page="prompts">
-                <i class="fas fa-bolt"></i>
-                <span>Respuestas Rápidas</span>
-            </a>
-            <a href="#appearance" class="nav-item" data-page="appearance">
-                <i class="fas fa-palette"></i>
-                <span>Apariencia</span>
-            </a>
-            <a href="#integrations" class="nav-item" data-page="integrations">
-                <i class="fas fa-plug"></i>
-                <span>Integraciones</span>
-            </a>
-            <a href="#settings" class="nav-item" data-page="settings">
-                <i class="fas fa-cog"></i>
-                <span>Configuración</span>
-            </a>
-        </div>
-
-        <div class="sidebar-footer">
-            <a href="#" class="nav-item">
-                <i class="fas fa-question-circle"></i>
-                <span>Solicitar Funciones</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <h1 id="page-title">Panel de Control</h1>
-            </div>
-            <div class="header-right">
-                <div class="usage-indicator" id="usage-indicator">
-                    <div class="usage-text">
-                        <span>Mensajes <i class="fas fa-info-circle" title="Los mensajes se resetean mensualmente"></i></span>
-                        <span id="usage-count">0/10,000</span>
-                    </div>
-                    <div class="usage-bar">
-                        <div class="usage-bar-fill" id="usage-bar-fill"></div>
-                    </div>
-                </div>
-                <button class="btn btn-primary" id="integrate-btn">
-                    <i class="fas fa-code"></i>
-                    Integrar Chatbot
-                </button>
-            </div>
-        </header>
-
-        <!-- Dashboard Page -->
-        <div id="page-dashboard" class="page active">
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-label">Mensajes Totales</span>
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <div class="stat-value" id="total-messages">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-label">Conversaciones Totales</span>
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <div class="stat-value" id="total-conversations">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-label">Elementos de Entrenamiento</span>
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <div class="stat-value" id="total-training">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <span class="stat-label">Contactos Totales</span>
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <div class="stat-value" id="total-leads">0</div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <span>Support AI</span>
                 </div>
             </div>
 
-            <!-- Charts Row -->
-            <div class="charts-row">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Historial de Chat</h3>
-                        <div class="chart-tabs">
-                            <button class="chart-tab active" data-period="1w">1S</button>
-                            <button class="chart-tab" data-period="1m">1M</button>
-                            <button class="chart-tab" data-period="3m">3M</button>
-                            <button class="chart-tab" data-period="6m">6M</button>
-                        </div>
-                    </div>
-                    <canvas id="chat-history-chart"></canvas>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <span class="nav-section-title">Principal</span>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="conversations">
+                        <i class="fas fa-comments"></i>
+                        <span>Conversaciones</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="leads">
+                        <i class="fas fa-users"></i>
+                        <span>Contactos</span>
+                    </a>
                 </div>
 
-                <div class="conversations-card">
-                    <div class="conversations-header">
-                        <h3>Últimas Conversaciones</h3>
-                        <a href="#conversations" class="view-all">Ver Todo</a>
-                    </div>
-                    <div id="recent-conversations" class="conversations-list">
-                        <!-- Conversations will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Token Usage Card -->
-            <div class="token-usage-card">
-                <div class="token-header">
-                    <h3><i class="fas fa-coins"></i> Uso de Tokens y Costes</h3>
-                    <div class="token-period">
-                        <select id="token-period" aria-label="Seleccionar período">
-                            <option value="today">Hoy</option>
-                            <option value="week">Esta Semana</option>
-                            <option value="month" selected>Este Mes</option>
-                            <option value="all">Todo el Tiempo</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="token-stats">
-                    <div class="token-stat">
-                        <div class="token-label">Tokens Totales Usados</div>
-                        <div class="token-value" id="total-tokens">0</div>
-                    </div>
-                    <div class="token-stat">
-                        <div class="token-label">Tokens de Entrada</div>
-                        <div class="token-value" id="input-tokens">0</div>
-                    </div>
-                    <div class="token-stat">
-                        <div class="token-label">Tokens de Salida</div>
-                        <div class="token-value" id="output-tokens">0</div>
-                    </div>
-                    <div class="token-stat">
-                        <div class="token-label">Coste Estimado</div>
-                        <div class="token-value cost" id="estimated-cost">$0.00</div>
-                    </div>
-                </div>
-                <div class="token-chart">
-                    <canvas id="token-usage-chart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Conversations Page -->
-        <div id="page-conversations" class="page">
-            <div class="conversations-container">
-                <div class="conversations-filters">
-                    <input type="search" placeholder="Buscar conversaciones..." class="search-input" aria-label="Buscar conversaciones">
-                    <select class="filter-select" aria-label="Filtrar conversaciones">
-                        <option value="all">Todas las Conversaciones</option>
-                        <option value="active">Activas</option>
-                        <option value="archived">Archivadas</option>
-                    </select>
-                </div>
-                <div id="all-conversations" class="conversations-table">
-                    <!-- Table will be loaded here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Train Chatbot Page -->
-        <div id="page-train" class="page">
-            <div class="train-container">
-                <div class="train-methods">
-                    <div class="train-method-card" id="train-files">
-                        <div class="method-icon">
-                            <i class="fas fa-file-upload"></i>
-                        </div>
-                        <h3>Subir Archivos</h3>
-                        <p>Sube archivos PDF, DOCX, TXT para entrenar tu chatbot</p>
-                        <button class="btn btn-primary" aria-label="Subir archivos">Subir Archivos</button>
-                    </div>
-                    <div class="train-method-card" id="train-url">
-                        <div class="method-icon">
-                            <i class="fas fa-link"></i>
-                        </div>
-                        <h3>Entrenar desde URL</h3>
-                        <p>Extrae y entrena desde URLs de sitios web</p>
-                        <button class="btn btn-primary" aria-label="Añadir URL">Añadir URL</button>
-                    </div>
-                    <div class="train-method-card" id="train-text">
-                        <div class="method-icon">
-                            <i class="fas fa-keyboard"></i>
-                        </div>
-                        <h3>Texto Directo</h3>
-                        <p>Añade datos de entrenamiento directamente como texto</p>
-                        <button class="btn btn-primary" aria-label="Añadir texto">Añadir Texto</button>
-                    </div>
-                </div>
-
-                <div class="training-data-section">
-                    <div class="section-header">
-                        <h3>Datos de Entrenamiento</h3>
-                        <button class="btn btn-secondary" id="refresh-training" aria-label="Actualizar datos de entrenamiento">
-                            <i class="fas fa-sync"></i> Actualizar
-                        </button>
-                    </div>
-                    <div id="training-data-list" class="training-data-list">
-                        <!-- Training data will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Test Chatbot Page -->
-        <div id="page-test" class="page">
-            <div class="test-container">
-                <div class="test-chat">
-                    <div class="test-chat-header">
-                        <h3>Prueba tu Chatbot</h3>
-                        <button class="btn btn-secondary" id="clear-test-chat" aria-label="Limpiar chat de prueba">
-                            <i class="fas fa-trash"></i> Limpiar
-                        </button>
-                    </div>
-                    <div id="test-messages" class="test-messages">
-                        <div class="test-message bot">
-                            <div class="message-content">¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte?</div>
-                        </div>
-                    </div>
-                    <div class="test-input-container">
-                        <input type="text" id="test-input" placeholder="Escribe tu mensaje..." class="test-input" aria-label="Escribe tu mensaje">
-                        <button id="test-send" class="btn btn-primary" aria-label="Enviar mensaje">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Leads Page -->
-        <div id="page-leads" class="page">
-            <div class="leads-container">
-                <div class="leads-header">
-                    <h3>Contactos Capturados</h3>
-                    <button class="btn btn-primary" id="export-leads" aria-label="Exportar contactos a CSV">
-                        <i class="fas fa-download"></i> Exportar CSV
-                    </button>
-                </div>
-                <div id="leads-table" class="leads-table">
-                    <!-- Leads table will be loaded here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Page -->
-        <div id="page-settings" class="page">
-            <div class="settings-container">
-                <div class="settings-section">
-                    <h3>Configuración de OpenAI</h3>
-                    <div class="form-group">
-                        <label for="openai-api-key">Clave API</label>
-                        <input type="password" id="openai-api-key" class="form-control" placeholder="sk-...">
-                    </div>
-                    <div class="form-group">
-                        <label for="openai-model">Modelo</label>
-                        <select id="openai-model" class="form-control">
-                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                            <option value="gpt-4">GPT-4</option>
-                            <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="system-prompt">Prompt del Sistema</label>
-                        <textarea id="system-prompt" class="form-control" rows="4" placeholder="Eres un asistente útil..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="temperature">Temperatura</label>
-                        <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7" class="form-range">
-                        <span id="temperature-value">0.7</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="max-tokens">Tokens Máximos</label>
-                        <input type="number" id="max-tokens" class="form-control" value="500" min="1" max="4000">
-                    </div>
-                    <button class="btn btn-primary" id="save-settings" aria-label="Guardar configuración de OpenAI">
-                        <i class="fas fa-save"></i> Guardar Configuración
-                    </button>
-                </div>
-
-                <div class="settings-section">
-                    <h3>Configuración del Chatbot</h3>
-                    <div class="form-group">
-                        <label for="chatbot-name-input">Nombre del Chatbot</label>
-                        <input type="text" id="chatbot-name-input" class="form-control" placeholder="Mi Chatbot">
-                    </div>
-                    <div class="form-group">
-                        <label for="welcome-message">Mensaje de Bienvenida</label>
-                        <textarea id="welcome-message" class="form-control" rows="2" placeholder="¡Hola! ¿En qué puedo ayudarte?"></textarea>
-                    </div>
-                    <button class="btn btn-primary" id="save-chatbot-settings" aria-label="Guardar configuración del chatbot">
-                        <i class="fas fa-save"></i> Guardar Configuración
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Functions Page -->
-        <div id="page-functions" class="page">
-            <div class="functions-container">
-                <div class="functions-header">
-                    <div>
-                        <h2>Funciones</h2>
-                        <p class="functions-description">Añade funcionalidades personalizadas que tu chatbot puede ejecutar</p>
-                    </div>
-                    <button class="btn btn-primary" id="add-function-btn">
-                        <i class="fas fa-plus"></i> Crear Función
-                    </button>
-                </div>
-
-                <div class="functions-list" id="functions-list">
-                    <!-- Functions will be loaded here -->
-                    <div class="empty-state">
-                        <i class="fas fa-code"></i>
-                        <h3>No hay funciones configuradas</h3>
-                        <p>Las funciones permiten que tu chatbot realice acciones específicas como buscar información, realizar cálculos o conectarse con APIs externas.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Prompts Page -->
-        <div id="page-prompts" class="page">
-            <div class="prompts-container">
-                <div class="prompts-header">
-                    <div>
-                        <h2>Respuestas Rápidas</h2>
-                        <p class="prompts-description">Los botones de respuestas rápidas aparecen sobre el input del usuario, proporcionando una forma rápida de obtener respuestas.</p>
-                    </div>
-                    <button class="btn btn-primary" id="add-prompt-btn">
-                        <i class="fas fa-plus"></i> Añadir Respuesta Rápida
-                    </button>
-                </div>
-
-                <div class="prompts-list" id="prompts-list">
-                    <!-- Prompts will be loaded here -->
-                    <div class="empty-state">
+                <div class="nav-section">
+                    <span class="nav-section-title">Chatbot</span>
+                    <a href="#" class="nav-item" data-page="train">
+                        <i class="fas fa-brain"></i>
+                        <span>Entrenamiento</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="appearance">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>Apariencia</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="prompts">
                         <i class="fas fa-bolt"></i>
-                        <h3>No hay respuestas rápidas configuradas</h3>
-                        <p>Crea botones rápidos para que tus usuarios puedan acceder fácilmente a información o iniciar conversaciones específicas.</p>
+                        <span>Respuestas Rápidas</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="functions">
+                        <i class="fas fa-code"></i>
+                        <span>Funciones</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">Configuración</span>
+                    <a href="#" class="nav-item" data-page="integrations">
+                        <i class="fas fa-plug"></i>
+                        <span>Integraciones</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Ajustes</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">A</div>
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Pro Plan</span>
                     </div>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <!-- Appearance Page -->
-        <div id="page-appearance" class="page">
-            <div class="appearance-container-new">
-                <h2 class="appearance-title">Apariencia</h2>
-                
-                <!-- Tabs -->
-                <div class="appearance-tabs">
-                    <button class="appearance-tab active" data-tab="content">
-                        <i class="fas fa-align-left"></i> Contenido
-                    </button>
-                    <button class="appearance-tab" data-tab="colors">
-                        <i class="fas fa-palette"></i> Colores
-                    </button>
-                    <button class="appearance-tab" data-tab="chat-bubble">
-                        <i class="fas fa-comment"></i> Burbuja de Chat
-                    </button>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">Dashboard</h1>
                 </div>
-
-                <!-- Tab Content -->
-                <div class="appearance-content">
-                    
-                    <!-- Content Tab -->
-                    <div class="appearance-tab-content active" data-content="content">
-                        <div class="form-group">
-                            <label for="chatbot-name">Nombre del Chatbot</label>
-                            <input type="text" id="chatbot-name" class="form-control" placeholder="Mi Asistente">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="welcome-message">Mensaje de Bienvenida</label>
-                            <textarea id="welcome-message" class="form-control" rows="3" placeholder="¡Hola! ¿En qué puedo ayudarte?"></textarea>
-                            <small class="form-text">El primer mensaje que verán los usuarios en el chatbot.</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="input-placeholder">Texto del Placeholder de Entrada</label>
-                            <input type="text" id="input-placeholder" class="form-control" placeholder="Escribe tu mensaje...">
-                            <small class="form-text">El texto por defecto que los usuarios ven antes de escribir.</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Avatar del Bot</label>
-                            <div class="file-upload-box">
-                                <i class="fas fa-robot"></i>
-                                <button class="btn-upload">Seleccionar archivo</button>
-                                <span class="file-name">Ningún archivo seleccionado</span>
-                                <input type="file" id="bot-avatar" accept="image/*" class="hidden-file-input" aria-label="Subir avatar del bot">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Logo de la Compañía</label>
-                            <div class="file-upload-box">
-                                <i class="fas fa-building"></i>
-                                <button class="btn-upload">Seleccionar archivo</button>
-                                <span class="file-name">Ningún archivo seleccionado</span>
-                                <input type="file" id="company-logo" accept="image/*" class="hidden-file-input" aria-label="Subir logo de la compañía">
-                            </div>
-                        </div>
-
-                        <div class="form-group toggle-group">
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <label>Mostrar Respuestas Rápidas Verticalmente</label>
-                                    <small>Activar esta opción no se reflejará en la demostración.</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="display-prompts-vertical" aria-label="Mostrar respuestas rápidas verticalmente">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <label>Ocultar Avatar y Nombre del Bot</label>
-                                    <small>Activa esto para un aspecto más minimalista.</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="hide-bot-avatar" aria-label="Ocultar avatar y nombre del bot">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <label>Ocultar Fuentes</label>
-                                    <small>Activa esto para ocultar las fuentes relevantes usadas para responder.</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="hide-sources" aria-label="Ocultar fuentes">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <label>Ocultar Marca de Support AI</label>
-                                    <small>Activa esto para eliminar el enlace a Support AI. Reservado para cuentas de pago.</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="hide-branding" aria-label="Ocultar marca de Support AI">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Colors Tab -->
-                    <div class="appearance-tab-content" data-content="colors">
-                        <div class="color-group">
-                            <label>Color Principal</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para color principal" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para color principal" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para color principal" title="Púrpura"></button>
-                                <button class="color-btn active" data-color="#3B82F6"  aria-label="Seleccionar azul para color principal" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para color principal" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para color principal" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para color principal" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para color principal" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para color principal" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para color principal" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="primary-color-picker" aria-label="Abrir selector de color personalizado para color principal" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="primary-color-picker" aria-label="Selector de color personalizado para color principal">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Fondo del Encabezado</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para color principal" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fondo del encabezado" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fondo del encabezado" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fondo del encabezado" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fondo del encabezado" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fondo del encabezado" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para fondo del encabezado" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para fondo del encabezado" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fondo del encabezado" title="Rosa"></button>
-                                <button class="color-btn active" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fondo del encabezado" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="header-bg-picker" aria-label="Abrir selector de color personalizado para fondo del encabezado" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="header-bg-picker" aria-label="Selector de color personalizado para fondo del encabezado">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color de Fuente del Encabezado</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"  aria-label="Seleccionar negro para fondo del encabezado" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fondo del encabezado" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fuente del encabezado" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fuente del encabezado" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fuente del encabezado" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fuente del encabezado" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para fuente del encabezado" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para fuente del encabezado" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fuente del encabezado" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fuente del encabezado" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="header-font-picker" aria-label="Abrir selector de color personalizado para fuente del encabezado" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="header-font-picker" aria-label="Selector de color personalizado para fuente del encabezado">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color de Fondo de la Burbuja del Usuario</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para fuente del encabezado" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fuente del encabezado" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fuente del encabezado" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fondo de burbuja de usuario" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fondo de burbuja de usuario" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fondo de burbuja de usuario" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para fondo de burbuja de usuario" title="Amarillo"></button>
-                                <button class="color-btn active" data-color="#10B981"  aria-label="Seleccionar verde para fondo de burbuja de usuario" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fondo de burbuja de usuario" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fondo de burbuja de usuario" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="user-bubble-picker" aria-label="Abrir selector de color personalizado para fondo de burbuja de usuario" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="user-bubble-picker" aria-label="Selector de color personalizado para fondo de burbuja de usuario">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color de Fondo de Respuestas Rápidas</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para fondo de burbuja de usuario" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fondo de burbuja de usuario" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fondo de burbuja de usuario" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fondo de burbuja de usuario" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fuente de burbuja de usuario" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fuente de burbuja de usuario" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para fuente de burbuja de usuario" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para fuente de burbuja de usuario" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fuente de burbuja de usuario" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fuente de burbuja de usuario" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn active" data-color="custom" data-input="prompts-bg-picker" aria-label="Abrir selector de color personalizado para fuente de burbuja de usuario" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-bg-picker" aria-label="Selector de color personalizado para fuente de burbuja de usuario">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color del Borde de Respuestas Rápidas</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para fuente de burbuja de usuario" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fuente de burbuja de usuario" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fuente de burbuja de usuario" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fuente de burbuja de usuario" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fuente de burbuja de usuario" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fondo de respuestas rápidas" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para fondo de respuestas rápidas" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para fondo de respuestas rápidas" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fondo de respuestas rápidas" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fondo de respuestas rápidas" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn active" data-color="custom" data-input="prompts-border-picker" aria-label="Abrir selector de color personalizado para fondo de respuestas rápidas" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-border-picker" aria-label="Selector de color personalizado para fondo de respuestas rápidas">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color de Fuente de Respuestas Rápidas</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"  aria-label="Seleccionar negro para fondo de respuestas rápidas" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fondo de respuestas rápidas" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fondo de respuestas rápidas" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fondo de respuestas rápidas" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fondo de respuestas rápidas" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fondo de respuestas rápidas" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para borde de respuestas rápidas" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para borde de respuestas rápidas" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para borde de respuestas rápidas" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para borde de respuestas rápidas" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="prompts-font-picker" aria-label="Abrir selector de color personalizado para fuente de burbuja de usuario" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-font-picker" aria-label="Selector de color personalizado para borde de respuestas rápidas">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color de Fondo de Respuestas Rápidas (Hover)</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para borde de respuestas rápidas" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para borde de respuestas rápidas" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para borde de respuestas rápidas" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para borde de respuestas rápidas" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para borde de respuestas rápidas" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para borde de respuestas rápidas" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para borde de respuestas rápidas" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para fuente de respuestas rápidas (normal)" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fuente de respuestas rápidas (normal)" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fuente de respuestas rápidas (normal)" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn active" data-color="custom" data-input="prompts-bg-hover-picker" aria-label="Abrir selector de color personalizado para fuente de respuestas rápidas (normal)" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-bg-hover-picker" aria-label="Selector de color personalizado para fuente de respuestas rápidas (normal)">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color del Borde de Respuestas Rápidas (Hover)</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para fuente de respuestas rápidas (normal)" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fuente de respuestas rápidas (normal)" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fuente de respuestas rápidas (normal)" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fuente de respuestas rápidas (normal)" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fuente de respuestas rápidas (normal)" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fuente de respuestas rápidas (normal)" title="Naranja"></button>
-                                <button class="color-btn active" data-color="#EAB308"  aria-label="Seleccionar amarillo para fuente de respuestas rápidas (normal)" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para fuente de respuestas rápidas (normal)" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fuente de respuestas rápidas (hover)" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fuente de respuestas rápidas (hover)" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="prompts-border-hover-picker" aria-label="Abrir selector de color personalizado para fondo de respuestas rápidas" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-border-hover-picker" aria-label="Selector de color personalizado para fuente de respuestas rápidas (hover)">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color de Fuente de Respuestas Rápidas (Hover)</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"  aria-label="Seleccionar negro para fuente de respuestas rápidas (hover)" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fuente de respuestas rápidas (hover)" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fuente de respuestas rápidas (hover)" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fuente de respuestas rápidas (hover)" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fuente de respuestas rápidas (hover)" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fuente de respuestas rápidas (hover)" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para fuente de respuestas rápidas (hover)" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para fuente de respuestas rápidas (hover)" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fuente de respuestas rápidas (hover)" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fondo de burbuja de chat" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="prompts-font-hover-picker" aria-label="Abrir selector de color personalizado para borde de respuestas rápidas" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-font-hover-picker" aria-label="Selector de color personalizado para fondo de burbuja de chat">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chat Bubble Tab -->
-                    <div class="appearance-tab-content" data-content="chat-bubble">
-                        <div class="bubble-settings-row">
-                            <div class="form-group">
-                                <label for="chat-icon-size">Tamaño del Icono de Chat</label>
-                                <select id="chat-icon-size" class="form-control">
-                                    <option value="small">Pequeño (48×48 px)</option>
-                                    <option value="medium" selected>Mediano (56×56 px)</option>
-                                    <option value="large">Grande (64×64 px)</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="position-screen">Posición en Pantalla</label>
-                                <select id="position-screen" class="form-control">
-                                    <option value="bottom-right" selected>Abajo - Derecha</option>
-                                    <option value="bottom-left">Abajo - Izquierda</option>
-                                    <option value="top-right">Arriba - Derecha</option>
-                                    <option value="top-left">Arriba - Izquierda</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="bubble-settings-row">
-                            <div class="form-group">
-                                <label for="distance-bottom">Distancia desde Abajo</label>
-                                <input type="number" id="distance-bottom" class="form-control" value="16" min="0" max="100">
-                                <small class="form-text">La vista previa de distancias no está disponible.</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="distance-side">Distancia desde el Lado</label>
-                                <input type="number" id="distance-side" class="form-control" value="16" min="0" max="100">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Icono de la Burbuja de Chat</label>
-                            <div class="icon-selector">
-                                <button class="icon-btn" data-icon="comment" aria-label="Icono de comentario" title="Comentario"><i class="fas fa-comment"></i></button>
-                                <button class="icon-btn" data-icon="whatsapp" aria-label="Icono de WhatsApp" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
-                                <button class="icon-btn" data-icon="comment-dots" aria-label="Icono de comentario con puntos" title="Chat"><i class="fas fa-comment-dots"></i></button>
-                                <button class="icon-btn active" data-icon="comments" aria-label="Icono de comentarios múltiples" title="Comentarios"><i class="fas fa-comments"></i></button>
-                                <button class="icon-btn" data-icon="headset" aria-label="Icono de auriculares" title="Soporte"><i class="fas fa-headset"></i></button>
-                                <button class="icon-btn" data-icon="life-ring" aria-label="Icono de salvavidas" title="Ayuda"><i class="fas fa-life-ring"></i></button>
-                                <button class="icon-btn" data-icon="comment-alt" aria-label="Icono de comentario alternativo" title="Mensaje"><i class="far fa-comment-alt"></i></button>
-                                <button class="icon-btn" data-icon="question-circle" aria-label="Icono de pregunta" title="Pregunta"><i class="fas fa-question-circle"></i></button>
-                                <button class="icon-btn" data-icon="info-circle" aria-label="Icono de información" title="Información"><i class="fas fa-info-circle"></i></button>
-                                <button class="icon-btn" data-icon="comment-medical" aria-label="Icono de comentario médico" title="Médico"><i class="fas fa-comment-medical"></i></button>
-                                <button class="icon-btn" data-icon="briefcase" aria-label="Icono de maletín" title="Negocios"><i class="fas fa-briefcase"></i></button>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color de Fondo de la Burbuja de Chat</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para fondo de burbuja de chat" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para fondo de burbuja de chat" title="Gris"></button>
-                                <button class="color-btn active" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para fondo de burbuja de chat" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para fondo de burbuja de chat" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para fondo de burbuja de chat" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para fondo de burbuja de chat" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para fondo de burbuja de chat" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para fondo de burbuja de chat" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para fondo de burbuja de chat" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para fondo de burbuja de chat" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="bubble-bg-picker" aria-label="Abrir selector de color personalizado para fuente de respuestas rápidas (normal)" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="bubble-bg-picker" aria-label="Selector de color personalizado">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color del Icono de la Burbuja de Chat</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"  aria-label="Seleccionar negro para color" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para color" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para color" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para color" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para color" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para color" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para color" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para color" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para color" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para color" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="bubble-icon-picker" aria-label="Abrir selector de color personalizado para fuente de respuestas rápidas (hover)" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="bubble-icon-picker" aria-label="Selector de color personalizado">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="bubble-message">Mensaje de la Burbuja de Chat</label>
-                            <input type="text" id="bubble-message" class="form-control" placeholder="Consulte aquí">
-                            <small class="form-text">Este mensaje aparece como un tooltip cuando tu chatbot está cerrado para los visitantes por primera vez. Déjalo vacío para eliminarlo.</small>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color de Fondo del Mensaje de la Burbuja</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"  aria-label="Seleccionar negro para color" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para color" title="Gris"></button>
-                                <button class="color-btn active" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para color" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para color" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para color" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para color" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para color" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para color" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para color" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para color" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="bubble-msg-bg-picker" aria-label="Abrir selector de color personalizado para fondo de burbuja de chat" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="bubble-msg-bg-picker" aria-label="Selector de color personalizado">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="color-group">
-                            <label>Color del Texto del Mensaje de la Burbuja</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"  aria-label="Seleccionar negro para color" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"  aria-label="Seleccionar gris para color" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"  aria-label="Seleccionar púrpura para color" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"  aria-label="Seleccionar azul para color" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"  aria-label="Seleccionar rojo para color" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"  aria-label="Seleccionar naranja para color" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"  aria-label="Seleccionar amarillo para color" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"  aria-label="Seleccionar verde para color" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"  aria-label="Seleccionar rosa para color" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"  aria-label="Seleccionar blanco para color" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom" data-input="bubble-msg-color-picker" aria-label="Abrir selector de color personalizado para color" title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="bubble-msg-color-picker" aria-label="Selector de color personalizado">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="custom-bubble-css">CSS Personalizado de la Burbuja</label>
-                            <textarea id="custom-bubble-css" class="form-control code-textarea" rows="6" placeholder=".chat-bubble { /* Tu CSS personalizado aquí */ }"></textarea>
-                            <small class="form-text">Los cambios aplicados al CSS personalizado no se verán reflejados inmediatamente en la demostración.</small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Save Button -->
-                <div class="appearance-footer">
-                    <button class="btn btn-primary btn-save-appearance" id="save-appearance">
-                        <i class="fas fa-save"></i> Guardar Cambios
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Integrations Page -->
-        <div id="page-integrations" class="page">
-            <div class="integrations-container">
-                <div class="integration-card">
-                    <div class="integration-header">
-                        <h3><i class="fas fa-code"></i> Integración JavaScript</h3>
-                    </div>
-                    <p>Copia y pega este código en el HTML de tu sitio web:</p>
-                    <div class="code-block">
-                        <pre id="integration-code"><code><script src="http://localhost:3000/widget.js"
-        data-api-url="http://localhost:3000/api"
-        data-title="Mi Asistente"
-        data-welcome="¡Hola! ¿En qué puedo ayudarte?"></script></code></pre>
-                        <button class="btn-copy" id="copy-integration-code" aria-label="Copiar código de integración">
-                            <i class="fas fa-copy"></i> Copiar
+                <div class="header-right">
+                    <div class="chatbot-selector">
+                        <button id="chatbot-current" class="btn-selector">
+                            <span id="current-chatbot-name">Seleccionar Chatbot</span>
+                            <i class="fas fa-chevron-down"></i>
                         </button>
+                        <div id="chatbot-dropdown" class="dropdown-menu hidden">
+                            <div id="chatbot-list">
+                                <!-- Chatbots list will be populated here -->
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <button id="btn-new-chatbot" class="dropdown-item create-new">
+                                <i class="fas fa-plus"></i> Crear Nuevo Chatbot
+                            </button>
+                        </div>
                     </div>
+                    <button class="btn-icon"><i class="fas fa-bell"></i></button>
                 </div>
+            </header>
 
-                <div class="integration-card">
-                    <div class="integration-header">
-                        <h3><i class="fas fa-plug"></i> Integración API</h3>
+            <!-- Page Content -->
+            <div class="content-wrapper">
+
+                <!-- Dashboard Page -->
+                <div id="page-dashboard" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fas fa-comment-alt"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Mensajes Totales</span>
+                                <span class="stat-value" id="total-messages">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Conversaciones</span>
+                                <span class="stat-value" id="total-conversations">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple"><i class="fas fa-brain"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Items Entrenados</span>
+                                <span class="stat-value" id="training-count">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange"><i class="fas fa-address-book"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Leads Capturados</span>
+                                <span class="stat-value" id="total-leads">0</span>
+                            </div>
+                        </div>
                     </div>
-                    <p>Usa nuestra API REST para integrar el chatbot:</p>
-                    <div class="api-endpoint">
-                        <strong>POST</strong> /api/chat
-                        <div class="code-block">
-                            <pre><code>{
-  "message": "Hello",
-  "sessionId": "optional-session-id"
-}</code></pre>
+
+                    <div class="charts-section">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3>Actividad de Chat</h3>
+                                <div class="chart-actions">
+                                    <button class="chart-tab active" data-period="7d">7 días</button>
+                                    <button class="chart-tab" data-period="30d">30 días</button>
+                                </div>
+                            </div>
+                            <canvas id="chat-history-chart"></canvas>
                         </div>
                     </div>
                 </div>
+
+                <!-- Placeholder for other pages (will be populated dynamically or kept hidden) -->
+                <div id="page-conversations" class="page">
+                    <h2>Conversaciones</h2>
+                    <p>Próximamente...</p>
+                </div>
+                <div id="page-leads" class="page">
+                    <h2>Contactos</h2>
+                    <p>Próximamente...</p>
+                </div>
+                <div id="page-train" class="page">
+                    <!-- Training Content (Migrated from old dashboard) -->
+                    <div class="section-header">
+                        <h2>Entrenamiento del Chatbot</h2>
+                        <p>Sube archivos o añade enlaces para que tu chatbot aprenda.</p>
+                    </div>
+                    <div class="training-grid">
+                        <div class="upload-card">
+                            <i class="fas fa-file-upload"></i>
+                            <h3>Archivos</h3>
+                            <p>PDF, DOCX, TXT</p>
+                            <button class="btn-primary" onclick="document.getElementById('file-upload').click()">Subir
+                                Archivos</button>
+                            <input type="file" id="file-upload" multiple hidden>
+                        </div>
+                        <div class="upload-card">
+                            <i class="fas fa-link"></i>
+                            <h3>Sitio Web</h3>
+                            <p>Rastrea tu web</p>
+                            <button class="btn-secondary" id="btn-add-url">Añadir URL</button>
+                        </div>
+                        <div class="upload-card">
+                            <i class="fas fa-align-left"></i>
+                            <h3>Texto</h3>
+                            <p>Entrada directa</p>
+                            <button class="btn-secondary" id="btn-add-text">Escribir Texto</button>
+                        </div>
+                    </div>
+                    <div class="training-list-section">
+                        <h3>Fuentes de Datos</h3>
+                        <div id="training-list" class="data-list"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="page-settings" class="page">
+                    <div class="settings-container">
+                        <div class="settings-tabs">
+                            <button class="tab-btn active" data-tab="general">General</button>
+                            <button class="tab-btn" data-tab="model">Modelo</button>
+                        </div>
+                        <div class="settings-content">
+                            <!-- Content will be migrated -->
+                            <div class="form-group">
+                                <label>Nombre del Chatbot</label>
+                                <input type="text" class="form-control" id="chatbot-name-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Mensaje de Bienvenida</label>
+                                <textarea class="form-control" id="welcome-message"></textarea>
+                            </div>
+                            <button class="btn-primary" id="save-chatbot-settings">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Integrations / Deploy Page -->
+                <div id="page-integrations" class="page">
+                    <div class="deploy-container">
+                        <div class="deploy-header">
+                            <h2>Instalar Chatbot</h2>
+                            <p>Copia y pega este código en tu sitio web para activar el chatbot.</p>
+                        </div>
+                        <div class="code-block-wrapper">
+                            <div class="code-header">
+                                <span>HTML</span>
+                                <button class="btn-copy" id="copy-integration-code"><i class="fas fa-copy"></i>
+                                    Copiar</button>
+                            </div>
+                            <pre><code id="integration-code" class="language-html">&lt;!-- Cargando código... --&gt;</code></pre>
+                        </div>
+                        <div class="deploy-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Copia el código de arriba.</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Pégalo en el <code>&lt;head&gt;</code> o antes del cierre
+                                    <code>&lt;/body&gt;</code> de tu HTML.</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-text">¡Listo! El widget aparecerá en tu web.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appearance Page -->
+                <div id="page-appearance" class="page">
+                    <h2>Apariencia</h2>
+                    <p>Configuración visual (migración pendiente).</p>
+                </div>
+
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
     <!-- Modals -->
-    <!-- Upload Files Modal -->
-    <div id="upload-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Subir Archivos de Entrenamiento</h3>
-                <button class="modal-close" aria-label="Cerrar modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="upload-area" id="upload-area">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Arrastra y suelta archivos aquí o haz clic para buscar</p>
-                    <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt" aria-label="Seleccionar archivos">
-                </div>
-                <div id="upload-progress" class="upload-progress hidden">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
-                    </div>
-                    <p id="upload-status">Subiendo...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- URL Training Modal -->
-    <div id="url-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Entrenar desde URL</h3>
-                <button class="modal-close" aria-label="Cerrar modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="training-url">URL del Sitio Web</label>
-                    <input type="url" id="training-url" class="form-control" placeholder="https://example.com">
-                </div>
-                <div class="form-group">
-                    <label for="crawl-subpages">
-                        <input type="checkbox" id="crawl-subpages">
-                        Rastrear subpáginas
-                    </label>
-                </div>
-                <button class="btn btn-primary" id="start-url-training" aria-label="Iniciar entrenamiento desde URL">
-                    <i class="fas fa-play"></i> Iniciar Entrenamiento
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Text Training Modal -->
-    <div id="text-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Añadir Texto de Entrenamiento</h3>
-                <button class="modal-close" aria-label="Cerrar modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="training-text">Texto de Entrenamiento</label>
-                    <textarea id="training-text" class="form-control" rows="10" placeholder="Introduce tus datos de entrenamiento aquí..."></textarea>
-                </div>
-                <button class="btn btn-primary" id="save-training-text" aria-label="Guardar datos de entrenamiento">
-                    <i class="fas fa-save"></i> Guardar Datos de Entrenamiento
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- New Chatbot Modal -->
     <div id="new-chatbot-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content wizard-modal">
             <div class="modal-header">
-                <h3>Crear Nuevo Chatbot</h3>
-                <button class="modal-close" aria-label="Cerrar modal">&times;</button>
+                <h2>Crear Nuevo Chatbot</h2>
+                <button class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="new-chatbot-name">Nombre del Chatbot *</label>
-                    <input type="text" id="new-chatbot-name" class="form-control" placeholder="ej., Centro Médico" required>
-                </div>
-                <div class="form-group">
-                    <label for="new-chatbot-description">Descripción</label>
-                    <textarea id="new-chatbot-description" class="form-control" rows="3" placeholder="Breve descripción de este chatbot..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="new-chatbot-api-key">Clave API de OpenAI (opcional)</label>
-                    <input type="password" id="new-chatbot-api-key" class="form-control" placeholder="sk-...">
-                    <small>Déjalo vacío para usar la clave API por defecto</small>
-                </div>
-                <div class="form-group">
-                    <label for="new-chatbot-model">Modelo</label>
-                    <select id="new-chatbot-model" class="form-control">
-                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                        <option value="gpt-4">GPT-4</option>
-                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="new-chatbot-prompt">Prompt del Sistema</label>
-                    <textarea id="new-chatbot-prompt" class="form-control" rows="4" placeholder="Eres un asistente útil...">Eres un asistente útil y amigable.</textarea>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary modal-close" aria-label="Cancelar">Cancelar</button>
-                    <button class="btn btn-primary" id="create-chatbot-btn" aria-label="Crear chatbot">
-                        <i class="fas fa-plus"></i> Crear Chatbot
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Prompt Editor Modal -->
-    <div id="prompt-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="prompt-modal-title">Añadir Respuesta Rápida</h3>
-                <button class="modal-close" aria-label="Cerrar modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="prompt-button-title">
-                        <i class="fas fa-tag"></i> Título del Botón <span class="required">*</span>
-                    </label>
-                    <input type="text" id="prompt-button-title" class="form-input" placeholder="Ej: Pricing, Contacto, Agendar cita" maxlength="50">
-                    <small class="form-hint">Este es el texto que verán tus usuarios en el botón</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="prompt-link">
-                        <i class="fas fa-link"></i> Enlace Externo <span class="optional">(Opcional)</span>
-                    </label>
-                    <input type="url" id="prompt-link" class="form-input" placeholder="https://ejemplo.com/pricing">
-                    <small class="form-hint">El botón abrirá este enlace en una nueva pestaña</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="prompt-text">
-                        <i class="fas fa-comment-dots"></i> Mensaje al Chatbot <span class="optional">(Opcional)</span>
-                    </label>
-                    <textarea id="prompt-text" class="form-textarea" placeholder="Ej: ¿Cuáles son sus precios y planes disponibles?" rows="4"></textarea>
-                    <small class="form-hint">Este mensaje se enviará automáticamente al chatbot</small>
-                </div>
-
-                <div class="form-notice">
-                    <i class="fas fa-lightbulb"></i>
-                    <p>Puedes elegir entre un <strong>Enlace Externo</strong> o un <strong>Mensaje al Chatbot</strong>. Si añades ambos, el enlace tendrá prioridad.</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancel-prompt-btn">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-                <button class="btn btn-primary" id="save-prompt-btn">
-                    <i class="fas fa-check"></i> Guardar Respuesta Rápida
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Function Editor Modal -->
-    <div id="function-modal" class="modal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h3 id="function-modal-title">Crear Función</h3>
-                <button class="modal-close" aria-label="Cerrar modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="function-name">Nombre de la Función *</label>
-                    <input type="text" id="function-name" class="form-control" placeholder="ej., buscar_producto" required>
-                    <small>Solo letras, números y guiones bajos. Sin espacios.</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="function-description">Descripción *</label>
-                    <textarea id="function-description" class="form-control" rows="2" placeholder="Describe qué hace esta función..." required></textarea>
-                    <small>Explica claramente qué hace la función para que el chatbot sepa cuándo usarla.</small>
-                </div>
-
-                <div class="form-group">
-                    <label>Parámetros</label>
-                    <div id="parameters-list" class="parameters-list">
-                        <!-- Parameters will be added here -->
+                <!-- Step 1: Basic Info -->
+                <div class="wizard-step active" data-step="1">
+                    <div class="form-group">
+                        <label>Nombre del Chatbot</label>
+                        <input type="text" id="new-chatbot-name" class="form-control"
+                            placeholder="Ej. Mi Asistente de Soporte">
                     </div>
-                    <button type="button" class="btn btn-secondary btn-sm" id="add-parameter-btn">
-                        <i class="fas fa-plus"></i> Añadir Parámetro
-                    </button>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea id="new-chatbot-description" class="form-control"
+                            placeholder="¿Para qué servirá este chatbot?"></textarea>
+                    </div>
+                    <button class="btn-primary full-width" id="btn-step-1">Siguiente: Fuentes de Datos</button>
                 </div>
 
-                <div class="form-group">
-                    <label for="function-endpoint">URL del Endpoint *</label>
-                    <input type="url" id="function-endpoint" class="form-control" placeholder="https://api.example.com/action" required>
-                    <small>La URL donde se enviará la solicitud cuando se llame a esta función.</small>
+                <!-- Step 2: Data Sources -->
+                <div class="wizard-step hidden" data-step="2">
+                    <h3>Entrena tu Chatbot</h3>
+                    <p class="text-secondary">Sube archivos o añade una URL para que el bot aprenda.</p>
+
+                    <div class="wizard-options">
+                        <div class="option-card" id="wiz-opt-file">
+                            <i class="fas fa-file-upload"></i>
+                            <span>Subir Archivos</span>
+                        </div>
+                        <div class="option-card" id="wiz-opt-url">
+                            <i class="fas fa-link"></i>
+                            <span>Añadir URL</span>
+                        </div>
+                    </div>
+
+                    <div id="wiz-upload-area" class="hidden mt-4">
+                        <input type="file" id="wiz-file-input" class="form-control">
+                    </div>
+                    <div id="wiz-url-area" class="hidden mt-4">
+                        <input type="url" id="wiz-url-input" class="form-control" placeholder="https://tu-sitio.com">
+                    </div>
+
+                    <div class="wizard-actions">
+                        <button class="btn-secondary" id="btn-back-2">Atrás</button>
+                        <button class="btn-primary" id="btn-step-2">Siguiente: Personalizar</button>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="function-method">Método HTTP</label>
-                    <select id="function-method" class="form-control">
-                        <option value="GET">GET</option>
-                        <option value="POST" selected>POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="DELETE">DELETE</option>
-                    </select>
-                </div>
+                <!-- Step 3: Customization -->
+                <div class="wizard-step hidden" data-step="3">
+                    <h3>Personaliza la Apariencia</h3>
+                    <div class="form-group">
+                        <label>Color Principal</label>
+                        <input type="color" id="wiz-color" class="form-control" value="#2563eb" style="height: 50px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Mensaje de Bienvenida</label>
+                        <input type="text" id="wiz-welcome" class="form-control" value="¡Hola! ¿En qué puedo ayudarte?">
+                    </div>
 
-                <div class="form-group">
-                    <label for="function-headers">Headers (JSON)</label>
-                    <textarea id="function-headers" class="form-control code-textarea" rows="4" placeholder='{"Authorization": "Bearer tu_token", "Content-Type": "application/json"}'></textarea>
-                    <small>Headers HTTP en formato JSON.</small>
-                </div>
-
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="function-enabled">
-                        Función Habilitada
-                    </label>
-                    <small class="d-block">Si está deshabilitada, el chatbot no podrá usar esta función.</small>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-secondary modal-close">Cancelar</button>
-                    <button class="btn btn-primary" id="save-function-btn">
-                        <i class="fas fa-save"></i> Guardar Función
-                    </button>
+                    <div class="wizard-actions">
+                        <button class="btn-secondary" id="btn-back-3">Atrás</button>
+                        <button class="btn-primary" id="btn-step-3">Finalizar y Desplegar</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/js/dashboard.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
+
 </html>

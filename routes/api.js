@@ -10,14 +10,22 @@ const documentProcessor = new DocumentProcessor();
 // Endpoint para enviar mensajes al chatbot
 router.post('/chat', async (req, res) => {
   try {
-    const { message, sessionId, context, chatbotId } = req.body;
-    
+    let { message, sessionId, context, chatbotId } = req.body;
+
+    // Extract chatbotId from Authorization header if not in body
+    if (!chatbotId && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        chatbotId = authHeader.substring(7);
+      }
+    }
+
     if (!message) {
       return res.status(400).json({ error: 'El mensaje es requerido' });
     }
 
     const response = await chatbotService.processMessage(message, sessionId, context, chatbotId);
-    
+
     res.json({
       success: true,
       response: response.text,
@@ -35,7 +43,7 @@ router.get('/history/:sessionId', async (req, res) => {
   try {
     const { sessionId } = req.params;
     const history = await chatbotService.getConversationHistory(sessionId);
-    
+
     res.json({
       success: true,
       history: history || []
@@ -50,13 +58,13 @@ router.get('/history/:sessionId', async (req, res) => {
 router.post('/config', async (req, res) => {
   try {
     const { apiKey, model, systemPrompt } = req.body;
-    
+
     await chatbotService.updateConfig({
       apiKey,
       model: model || 'gpt-3.5-turbo',
       systemPrompt: systemPrompt || 'Eres un asistente útil y amigable.'
     });
-    
+
     res.json({ success: true, message: 'Configuración actualizada' });
   } catch (error) {
     console.error('Error actualizando configuración:', error);
