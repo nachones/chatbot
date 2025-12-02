@@ -13,8 +13,74 @@
         initNavigation();
         initChatbotSelector();
         initModals();
+        initAppearanceTabs();
         loadChatbots();
     });
+
+    // --- Appearance Tabs ---
+    function initAppearanceTabs() {
+        const tabBtns = document.querySelectorAll('.tab-btn-modern');
+        const panels = document.querySelectorAll('.appearance-panel');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                
+                // Update buttons
+                tabBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update panels
+                panels.forEach(panel => {
+                    panel.classList.remove('active');
+                    if (panel.getAttribute('data-content') === tabName) {
+                        panel.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Initialize color dots
+        initColorDots();
+        
+        // Initialize icon options
+        initIconOptions();
+    }
+
+    function initColorDots() {
+        document.querySelectorAll('.color-presets').forEach(presetGroup => {
+            const dots = presetGroup.querySelectorAll('.color-dot');
+            const colorInput = presetGroup.nextElementSibling;
+            
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    dots.forEach(d => d.classList.remove('active'));
+                    this.classList.add('active');
+                    if (colorInput && colorInput.type === 'color') {
+                        colorInput.value = color;
+                        colorInput.dispatchEvent(new Event('input'));
+                    }
+                });
+            });
+        });
+    }
+
+    function initIconOptions() {
+        const iconOptions = document.querySelectorAll('.icon-option');
+        iconOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                iconOptions.forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                // Update preview bubble icon
+                const icon = this.getAttribute('data-icon');
+                const previewIcon = document.getElementById('preview-bubble-icon');
+                if (previewIcon && icon) {
+                    previewIcon.className = icon === 'whatsapp' ? 'fab fa-whatsapp' : `fas fa-${icon}`;
+                }
+            });
+        });
+    }
 
     // --- Navigation ---
     function initNavigation() {

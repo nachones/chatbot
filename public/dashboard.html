@@ -536,786 +536,531 @@
         </div>
         <!-- Quick Prompts Page -->
         <div id="page-prompts" class="page">
-            <div class="prompts-container">
-                <div class="prompts-header">
-                    <div>
-                        <h2>Respuestas Rápidas</h2>
-                        <p class="prompts-description">Los botones de respuestas rápidas aparecen sobre el input del
-                            usuario, proporcionando una forma rápida de obtener respuestas.</p>
+            <div class="prompts-layout">
+                <!-- Header -->
+                <div class="prompts-header-modern">
+                    <div class="prompts-icon">
+                        <i class="fas fa-bolt"></i>
                     </div>
-                    <button class="btn btn-primary" id="add-prompt-btn">
-                        <i class="fas fa-plus"></i> Añadir Respuesta Rápida
+                    <div class="prompts-header-text">
+                        <h2>Respuestas Rápidas</h2>
+                        <p>Crea botones que aparecen sobre el input para que los usuarios accedan rápidamente a información</p>
+                    </div>
+                    <button class="btn-add-prompt" id="add-prompt-btn">
+                        <i class="fas fa-plus"></i>
+                        <span>Nueva Respuesta</span>
                     </button>
                 </div>
-                <div class="prompts-list" id="prompts-list">
-                    <!-- Prompts will be loaded here -->
-                    <div class="empty-state">
-                        <i class="fas fa-bolt"></i>
-                        <h3>No hay respuestas rápidas configuradas</h3>
-                        <p>Crea botones rápidos para que tus usuarios puedan acceder fácilmente a información o iniciar
-                            conversaciones específicas.</p>
+
+                <!-- Info Card -->
+                <div class="prompts-info-card">
+                    <div class="info-card-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="info-card-content">
+                        <h4>¿Cómo funcionan?</h4>
+                        <p>Las respuestas rápidas son botones que aparecen en el chat. Cuando un usuario hace clic, se envía automáticamente el texto configurado como mensaje.</p>
+                    </div>
+                </div>
+
+                <!-- Prompts Grid -->
+                <div class="prompts-grid" id="prompts-list">
+                    <!-- Example prompt cards - will be replaced by JS -->
+                    <div class="prompt-card-empty">
+                        <div class="empty-icon">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <h3>Sin respuestas rápidas</h3>
+                        <p>Añade tu primera respuesta rápida para mejorar la experiencia de tus usuarios</p>
+                        <button class="btn-empty-add" id="add-prompt-empty">
+                            <i class="fas fa-plus"></i> Crear primera respuesta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="prompts-preview-section">
+                    <h3><i class="fas fa-eye"></i> Vista previa</h3>
+                    <div class="prompts-preview-widget">
+                        <div class="preview-chat-input">
+                            <div class="preview-quick-prompts" id="preview-prompts">
+                                <button class="preview-prompt-btn">¿Cuáles son sus horarios?</button>
+                                <button class="preview-prompt-btn">¿Dónde están ubicados?</button>
+                                <button class="preview-prompt-btn">Quiero hacer una reserva</button>
+                            </div>
+                            <div class="preview-input-bar">
+                                <input type="text" placeholder="Escribe tu mensaje..." disabled>
+                                <button class="preview-send"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Appearance Page -->
         <div id="page-appearance" class="page">
-            <div class="appearance-container-new">
-                <h2 class="appearance-title">Apariencia</h2>
-                <!-- Tabs -->
-                <div class="appearance-tabs">
-                    <button class="appearance-tab active" data-tab="content">
-                        <i class="fas fa-align-left"></i> Contenido
-                    </button>
-                    <button class="appearance-tab" data-tab="colors">
-                        <i class="fas fa-palette"></i> Colores
-                    </button>
-                    <button class="appearance-tab" data-tab="chat-bubble">
-                        <i class="fas fa-comment"></i> Burbuja de Chat
-                    </button>
-                </div>
-                <!-- Tab Content -->
-                <div class="appearance-content">
-                    <!-- Content Tab -->
-                    <div class="appearance-tab-content active" data-content="content">
-                        <div class="form-group">
-                            <label for="chatbot-name">Nombre del Chatbot</label>
-                            <input type="text" id="chatbot-name" class="form-control" placeholder="Mi Asistente">
+            <div class="appearance-layout">
+                <!-- Left Panel - Settings -->
+                <div class="appearance-settings">
+                    <div class="appearance-header-modern">
+                        <div class="appearance-icon">
+                            <i class="fas fa-palette"></i>
                         </div>
-                        <div class="form-group">
-                            <label for="welcome-message">Mensaje de Bienvenida</label>
-                            <textarea id="welcome-message" class="form-control" rows="3"
-                                placeholder="¡Hola! ¿En qué puedo ayudarte?"></textarea>
-                            <small class="form-text">El primer mensaje que verán los usuarios en el chatbot.</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="input-placeholder">Texto del Placeholder de Entrada</label>
-                            <input type="text" id="input-placeholder" class="form-control"
-                                placeholder="Escribe tu mensaje...">
-                            <small class="form-text">El texto por defecto que los usuarios ven antes de
-                                escribir.</small>
-                        </div>
-                        <div class="form-group">
-                            <label>Avatar del Bot</label>
-                            <div class="file-upload-box">
-                                <i class="fas fa-robot"></i>
-                                <button class="btn-upload">Seleccionar archivo</button>
-                                <span class="file-name">Ningún archivo seleccionado</span>
-                                <input type="file" id="bot-avatar" accept="image/*" class="hidden-file-input"
-                                    aria-label="Subir avatar del bot">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Logo de la Compañía</label>
-                            <div class="file-upload-box">
-                                <i class="fas fa-building"></i>
-                                <button class="btn-upload">Seleccionar archivo</button>
-                                <span class="file-name">Ningún archivo seleccionado</span>
-                                <input type="file" id="company-logo" accept="image/*" class="hidden-file-input"
-                                    aria-label="Subir logo de la compañía">
-                            </div>
-                        </div>
-                        <div class="form-group toggle-group">
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <label>Mostrar Respuestas Rápidas Verticalmente</label>
-                                    <small>Activar esta opción no se reflejará en la demostración.</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="display-prompts-vertical"
-                                        aria-label="Mostrar respuestas rápidas verticalmente">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <label>Ocultar Avatar y Nombre del Bot</label>
-                                    <small>Activa esto para un aspecto más minimalista.</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="hide-bot-avatar"
-                                        aria-label="Ocultar avatar y nombre del bot">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <label>Ocultar Fuentes</label>
-                                    <small>Activa esto para ocultar las fuentes relevantes usadas para
-                                        responder.</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="hide-sources" aria-label="Ocultar fuentes">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
-                            <div class="toggle-item">
-                                <div class="toggle-info">
-                                    <label>Ocultar Marca MIABOT</label>
-                                    <small>Activa esto para eliminar el enlace a MIABOT. Reservado para cuentas de
-                                        pago.</small>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="hide-branding" aria-label="Ocultar marca MIABOT">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                            </div>
+                        <div>
+                            <h2>Personaliza tu Chatbot</h2>
+                            <p>Configura la apariencia y comportamiento del widget</p>
                         </div>
                     </div>
-                    <!-- Colors Tab -->
-                    <div class="appearance-tab-content" data-content="colors">
-                        <div class="color-group">
-                            <label>Color Principal</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"
-                                    aria-label="Seleccionar negro para color principal" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para color principal" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para color principal" title="Púrpura"></button>
-                                <button class="color-btn active" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para color principal" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para color principal" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para color principal" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para color principal" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para color principal" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para color principal" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para color principal" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="primary-color-picker"
-                                        aria-label="Abrir selector de color personalizado para color principal"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="primary-color-picker"
-                                        aria-label="Selector de color personalizado para color principal">
+                    
+                    <!-- Modern Tabs -->
+                    <div class="appearance-tabs-modern">
+                        <button class="tab-btn-modern active" data-tab="content">
+                            <i class="fas fa-align-left"></i>
+                            <span>Contenido</span>
+                        </button>
+                        <button class="tab-btn-modern" data-tab="colors">
+                            <i class="fas fa-palette"></i>
+                            <span>Colores</span>
+                        </button>
+                        <button class="tab-btn-modern" data-tab="chat-bubble">
+                            <i class="fas fa-comment-dots"></i>
+                            <span>Burbuja</span>
+                        </button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="appearance-panels">
+                        <!-- Content Tab -->
+                        <div class="appearance-panel active" data-content="content">
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-robot"></i> Identidad del Bot</h3>
+                                <div class="form-group-modern">
+                                    <label for="chatbot-name">Nombre del Chatbot</label>
+                                    <input type="text" id="chatbot-name" class="input-modern" placeholder="Mi Asistente">
+                                </div>
+                                <div class="form-group-modern">
+                                    <label for="welcome-message">Mensaje de Bienvenida</label>
+                                    <textarea id="welcome-message" class="input-modern" rows="3" placeholder="¡Hola! ¿En qué puedo ayudarte?"></textarea>
+                                    <span class="input-hint">El primer mensaje que verán los usuarios</span>
+                                </div>
+                                <div class="form-group-modern">
+                                    <label for="input-placeholder">Placeholder del Input</label>
+                                    <input type="text" id="input-placeholder" class="input-modern" placeholder="Escribe tu mensaje...">
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-image"></i> Imágenes</h3>
+                                <div class="upload-grid">
+                                    <div class="upload-item-modern">
+                                        <div class="upload-preview">
+                                            <i class="fas fa-robot"></i>
+                                        </div>
+                                        <div class="upload-info">
+                                            <span class="upload-label">Avatar del Bot</span>
+                                            <button class="btn-upload-modern">
+                                                <i class="fas fa-cloud-upload-alt"></i> Subir
+                                            </button>
+                                            <input type="file" id="bot-avatar" accept="image/*" class="hidden-file-input">
+                                        </div>
+                                    </div>
+                                    <div class="upload-item-modern">
+                                        <div class="upload-preview">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                        <div class="upload-info">
+                                            <span class="upload-label">Logo Empresa</span>
+                                            <button class="btn-upload-modern">
+                                                <i class="fas fa-cloud-upload-alt"></i> Subir
+                                            </button>
+                                            <input type="file" id="company-logo" accept="image/*" class="hidden-file-input">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-sliders-h"></i> Opciones</h3>
+                                <div class="toggle-list-modern">
+                                    <div class="toggle-item-modern">
+                                        <div class="toggle-content">
+                                            <span class="toggle-label">Respuestas rápidas verticales</span>
+                                            <span class="toggle-desc">Mostrar los botones en columna</span>
+                                        </div>
+                                        <label class="switch-modern">
+                                            <input type="checkbox" id="display-prompts-vertical">
+                                            <span class="slider-modern"></span>
+                                        </label>
+                                    </div>
+                                    <div class="toggle-item-modern">
+                                        <div class="toggle-content">
+                                            <span class="toggle-label">Ocultar avatar del bot</span>
+                                            <span class="toggle-desc">Aspecto más minimalista</span>
+                                        </div>
+                                        <label class="switch-modern">
+                                            <input type="checkbox" id="hide-bot-avatar">
+                                            <span class="slider-modern"></span>
+                                        </label>
+                                    </div>
+                                    <div class="toggle-item-modern">
+                                        <div class="toggle-content">
+                                            <span class="toggle-label">Ocultar fuentes</span>
+                                            <span class="toggle-desc">No mostrar referencias usadas</span>
+                                        </div>
+                                        <label class="switch-modern">
+                                            <input type="checkbox" id="hide-sources">
+                                            <span class="slider-modern"></span>
+                                        </label>
+                                    </div>
+                                    <div class="toggle-item-modern">
+                                        <div class="toggle-content">
+                                            <span class="toggle-label">Ocultar marca MIABOT</span>
+                                            <span class="toggle-desc">Solo para cuentas de pago</span>
+                                        </div>
+                                        <label class="switch-modern">
+                                            <input type="checkbox" id="hide-branding">
+                                            <span class="slider-modern"></span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="color-group">
-                            <label>Fondo del Encabezado</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"
-                                    aria-label="Seleccionar negro para color principal" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fondo del encabezado" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fondo del encabezado" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fondo del encabezado" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fondo del encabezado" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fondo del encabezado" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para fondo del encabezado"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fondo del encabezado" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fondo del encabezado" title="Rosa"></button>
-                                <button class="color-btn active" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fondo del encabezado" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="header-bg-picker"
-                                        aria-label="Abrir selector de color personalizado para fondo del encabezado"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="header-bg-picker"
-                                        aria-label="Selector de color personalizado para fondo del encabezado">
+
+                        <!-- Colors Tab -->
+                        <div class="appearance-panel" data-content="colors">
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-fill-drip"></i> Colores Principales</h3>
+                                
+                                <div class="color-section">
+                                    <div class="color-row">
+                                        <div class="color-info">
+                                            <span class="color-name">Color Principal</span>
+                                            <span class="color-desc">Acentos y elementos destacados</span>
+                                        </div>
+                                        <div class="color-selector">
+                                            <div class="color-presets">
+                                                <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
+                                                <button class="color-dot" data-color="#8B5CF6" style="background:#8B5CF6" title="Púrpura"></button>
+                                                <button class="color-dot" data-color="#3B82F6" style="background:#3B82F6" title="Azul"></button>
+                                                <button class="color-dot" data-color="#10B981" style="background:#10B981" title="Verde"></button>
+                                                <button class="color-dot" data-color="#F59E0B" style="background:#F59E0B" title="Ámbar"></button>
+                                                <button class="color-dot" data-color="#EF4444" style="background:#EF4444" title="Rojo"></button>
+                                                <button class="color-dot" data-color="#EC4899" style="background:#EC4899" title="Rosa"></button>
+                                                <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
+                                            </div>
+                                            <input type="color" id="primary-color-picker" class="color-input-modern" value="#6366F1">
+                                        </div>
+                                    </div>
+
+                                    <div class="color-row">
+                                        <div class="color-info">
+                                            <span class="color-name">Fondo del Header</span>
+                                            <span class="color-desc">Cabecera del widget</span>
+                                        </div>
+                                        <div class="color-selector">
+                                            <div class="color-presets">
+                                                <button class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ddd" title="Blanco"></button>
+                                                <button class="color-dot" data-color="#F3F4F6" style="background:#F3F4F6" title="Gris claro"></button>
+                                                <button class="color-dot" data-color="#1F2937" style="background:#1F2937" title="Oscuro"></button>
+                                                <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
+                                            </div>
+                                            <input type="color" id="header-bg-picker" class="color-input-modern" value="#FFFFFF">
+                                        </div>
+                                    </div>
+
+                                    <div class="color-row">
+                                        <div class="color-info">
+                                            <span class="color-name">Texto del Header</span>
+                                            <span class="color-desc">Título y estado</span>
+                                        </div>
+                                        <div class="color-selector">
+                                            <div class="color-presets">
+                                                <button class="color-dot active" data-color="#111827" style="background:#111827" title="Negro"></button>
+                                                <button class="color-dot" data-color="#6B7280" style="background:#6B7280" title="Gris"></button>
+                                                <button class="color-dot" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ddd" title="Blanco"></button>
+                                            </div>
+                                            <input type="color" id="header-font-picker" class="color-input-modern" value="#111827">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-comment-alt"></i> Burbujas de Chat</h3>
+                                
+                                <div class="color-section">
+                                    <div class="color-row">
+                                        <div class="color-info">
+                                            <span class="color-name">Burbuja del Usuario</span>
+                                            <span class="color-desc">Mensajes enviados</span>
+                                        </div>
+                                        <div class="color-selector">
+                                            <div class="color-presets">
+                                                <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
+                                                <button class="color-dot active" data-color="#10B981" style="background:#10B981" title="Verde"></button>
+                                                <button class="color-dot" data-color="#3B82F6" style="background:#3B82F6" title="Azul"></button>
+                                                <button class="color-dot" data-color="#8B5CF6" style="background:#8B5CF6" title="Púrpura"></button>
+                                            </div>
+                                            <input type="color" id="user-bubble-picker" class="color-input-modern" value="#10B981">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-bolt"></i> Respuestas Rápidas</h3>
+                                <p class="settings-card-desc">Personaliza el aspecto de los botones de respuesta rápida</p>
+                                
+                                <div class="color-grid-compact">
+                                    <div class="color-mini">
+                                        <label>Fondo</label>
+                                        <input type="color" id="prompts-bg-picker" class="color-input-modern" value="#FFFFFF">
+                                    </div>
+                                    <div class="color-mini">
+                                        <label>Borde</label>
+                                        <input type="color" id="prompts-border-picker" class="color-input-modern" value="#E5E7EB">
+                                    </div>
+                                    <div class="color-mini">
+                                        <label>Texto</label>
+                                        <input type="color" id="prompts-font-picker" class="color-input-modern" value="#374151">
+                                    </div>
+                                </div>
+                                
+                                <div class="color-subsection">
+                                    <span class="subsection-label">Estado Hover</span>
+                                    <div class="color-grid-compact">
+                                        <div class="color-mini">
+                                            <label>Fondo</label>
+                                            <input type="color" id="prompts-bg-hover-picker" class="color-input-modern" value="#F3F4F6">
+                                        </div>
+                                        <div class="color-mini">
+                                            <label>Borde</label>
+                                            <input type="color" id="prompts-border-hover-picker" class="color-input-modern" value="#D1D5DB">
+                                        </div>
+                                        <div class="color-mini">
+                                            <label>Texto</label>
+                                            <input type="color" id="prompts-font-hover-picker" class="color-input-modern" value="#111827">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="color-group">
-                            <label>Color de Fuente del Encabezado</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"
-                                    aria-label="Seleccionar negro para fondo del encabezado" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fondo del encabezado" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fuente del encabezado"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fuente del encabezado" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fuente del encabezado" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fuente del encabezado"
-                                    title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para fuente del encabezado"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fuente del encabezado" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fuente del encabezado" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fuente del encabezado" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="header-font-picker"
-                                        aria-label="Abrir selector de color personalizado para fuente del encabezado"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="header-font-picker"
-                                        aria-label="Selector de color personalizado para fuente del encabezado">
+
+                        <!-- Chat Bubble Tab -->
+                        <div class="appearance-panel" data-content="chat-bubble">
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-expand-arrows-alt"></i> Tamaño y Posición</h3>
+                                
+                                <div class="settings-grid">
+                                    <div class="form-group-modern">
+                                        <label for="chat-icon-size">Tamaño del Icono</label>
+                                        <select id="chat-icon-size" class="select-modern">
+                                            <option value="small">Pequeño (48px)</option>
+                                            <option value="medium" selected>Mediano (56px)</option>
+                                            <option value="large">Grande (64px)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group-modern">
+                                        <label for="position-screen">Posición</label>
+                                        <select id="position-screen" class="select-modern">
+                                            <option value="bottom-right" selected>Abajo Derecha</option>
+                                            <option value="bottom-left">Abajo Izquierda</option>
+                                            <option value="top-right">Arriba Derecha</option>
+                                            <option value="top-left">Arriba Izquierda</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group-modern">
+                                        <label for="distance-bottom">Distancia Inferior</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="distance-bottom" class="input-modern" value="16" min="0" max="100">
+                                            <span class="unit">px</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group-modern">
+                                        <label for="distance-side">Distancia Lateral</label>
+                                        <div class="input-with-unit">
+                                            <input type="number" id="distance-side" class="input-modern" value="16" min="0" max="100">
+                                            <span class="unit">px</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color de Fondo de la Burbuja del Usuario</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"
-                                    aria-label="Seleccionar negro para fuente del encabezado" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fuente del encabezado" title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fuente del encabezado"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fondo de burbuja de usuario"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fondo de burbuja de usuario"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fondo de burbuja de usuario"
-                                    title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para fondo de burbuja de usuario"
-                                    title="Amarillo"></button>
-                                <button class="color-btn active" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fondo de burbuja de usuario"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fondo de burbuja de usuario"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fondo de burbuja de usuario"
-                                    title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="user-bubble-picker"
-                                        aria-label="Abrir selector de color personalizado para fondo de burbuja de usuario"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-icons"></i> Icono de la Burbuja</h3>
+                                
+                                <div class="icon-grid-modern">
+                                    <button class="icon-option" data-icon="comment" title="Comentario">
+                                        <i class="fas fa-comment"></i>
                                     </button>
-                                    <input type="color" class="color-picker-input" id="user-bubble-picker"
-                                        aria-label="Selector de color personalizado para fondo de burbuja de usuario">
+                                    <button class="icon-option" data-icon="comment-dots" title="Chat">
+                                        <i class="fas fa-comment-dots"></i>
+                                    </button>
+                                    <button class="icon-option active" data-icon="comments" title="Conversación">
+                                        <i class="fas fa-comments"></i>
+                                    </button>
+                                    <button class="icon-option" data-icon="headset" title="Soporte">
+                                        <i class="fas fa-headset"></i>
+                                    </button>
+                                    <button class="icon-option" data-icon="robot" title="Robot">
+                                        <i class="fas fa-robot"></i>
+                                    </button>
+                                    <button class="icon-option" data-icon="question-circle" title="Ayuda">
+                                        <i class="fas fa-question-circle"></i>
+                                    </button>
+                                    <button class="icon-option" data-icon="life-ring" title="Salvavidas">
+                                        <i class="fas fa-life-ring"></i>
+                                    </button>
+                                    <button class="icon-option" data-icon="whatsapp" title="WhatsApp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color de Fondo de Respuestas Rápidas</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"
-                                    aria-label="Seleccionar negro para fondo de burbuja de usuario"
-                                    title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fondo de burbuja de usuario"
-                                    title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fondo de burbuja de usuario"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fondo de burbuja de usuario"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fuente de burbuja de usuario"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fuente de burbuja de usuario"
-                                    title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para fuente de burbuja de usuario"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fuente de burbuja de usuario"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fuente de burbuja de usuario"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fuente de burbuja de usuario"
-                                    title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn active" data-color="custom"
-                                        data-input="prompts-bg-picker"
-                                        aria-label="Abrir selector de color personalizado para fuente de burbuja de usuario"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-bg-picker"
-                                        aria-label="Selector de color personalizado para fuente de burbuja de usuario">
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-palette"></i> Colores de la Burbuja</h3>
+                                
+                                <div class="color-section">
+                                    <div class="color-row">
+                                        <div class="color-info">
+                                            <span class="color-name">Color de Fondo</span>
+                                        </div>
+                                        <div class="color-selector">
+                                            <div class="color-presets">
+                                                <button class="color-dot active" data-color="#8B5CF6" style="background:#8B5CF6" title="Púrpura"></button>
+                                                <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
+                                                <button class="color-dot" data-color="#3B82F6" style="background:#3B82F6" title="Azul"></button>
+                                                <button class="color-dot" data-color="#10B981" style="background:#10B981" title="Verde"></button>
+                                                <button class="color-dot" data-color="#EF4444" style="background:#EF4444" title="Rojo"></button>
+                                                <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
+                                            </div>
+                                            <input type="color" id="bubble-bg-picker" class="color-input-modern" value="#8B5CF6">
+                                        </div>
+                                    </div>
+                                    <div class="color-row">
+                                        <div class="color-info">
+                                            <span class="color-name">Color del Icono</span>
+                                        </div>
+                                        <div class="color-selector">
+                                            <div class="color-presets">
+                                                <button class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ddd" title="Blanco"></button>
+                                                <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
+                                            </div>
+                                            <input type="color" id="bubble-icon-picker" class="color-input-modern" value="#FFFFFF">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color del Borde de Respuestas Rápidas</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"
-                                    aria-label="Seleccionar negro para fuente de burbuja de usuario"
-                                    title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fuente de burbuja de usuario"
-                                    title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fuente de burbuja de usuario"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fuente de burbuja de usuario"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fuente de burbuja de usuario"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fondo de respuestas rápidas"
-                                    title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para fondo de respuestas rápidas"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fondo de respuestas rápidas"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fondo de respuestas rápidas"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fondo de respuestas rápidas"
-                                    title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn active" data-color="custom"
-                                        data-input="prompts-border-picker"
-                                        aria-label="Abrir selector de color personalizado para fondo de respuestas rápidas"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-border-picker"
-                                        aria-label="Selector de color personalizado para fondo de respuestas rápidas">
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-comment-alt"></i> Mensaje de Burbuja</h3>
+                                
+                                <div class="form-group-modern">
+                                    <label for="bubble-message">Texto del tooltip</label>
+                                    <input type="text" id="bubble-message" class="input-modern" placeholder="¿Necesitas ayuda?">
+                                    <span class="input-hint">Aparece cuando el chat está cerrado</span>
+                                </div>
+                                
+                                <div class="color-row compact">
+                                    <div class="color-mini">
+                                        <label>Fondo</label>
+                                        <input type="color" id="bubble-msg-bg-picker" class="color-input-modern" value="#8B5CF6">
+                                    </div>
+                                    <div class="color-mini">
+                                        <label>Texto</label>
+                                        <input type="color" id="bubble-msg-color-picker" class="color-input-modern" value="#FFFFFF">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color de Fuente de Respuestas Rápidas</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"
-                                    aria-label="Seleccionar negro para fondo de respuestas rápidas"
-                                    title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fondo de respuestas rápidas"
-                                    title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fondo de respuestas rápidas"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fondo de respuestas rápidas"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fondo de respuestas rápidas"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fondo de respuestas rápidas"
-                                    title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para borde de respuestas rápidas"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para borde de respuestas rápidas"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para borde de respuestas rápidas"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para borde de respuestas rápidas"
-                                    title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="prompts-font-picker"
-                                        aria-label="Abrir selector de color personalizado para fuente de burbuja de usuario"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-font-picker"
-                                        aria-label="Selector de color personalizado para borde de respuestas rápidas">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color de Fondo de Respuestas Rápidas (Hover)</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"
-                                    aria-label="Seleccionar negro para borde de respuestas rápidas"
-                                    title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para borde de respuestas rápidas"
-                                    title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para borde de respuestas rápidas"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para borde de respuestas rápidas"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para borde de respuestas rápidas"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para borde de respuestas rápidas"
-                                    title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para borde de respuestas rápidas"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fuente de respuestas rápidas (normal)"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fuente de respuestas rápidas (normal)"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fuente de respuestas rápidas (normal)"
-                                    title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn active" data-color="custom"
-                                        data-input="prompts-bg-hover-picker"
-                                        aria-label="Abrir selector de color personalizado para fuente de respuestas rápidas (normal)"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-bg-hover-picker"
-                                        aria-label="Selector de color personalizado para fuente de respuestas rápidas (normal)">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color del Borde de Respuestas Rápidas (Hover)</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"
-                                    aria-label="Seleccionar negro para fuente de respuestas rápidas (normal)"
-                                    title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fuente de respuestas rápidas (normal)"
-                                    title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fuente de respuestas rápidas (normal)"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fuente de respuestas rápidas (normal)"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fuente de respuestas rápidas (normal)"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fuente de respuestas rápidas (normal)"
-                                    title="Naranja"></button>
-                                <button class="color-btn active" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para fuente de respuestas rápidas (normal)"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fuente de respuestas rápidas (normal)"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fuente de respuestas rápidas (hover)"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fuente de respuestas rápidas (hover)"
-                                    title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="prompts-border-hover-picker"
-                                        aria-label="Abrir selector de color personalizado para fondo de respuestas rápidas"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-border-hover-picker"
-                                        aria-label="Selector de color personalizado para fuente de respuestas rápidas (hover)">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color de Fuente de Respuestas Rápidas (Hover)</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"
-                                    aria-label="Seleccionar negro para fuente de respuestas rápidas (hover)"
-                                    title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fuente de respuestas rápidas (hover)"
-                                    title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fuente de respuestas rápidas (hover)"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fuente de respuestas rápidas (hover)"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fuente de respuestas rápidas (hover)"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fuente de respuestas rápidas (hover)"
-                                    title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para fuente de respuestas rápidas (hover)"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fuente de respuestas rápidas (hover)"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fuente de respuestas rápidas (hover)"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fondo de burbuja de chat"
-                                    title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="prompts-font-hover-picker"
-                                        aria-label="Abrir selector de color personalizado para borde de respuestas rápidas"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="prompts-font-hover-picker"
-                                        aria-label="Selector de color personalizado para fondo de burbuja de chat">
+
+                            <div class="settings-card">
+                                <h3 class="settings-card-title"><i class="fas fa-code"></i> CSS Personalizado</h3>
+                                <div class="form-group-modern">
+                                    <textarea id="custom-bubble-css" class="input-modern code-textarea" rows="4" placeholder=".chat-bubble { /* Tu CSS aquí */ }"></textarea>
+                                    <span class="input-hint">Los cambios no se reflejan en tiempo real</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Chat Bubble Tab -->
-                    <div class="appearance-tab-content" data-content="chat-bubble">
-                        <div class="bubble-settings-row">
-                            <div class="form-group">
-                                <label for="chat-icon-size">Tamaño del Icono de Chat</label>
-                                <select id="chat-icon-size" class="form-control">
-                                    <option value="small">Pequeño (48×48 px)</option>
-                                    <option value="medium" selected>Mediano (56×56 px)</option>
-                                    <option value="large">Grande (64×64 px)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="position-screen">Posición en Pantalla</label>
-                                <select id="position-screen" class="form-control">
-                                    <option value="bottom-right" selected>Abajo - Derecha</option>
-                                    <option value="bottom-left">Abajo - Izquierda</option>
-                                    <option value="top-right">Arriba - Derecha</option>
-                                    <option value="top-left">Arriba - Izquierda</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="bubble-settings-row">
-                            <div class="form-group">
-                                <label for="distance-bottom">Distancia desde Abajo</label>
-                                <input type="number" id="distance-bottom" class="form-control" value="16" min="0"
-                                    max="100">
-                                <small class="form-text">La vista previa de distancias no está disponible.</small>
-                            </div>
-                            <div class="form-group">
-                                <label for="distance-side">Distancia desde el Lado</label>
-                                <input type="number" id="distance-side" class="form-control" value="16" min="0"
-                                    max="100">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Icono de la Burbuja de Chat</label>
-                            <div class="icon-selector">
-                                <button class="icon-btn" data-icon="comment" aria-label="Icono de comentario"
-                                    title="Comentario"><i class="fas fa-comment"></i></button>
-                                <button class="icon-btn" data-icon="whatsapp" aria-label="Icono de WhatsApp"
-                                    title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
-                                <button class="icon-btn" data-icon="comment-dots"
-                                    aria-label="Icono de comentario con puntos" title="Chat"><i
-                                        class="fas fa-comment-dots"></i></button>
-                                <button class="icon-btn active" data-icon="comments"
-                                    aria-label="Icono de comentarios múltiples" title="Comentarios"><i
-                                        class="fas fa-comments"></i></button>
-                                <button class="icon-btn" data-icon="headset" aria-label="Icono de auriculares"
-                                    title="Soporte"><i class="fas fa-headset"></i></button>
-                                <button class="icon-btn" data-icon="life-ring" aria-label="Icono de salvavidas"
-                                    title="Ayuda"><i class="fas fa-life-ring"></i></button>
-                                <button class="icon-btn" data-icon="comment-alt"
-                                    aria-label="Icono de comentario alternativo" title="Mensaje"><i
-                                        class="far fa-comment-alt"></i></button>
-                                <button class="icon-btn" data-icon="question-circle" aria-label="Icono de pregunta"
-                                    title="Pregunta"><i class="fas fa-question-circle"></i></button>
-                                <button class="icon-btn" data-icon="info-circle" aria-label="Icono de información"
-                                    title="Información"><i class="fas fa-info-circle"></i></button>
-                                <button class="icon-btn" data-icon="comment-medical"
-                                    aria-label="Icono de comentario médico" title="Médico"><i
-                                        class="fas fa-comment-medical"></i></button>
-                                <button class="icon-btn" data-icon="briefcase" aria-label="Icono de maletín"
-                                    title="Negocios"><i class="fas fa-briefcase"></i></button>
-                            </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color de Fondo de la Burbuja de Chat</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000"
-                                    aria-label="Seleccionar negro para fondo de burbuja de chat" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280"
-                                    aria-label="Seleccionar gris para fondo de burbuja de chat" title="Gris"></button>
-                                <button class="color-btn active" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para fondo de burbuja de chat"
-                                    title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6"
-                                    aria-label="Seleccionar azul para fondo de burbuja de chat" title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444"
-                                    aria-label="Seleccionar rojo para fondo de burbuja de chat" title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para fondo de burbuja de chat"
-                                    title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para fondo de burbuja de chat"
-                                    title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981"
-                                    aria-label="Seleccionar verde para fondo de burbuja de chat" title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899"
-                                    aria-label="Seleccionar rosa para fondo de burbuja de chat" title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para fondo de burbuja de chat"
-                                    title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="bubble-bg-picker"
-                                        aria-label="Abrir selector de color personalizado para fuente de respuestas rápidas (normal)"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="bubble-bg-picker"
-                                        aria-label="Selector de color personalizado">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color del Icono de la Burbuja de Chat</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"
-                                    aria-label="Seleccionar negro para color" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280" aria-label="Seleccionar gris para color"
-                                    title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para color" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6" aria-label="Seleccionar azul para color"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444" aria-label="Seleccionar rojo para color"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para color" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para color" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981" aria-label="Seleccionar verde para color"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899" aria-label="Seleccionar rosa para color"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para color" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="bubble-icon-picker"
-                                        aria-label="Abrir selector de color personalizado para fuente de respuestas rápidas (hover)"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="bubble-icon-picker"
-                                        aria-label="Selector de color personalizado">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="bubble-message">Mensaje de la Burbuja de Chat</label>
-                            <input type="text" id="bubble-message" class="form-control" placeholder="Consulte aquí">
-                            <small class="form-text">Este mensaje aparece como un tooltip cuando tu chatbot está cerrado
-                                para los visitantes por primera vez. Déjalo vacío para eliminarlo.</small>
-                        </div>
-                        <div class="color-group">
-                            <label>Color de Fondo del Mensaje de la Burbuja</label>
-                            <div class="color-palette">
-                                <button class="color-btn" data-color="#000000" aria-label="Seleccionar negro para color"
-                                    title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280" aria-label="Seleccionar gris para color"
-                                    title="Gris"></button>
-                                <button class="color-btn active" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para color" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6" aria-label="Seleccionar azul para color"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444" aria-label="Seleccionar rojo para color"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para color" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para color" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981" aria-label="Seleccionar verde para color"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899" aria-label="Seleccionar rosa para color"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para color" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="bubble-msg-bg-picker"
-                                        aria-label="Abrir selector de color personalizado para fondo de burbuja de chat"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="bubble-msg-bg-picker"
-                                        aria-label="Selector de color personalizado">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="color-group">
-                            <label>Color del Texto del Mensaje de la Burbuja</label>
-                            <div class="color-palette">
-                                <button class="color-btn active" data-color="#000000"
-                                    aria-label="Seleccionar negro para color" title="Negro"></button>
-                                <button class="color-btn" data-color="#6B7280" aria-label="Seleccionar gris para color"
-                                    title="Gris"></button>
-                                <button class="color-btn" data-color="#8B5CF6"
-                                    aria-label="Seleccionar púrpura para color" title="Púrpura"></button>
-                                <button class="color-btn" data-color="#3B82F6" aria-label="Seleccionar azul para color"
-                                    title="Azul"></button>
-                                <button class="color-btn" data-color="#EF4444" aria-label="Seleccionar rojo para color"
-                                    title="Rojo"></button>
-                                <button class="color-btn" data-color="#F97316"
-                                    aria-label="Seleccionar naranja para color" title="Naranja"></button>
-                                <button class="color-btn" data-color="#EAB308"
-                                    aria-label="Seleccionar amarillo para color" title="Amarillo"></button>
-                                <button class="color-btn" data-color="#10B981" aria-label="Seleccionar verde para color"
-                                    title="Verde"></button>
-                                <button class="color-btn" data-color="#EC4899" aria-label="Seleccionar rosa para color"
-                                    title="Rosa"></button>
-                                <button class="color-btn" data-color="#FFFFFF"
-                                    aria-label="Seleccionar blanco para color" title="Blanco"></button>
-                                <div class="color-picker-wrapper">
-                                    <button class="color-btn color-picker-btn" data-color="custom"
-                                        data-input="bubble-msg-color-picker"
-                                        aria-label="Abrir selector de color personalizado para color"
-                                        title="Selector personalizado">
-                                        <i class="fas fa-palette"></i>
-                                    </button>
-                                    <input type="color" class="color-picker-input" id="bubble-msg-color-picker"
-                                        aria-label="Selector de color personalizado">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="custom-bubble-css">CSS Personalizado de la Burbuja</label>
-                            <textarea id="custom-bubble-css" class="form-control code-textarea" rows="6"
-                                placeholder=".chat-bubble { /* Tu CSS personalizado aquí */ }"></textarea>
-                            <small class="form-text">Los cambios aplicados al CSS personalizado no se verán reflejados
-                                inmediatamente en la demostración.</small>
-                        </div>
+
+                    <!-- Save Button -->
+                    <div class="appearance-save-bar">
+                        <button class="btn-save-modern" id="save-appearance">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
                     </div>
                 </div>
-                <!-- Save Button -->
-                <div class="appearance-footer">
-                    <button class="btn btn-primary btn-save-appearance" id="save-appearance">
-                        <i class="fas fa-save"></i> Guardar Cambios
-                    </button>
+
+                <!-- Right Panel - Preview -->
+                <div class="appearance-preview-panel">
+                    <div class="preview-header">
+                        <h3><i class="fas fa-eye"></i> Vista Previa</h3>
+                        <span class="preview-badge">En tiempo real</span>
+                    </div>
+                    <div class="browser-mockup">
+                        <div class="browser-header">
+                            <div class="browser-dots">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <div class="browser-address-bar">
+                                <i class="fas fa-lock"></i>
+                                <span>tusitio.com</span>
+                            </div>
+                        </div>
+                        <div class="browser-content">
+                            <div class="website-mockup">
+                                <div class="mockup-header">
+                                    <div class="mockup-logo"></div>
+                                    <div class="mockup-nav">
+                                        <div class="mockup-nav-item"></div>
+                                        <div class="mockup-nav-item"></div>
+                                        <div class="mockup-nav-item"></div>
+                                    </div>
+                                </div>
+                                <div class="mockup-hero">
+                                    <div class="mockup-title"></div>
+                                    <div class="mockup-subtitle"></div>
+                                    <div class="mockup-button"></div>
+                                </div>
+                            </div>
+                            <div class="chatbot-preview-widget">
+                                <div class="chat-window active" id="preview-chat-window">
+                                    <div class="chat-window-header" id="preview-header">
+                                        <div class="chat-header-info">
+                                            <div class="chat-avatar">
+                                                <i class="fas fa-robot"></i>
+                                            </div>
+                                            <div class="chat-header-text">
+                                                <h4 id="preview-bot-name">Mi Asistente</h4>
+                                                <span class="chat-status"><i class="fas fa-circle"></i> En línea</span>
+                                            </div>
+                                        </div>
+                                        <button class="chat-close-btn">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="chat-window-messages">
+                                        <div class="chat-message bot">
+                                            <div class="message-avatar"><i class="fas fa-robot"></i></div>
+                                            <div class="message-bubble" id="preview-welcome">¡Hola! ¿En qué puedo ayudarte?</div>
+                                        </div>
+                                        <div class="chat-message user">
+                                            <div class="message-bubble" id="preview-user-bubble">Hola, tengo una pregunta</div>
+                                        </div>
+                                    </div>
+                                    <div class="chat-window-input">
+                                        <input type="text" id="preview-input" placeholder="Escribe tu mensaje...">
+                                        <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                                    </div>
+                                </div>
+                                <button class="chat-bubble-btn" id="preview-bubble">
+                                    <i class="fas fa-comments" id="preview-bubble-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
