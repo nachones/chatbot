@@ -1,4 +1,4 @@
-// Server entry point - Restart trigger
+// Server entry point - Production Ready
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -7,10 +7,14 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// Import security middleware
+const { sanitizeBody, sanitizeQuery, requestLogger } = require('./services/securityMiddleware');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProduction = process.env.NODE_ENV === 'production';
 
-console.log('Inicializando servidor MIABOT...\n');
+console.log(`Inicializando servidor MIABOT (${isProduction ? 'PRODUCCIÓN' : 'DESARROLLO'})...\n`);
 
 // Crear directorios necesarios
 const requiredDirs = ['uploads', 'logs', 'training-data'];
@@ -40,6 +44,16 @@ app.use('/api/', limiter);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Security: Sanitize inputs
+app.use(sanitizeBody);
+app.use(sanitizeQuery);
+
+// Request logging (production)
+if (isProduction) {
+  app.use(requestLogger);
+}
+
 app.use(express.static('public'));
 
 // Health check

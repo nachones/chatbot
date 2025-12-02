@@ -1,6 +1,10 @@
-# 🤖 Chatbot AI - Sistema Multicliente con IA
+# 🤖 MIABOT - Sistema de Chatbots con IA
 
-Sistema completo de chatbots personalizados potenciados por ChatGPT para sitios web. Permite crear, entrenar y gestionar múltiples chatbots con IA desde un panel de control centralizado.
+Sistema completo de chatbots personalizados potenciados por ChatGPT/Groq para sitios web. Permite crear, entrenar y gestionar múltiples chatbots con IA desde un panel de control centralizado.
+
+![Estado](https://img.shields.io/badge/estado-producción-green)
+![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)
+![Licencia](https://img.shields.io/badge/licencia-MIT-blue)
 
 ## ✨ Características Principales
 
@@ -11,11 +15,13 @@ Sistema completo de chatbots personalizados potenciados por ChatGPT para sitios 
 - Contador de uso en tiempo real con reseteo mensual automático
 
 ### 🧠 **Inteligencia Artificial**
-- Powered by OpenAI GPT-3.5-turbo / GPT-4
+- **OpenAI:** GPT-3.5-turbo, GPT-4, GPT-4o
+- **Groq (GRATIS):** LLaMA 3, Mixtral (alternativa sin coste)
 - Entrenamiento personalizado con múltiples fuentes:
   - Documentos (PDF, TXT, DOCX, Markdown)
   - URLs y sitios web
   - Texto directo
+- **Búsqueda semántica** con embeddings
 - Responde automáticamente hasta el 80% de consultas
 - Disponible 24/7 sin intervención humana
 
@@ -204,11 +210,71 @@ chatbot-ai/
 
 ## 🔒 Seguridad
 
-- API keys almacenadas de forma segura
+- Helmet.js para headers HTTP seguros
+- Rate limiting (100 req/15min por IP)
+- Sanitización automática de inputs
 - Validación de datos en todas las peticiones
 - Límites de tamaño de archivos (10MB)
-- Sanitización de contenido HTML
 - CORS configurado correctamente
+
+## 🚀 Despliegue en Producción
+
+### Con PM2 (Recomendado)
+
+```bash
+# Instalar PM2 globalmente
+npm install -g pm2
+
+# Iniciar en producción
+pm2 start ecosystem.config.js --env production
+
+# Ver logs
+pm2 logs miabot
+
+# Reiniciar
+pm2 restart miabot
+
+# Guardar configuración
+pm2 save
+pm2 startup
+```
+
+### Variables de Entorno para Producción
+
+```bash
+NODE_ENV=production
+PORT=3000
+OPENAI_API_KEY=sk-xxx
+# o usar Groq (gratis):
+GROQ_API_KEY=gsk_xxx
+DEFAULT_LLM_PROVIDER=groq
+```
+
+### Nginx como Reverse Proxy
+
+```nginx
+server {
+    listen 80;
+    server_name tudominio.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+### SSL con Let's Encrypt
+
+```bash
+sudo certbot --nginx -d tudominio.com
+```
 
 ## 🤝 Contribuir
 

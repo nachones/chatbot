@@ -9,7 +9,6 @@
 
     // Initialize Dashboard
     document.addEventListener('DOMContentLoaded', function () {
-        console.log('Dashboard initializing...');
         initNavigation();
         initChatbotSelector();
         initModals();
@@ -178,13 +177,11 @@
 
     async function loadChatbots() {
         try {
-            console.log('Loading chatbots...');
             const response = await fetch(`${API_URL}/chatbots`);
             const data = await response.json();
 
             if (data.success && data.chatbots) {
                 allChatbots = data.chatbots;
-                console.log(`Loaded ${allChatbots.length} chatbots`);
                 renderChatbotList();
 
                 // Select first chatbot if none selected
@@ -234,7 +231,6 @@
             if (nameEl) {
                 nameEl.textContent = bot.name;
             }
-            console.log(`Selected chatbot: ${bot.name} (${id})`);
             loadDashboardStats();
             generateIntegrationCode();
         }
@@ -474,11 +470,38 @@
     async function loadConversations() {
         if (!currentChatbotId) return;
 
+        const container = document.getElementById('conversations-list');
+        if (!container) return;
+
         try {
-            // This would load from the API
-            // For now, show empty state
-            const container = document.getElementById('conversations-list');
-            if (container) {
+            // Show loading state
+            container.innerHTML = `
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Cargando conversaciones...</p>
+                </div>
+            `;
+
+            const response = await fetch(`${API_URL}/dashboard/conversations?chatbotId=${currentChatbotId}&limit=20`);
+            const data = await response.json();
+
+            if (data.success && data.conversations && data.conversations.length > 0) {
+                container.innerHTML = data.conversations.map(conv => `
+                    <div class="conversation-item" data-session="${conv.session_id}">
+                        <div class="conversation-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">Usuario ${conv.session_id.slice(-6)}</div>
+                            <div class="conversation-preview">${escapeHtml(conv.last_message?.substring(0, 50) || 'Sin mensajes')}...</div>
+                        </div>
+                        <div class="conversation-meta">
+                            <div class="conversation-time">${formatDate(conv.last_message_time)}</div>
+                            <div class="conversation-count">${conv.message_count} msgs</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">
@@ -493,6 +516,17 @@
             }
         } catch (error) {
             console.error('Error loading conversations:', error);
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="empty-state-title">Error al cargar</div>
+                    <div class="empty-state-description">
+                        No se pudieron cargar las conversaciones
+                    </div>
+                </div>
+            `;
         }
     }
 

@@ -590,7 +590,7 @@
                             </div>
                             <div class="preview-input-bar">
                                 <input type="text" placeholder="Escribe tu mensaje..." disabled>
-                                <button class="preview-send"><i class="fas fa-paper-plane"></i></button>
+                                <button class="preview-send" title="Enviar mensaje" aria-label="Enviar mensaje"><i class="fas fa-paper-plane"></i></button>
                             </div>
                         </div>
                     </div>
@@ -661,7 +661,7 @@
                                             <button class="btn-upload-modern">
                                                 <i class="fas fa-cloud-upload-alt"></i> Subir
                                             </button>
-                                            <input type="file" id="bot-avatar" accept="image/*" class="hidden-file-input">
+                                            <input type="file" id="bot-avatar" accept="image/*" class="hidden-file-input" title="Subir avatar del bot" aria-label="Subir avatar del bot">
                                         </div>
                                     </div>
                                     <div class="upload-item-modern">
@@ -673,7 +673,7 @@
                                             <button class="btn-upload-modern">
                                                 <i class="fas fa-cloud-upload-alt"></i> Subir
                                             </button>
-                                            <input type="file" id="company-logo" accept="image/*" class="hidden-file-input">
+                                            <input type="file" id="company-logo" accept="image/*" class="hidden-file-input" title="Subir logo de empresa" aria-label="Subir logo de empresa">
                                         </div>
                                     </div>
                                 </div>
@@ -688,7 +688,7 @@
                                             <span class="toggle-desc">Mostrar los botones en columna</span>
                                         </div>
                                         <label class="switch-modern">
-                                            <input type="checkbox" id="display-prompts-vertical">
+                                            <input type="checkbox" id="display-prompts-vertical" title="Respuestas rápidas verticales">
                                             <span class="slider-modern"></span>
                                         </label>
                                     </div>
@@ -698,7 +698,7 @@
                                             <span class="toggle-desc">Aspecto más minimalista</span>
                                         </div>
                                         <label class="switch-modern">
-                                            <input type="checkbox" id="hide-bot-avatar">
+                                            <input type="checkbox" id="hide-bot-avatar" title="Ocultar avatar del bot">
                                             <span class="slider-modern"></span>
                                         </label>
                                     </div>
@@ -708,7 +708,7 @@
                                             <span class="toggle-desc">No mostrar referencias usadas</span>
                                         </div>
                                         <label class="switch-modern">
-                                            <input type="checkbox" id="hide-sources">
+                                            <input type="checkbox" id="hide-sources" title="Ocultar fuentes">
                                             <span class="slider-modern"></span>
                                         </label>
                                     </div>
@@ -718,7 +718,7 @@
                                             <span class="toggle-desc">Solo para cuentas de pago</span>
                                         </div>
                                         <label class="switch-modern">
-                                            <input type="checkbox" id="hide-branding">
+                                            <input type="checkbox" id="hide-branding" title="Ocultar marca MIABOT">
                                             <span class="slider-modern"></span>
                                         </label>
                                     </div>
@@ -748,7 +748,7 @@
                                                 <button class="color-dot" data-color="#EC4899" style="background:#EC4899" title="Rosa"></button>
                                                 <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
                                             </div>
-                                            <input type="color" id="primary-color-picker" class="color-input-modern" value="#6366F1">
+                                            <input type="color" id="primary-color-picker" class="color-input-modern" value="#6366F1" title="Color principal" aria-label="Seleccionar color principal">
                                         </div>
                                     </div>
 
@@ -764,7 +764,7 @@
                                                 <button class="color-dot" data-color="#1F2937" style="background:#1F2937" title="Oscuro"></button>
                                                 <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
                                             </div>
-                                            <input type="color" id="header-bg-picker" class="color-input-modern" value="#FFFFFF">
+                                            <input type="color" id="header-bg-picker" class="color-input-modern" value="#FFFFFF" title="Fondo del header" aria-label="Seleccionar fondo del header">
                                         </div>
                                     </div>
 
@@ -779,7 +779,7 @@
                                                 <button class="color-dot" data-color="#6B7280" style="background:#6B7280" title="Gris"></button>
                                                 <button class="color-dot" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ddd" title="Blanco"></button>
                                             </div>
-                                            <input type="color" id="header-font-picker" class="color-input-modern" value="#111827">
+                                            <input type="color" id="header-font-picker" class="color-input-modern" value="#111827" title="Texto del header" aria-label="Seleccionar color de texto del header">
                                         </div>
                                     </div>
                                 </div>
@@ -801,7 +801,7 @@
                                                 <button class="color-dot" data-color="#3B82F6" style="background:#3B82F6" title="Azul"></button>
                                                 <button class="color-dot" data-color="#8B5CF6" style="background:#8B5CF6" title="Púrpura"></button>
                                             </div>
-                                            <input type="color" id="user-bubble-picker" class="color-input-modern" value="#10B981">
+                                            <input type="color" id="user-bubble-picker" class="color-input-modern" value="#10B981" title="Burbuja del usuario" aria-label="Seleccionar color de burbuja del usuario">
                                         </div>
                                     </div>
                                 </div>
@@ -814,15 +814,15 @@
                                 <div class="color-grid-compact">
                                     <div class="color-mini">
                                         <label>Fondo</label>
-                                        <input type="color" id="prompts-bg-picker" class="color-input-modern" value="#FFFFFF">
+                                        <input type="color" id="prompts-bg-picker" class="color-input-modern" value="#FFFFFF" title="Fondo de respuestas rápidas">
                                     </div>
                                     <div class="color-mini">
                                         <label>Borde</label>
-                                        <input type="color" id="prompts-border-picker" class="color-input-modern" value="#E5E7EB">
+                                        <input type="color" id="prompts-border-picker" class="color-input-modern" value="#E5E7EB" title="Borde de respuestas rápidas">
                                     </div>
                                     <div class="color-mini">
                                         <label>Texto</label>
-                                        <input type="color" id="prompts-font-picker" class="color-input-modern" value="#374151">
+                                        <input type="color" id="prompts-font-picker" class="color-input-modern" value="#374151" title="Texto de respuestas rápidas">
                                     </div>
                                 </div>
                                 
@@ -831,15 +831,15 @@
                                     <div class="color-grid-compact">
                                         <div class="color-mini">
                                             <label>Fondo</label>
-                                            <input type="color" id="prompts-bg-hover-picker" class="color-input-modern" value="#F3F4F6">
+                                            <input type="color" id="prompts-bg-hover-picker" class="color-input-modern" value="#F3F4F6" title="Fondo hover">
                                         </div>
                                         <div class="color-mini">
                                             <label>Borde</label>
-                                            <input type="color" id="prompts-border-hover-picker" class="color-input-modern" value="#D1D5DB">
+                                            <input type="color" id="prompts-border-hover-picker" class="color-input-modern" value="#D1D5DB" title="Borde hover">
                                         </div>
                                         <div class="color-mini">
                                             <label>Texto</label>
-                                            <input type="color" id="prompts-font-hover-picker" class="color-input-modern" value="#111827">
+                                            <input type="color" id="prompts-font-hover-picker" class="color-input-modern" value="#111827" title="Texto hover">
                                         </div>
                                     </div>
                                 </div>
@@ -934,7 +934,7 @@
                                                 <button class="color-dot" data-color="#EF4444" style="background:#EF4444" title="Rojo"></button>
                                                 <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
                                             </div>
-                                            <input type="color" id="bubble-bg-picker" class="color-input-modern" value="#8B5CF6">
+                                            <input type="color" id="bubble-bg-picker" class="color-input-modern" value="#8B5CF6" title="Fondo de burbuja" aria-label="Seleccionar color de fondo de burbuja">
                                         </div>
                                     </div>
                                     <div class="color-row">
@@ -946,7 +946,7 @@
                                                 <button class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ddd" title="Blanco"></button>
                                                 <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
                                             </div>
-                                            <input type="color" id="bubble-icon-picker" class="color-input-modern" value="#FFFFFF">
+                                            <input type="color" id="bubble-icon-picker" class="color-input-modern" value="#FFFFFF" title="Color de icono de burbuja" aria-label="Seleccionar color de icono de burbuja">
                                         </div>
                                     </div>
                                 </div>
@@ -964,11 +964,11 @@
                                 <div class="color-row compact">
                                     <div class="color-mini">
                                         <label>Fondo</label>
-                                        <input type="color" id="bubble-msg-bg-picker" class="color-input-modern" value="#8B5CF6">
+                                        <input type="color" id="bubble-msg-bg-picker" class="color-input-modern" value="#8B5CF6" title="Fondo del mensaje">
                                     </div>
                                     <div class="color-mini">
                                         <label>Texto</label>
-                                        <input type="color" id="bubble-msg-color-picker" class="color-input-modern" value="#FFFFFF">
+                                        <input type="color" id="bubble-msg-color-picker" class="color-input-modern" value="#FFFFFF" title="Color del texto">
                                     </div>
                                 </div>
                             </div>
@@ -1037,7 +1037,7 @@
                                                 <span class="chat-status"><i class="fas fa-circle"></i> En línea</span>
                                             </div>
                                         </div>
-                                        <button class="chat-close-btn">
+                                        <button class="chat-close-btn" title="Cerrar chat" aria-label="Cerrar chat">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </div>
@@ -1052,10 +1052,10 @@
                                     </div>
                                     <div class="chat-window-input">
                                         <input type="text" id="preview-input" placeholder="Escribe tu mensaje...">
-                                        <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                                        <button class="send-btn" title="Enviar mensaje" aria-label="Enviar mensaje"><i class="fas fa-paper-plane"></i></button>
                                     </div>
                                 </div>
-                                <button class="chat-bubble-btn" id="preview-bubble">
+                                <button class="chat-bubble-btn" id="preview-bubble" title="Abrir chat" aria-label="Abrir chat">
                                     <i class="fas fa-comments" id="preview-bubble-icon"></i>
                                 </button>
                             </div>
