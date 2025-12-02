@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Chatbot</title>
-
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -33,7 +30,6 @@
                 </div>
             </div>
         </div>
-
         <nav class="sidebar-nav">
             <a href="#dashboard" class="nav-item active" data-page="dashboard">
                 <i class="fas fa-chart-line"></i>
@@ -56,7 +52,6 @@
                 <span>Contactos</span>
             </a>
         </nav>
-
         <div class="sidebar-section">
             <div class="section-title">PERSONALIZACIÓN</div>
             <a href="#functions" class="nav-item" data-page="functions">
@@ -81,7 +76,6 @@
                 <span>Configuración</span>
             </a>
         </div>
-
         <div class="sidebar-footer">
             <a href="#" class="nav-item">
                 <i class="fas fa-question-circle"></i>
@@ -89,7 +83,6 @@
             </a>
         </div>
     </aside>
-
     <!-- Main Content -->
     <main class="main-content">
         <!-- Header -->
@@ -114,7 +107,6 @@
                 </button>
             </div>
         </header>
-
         <!-- Dashboard Page -->
         <div id="page-dashboard" class="page active">
             <!-- Stats Cards -->
@@ -148,7 +140,6 @@
                     <div class="stat-value" id="total-leads">0</div>
                 </div>
             </div>
-
             <!-- Charts Row -->
             <div class="charts-row">
                 <div class="chart-card">
@@ -163,7 +154,6 @@
                     </div>
                     <canvas id="chat-history-chart"></canvas>
                 </div>
-
                 <div class="conversations-card">
                     <div class="conversations-header">
                         <h3>Últimas Conversaciones</h3>
@@ -174,7 +164,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Token Usage Card -->
             <div class="token-usage-card">
                 <div class="token-header">
@@ -211,96 +200,249 @@
                 </div>
             </div>
         </div>
-
         <!-- Conversations Page -->
         <div id="page-conversations" class="page">
-            <div class="conversations-container">
-                <div class="conversations-filters">
-                    <input type="search" placeholder="Buscar conversaciones..." class="search-input"
-                        aria-label="Buscar conversaciones">
-                    <select class="filter-select" aria-label="Filtrar conversaciones">
-                        <option value="all">Todas las Conversaciones</option>
-                        <option value="active">Activas</option>
-                        <option value="archived">Archivadas</option>
-                    </select>
-                </div>
-                <div id="all-conversations" class="conversations-table">
-                    <!-- Table will be loaded here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Train Chatbot Page -->
-        <div id="page-train" class="page">
-            <div class="train-container">
-                <div class="train-methods">
-                    <div class="train-method-card" id="train-files">
-                        <div class="method-icon">
-                            <i class="fas fa-file-upload"></i>
+            <div class="conversations-layout">
+                <!-- Sidebar with conversation list -->
+                <div class="conversations-sidebar">
+                    <div class="conversations-header">
+                        <h3>Conversaciones</h3>
+                        <div class="conversations-actions">
+                            <button class="btn btn-secondary btn-sm" id="refresh-conversations" aria-label="Actualizar conversaciones">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
                         </div>
-                        <h3>Subir Archivos</h3>
-                        <p>Sube archivos PDF, DOCX, TXT para entrenar tu chatbot</p>
-                        <button class="btn btn-primary" aria-label="Subir archivos">Subir Archivos</button>
                     </div>
-                    <div class="train-method-card" id="train-url">
-                        <div class="method-icon">
-                            <i class="fas fa-link"></i>
-                        </div>
-                        <h3>Entrenar desde URL</h3>
-                        <p>Extrae y entrena desde URLs de sitios web</p>
-                        <button class="btn btn-primary" aria-label="Añadir URL">Añadir URL</button>
+                    
+                    <div class="conversations-search">
+                        <i class="fas fa-search"></i>
+                        <input type="search" placeholder="Buscar conversaciones..." class="search-input" id="conversation-search" aria-label="Buscar conversaciones">
                     </div>
-                    <div class="train-method-card" id="train-text">
-                        <div class="method-icon">
-                            <i class="fas fa-keyboard"></i>
-                        </div>
-                        <h3>Texto Directo</h3>
-                        <p>Añade datos de entrenamiento directamente como texto</p>
-                        <button class="btn btn-primary" aria-label="Añadir texto">Añadir Texto</button>
-                    </div>
-                </div>
-
-                <div class="training-data-section">
-                    <div class="section-header">
-                        <h3>Datos de Entrenamiento</h3>
-                        <button class="btn btn-secondary" id="refresh-training"
-                            aria-label="Actualizar datos de entrenamiento">
-                            <i class="fas fa-sync"></i> Actualizar
+                    
+                    <div class="conversations-filters">
+                        <button class="filter-chip active" data-filter="all">
+                            Todas <span class="chip-count" id="count-all">0</span>
+                        </button>
+                        <button class="filter-chip" data-filter="today">
+                            Hoy <span class="chip-count" id="count-today">0</span>
+                        </button>
+                        <button class="filter-chip" data-filter="week">
+                            Esta Semana
                         </button>
                     </div>
-                    <div id="training-data-list" class="training-data-list">
-                        <!-- Training data will be loaded here -->
+                    
+                    <div id="conversations-list" class="conversations-list">
+                        <!-- Conversations will be loaded here -->
+                        <div class="empty-state-small">
+                            <i class="fas fa-comments"></i>
+                            <p>No hay conversaciones aún</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat View -->
+                <div class="chat-view">
+                    <div class="chat-empty-state" id="chat-empty-state">
+                        <div class="empty-chat-icon">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <h3>Selecciona una conversación</h3>
+                        <p>Elige una conversación de la lista para ver los mensajes</p>
+                    </div>
+                    
+                    <div class="chat-content hidden" id="chat-content">
+                        <div class="chat-header">
+                            <div class="chat-user-info">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-details">
+                                    <h4 id="chat-user-name">Usuario</h4>
+                                    <span class="user-status" id="chat-session-id">Sesión</span>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button class="btn btn-secondary btn-sm" id="export-chat" aria-label="Exportar conversación">
+                                    <i class="fas fa-download"></i> Exportar
+                                </button>
+                                <button class="btn btn-secondary btn-sm" id="delete-chat" aria-label="Eliminar conversación">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="chat-messages" class="chat-messages">
+                            <!-- Messages will be loaded here -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
+        <!-- Train Chatbot Page -->
+        <div id="page-train" class="page">
+            <!-- Hero Section -->
+            <div class="train-hero">
+                <div class="train-hero-content">
+                    <h2><i class="fas fa-graduation-cap"></i> Entrena tu Chatbot</h2>
+                    <p class="hero-subtitle">Añade conocimiento a tu chatbot para que pueda responder preguntas sobre tu negocio</p>
+                </div>
+            </div>
+            
+            <!-- Training Methods -->
+            <div class="train-methods-horizontal">
+                <div class="method-card-large" id="train-files">
+                    <div class="method-icon-large">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <h3>Subir Archivos</h3>
+                    <p>Sube documentos PDF, Word, TXT o Markdown para entrenar tu chatbot con información específica</p>
+                    <div class="method-features">
+                        <span class="feature-badge"><i class="fas fa-check"></i> PDF</span>
+                        <span class="feature-badge"><i class="fas fa-check"></i> DOCX</span>
+                        <span class="feature-badge"><i class="fas fa-check"></i> TXT</span>
+                        <span class="feature-badge"><i class="fas fa-check"></i> MD</span>
+                    </div>
+                    <button class="btn-method-action" id="btn-upload-files" aria-label="Subir archivos">
+                        <i class="fas fa-cloud-upload-alt"></i> Subir Archivos
+                    </button>
+                </div>
+                
+                <div class="method-card-large" id="train-url">
+                    <div class="method-icon-large">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Entrenar desde URL</h3>
+                    <p>Extrae automáticamente el contenido de páginas web para que tu chatbot aprenda de ellas</p>
+                    <div class="method-features">
+                        <span class="feature-badge"><i class="fas fa-check"></i> Automático</span>
+                        <span class="feature-badge"><i class="fas fa-check"></i> HTML</span>
+                        <span class="feature-badge"><i class="fas fa-check"></i> Blogs</span>
+                    </div>
+                    <button class="btn-method-action" id="btn-add-url" aria-label="Añadir URL">
+                        <i class="fas fa-link"></i> Añadir URL
+                    </button>
+                </div>
+                
+                <div class="method-card-large" id="train-text">
+                    <div class="method-icon-large">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <h3>Texto Directo</h3>
+                    <p>Escribe directamente la información que quieres que tu chatbot conozca y utilice</p>
+                    <div class="method-features">
+                        <span class="feature-badge"><i class="fas fa-check"></i> FAQs</span>
+                        <span class="feature-badge"><i class="fas fa-check"></i> Políticas</span>
+                        <span class="feature-badge"><i class="fas fa-check"></i> Info</span>
+                    </div>
+                    <button class="btn-method-action" id="btn-add-text" aria-label="Añadir texto">
+                        <i class="fas fa-edit"></i> Añadir Texto
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Training Data Section -->
+            <div class="training-data-container">
+                <div class="training-data-header">
+                    <div class="header-left">
+                        <h3><i class="fas fa-database"></i> Datos de Entrenamiento</h3>
+                        <p class="header-subtitle">Contenido que tu chatbot ha aprendido</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary btn-sm" id="refresh-training" aria-label="Actualizar datos">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+                <div id="training-data-list" class="training-data-list">
+                    <!-- Training data will be loaded here -->
+                    <div class="empty-training-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h4>Sin datos de entrenamiento</h4>
+                        <p>Comienza subiendo archivos, añadiendo URLs o escribiendo texto para entrenar tu chatbot</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Test Chatbot Page -->
         <div id="page-test" class="page">
-            <div class="test-container">
-                <div class="test-chat">
-                    <div class="test-chat-header">
+            <div class="test-container-modern">
+                <div class="test-sidebar">
+                    <div class="test-info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
                         <h3>Prueba tu Chatbot</h3>
-                        <button class="btn btn-secondary" id="clear-test-chat" aria-label="Limpiar chat de prueba">
+                        <p>Envía mensajes para verificar que tu chatbot responde correctamente con la información que le has enseñado.</p>
+                    </div>
+                    
+                    <div class="test-tips">
+                        <h4><i class="fas fa-lightbulb"></i> Consejos</h4>
+                        <ul>
+                            <li>Prueba preguntas sobre el contenido que has añadido</li>
+                            <li>Verifica que las respuestas sean precisas</li>
+                            <li>Añade más contenido si las respuestas no son satisfactorias</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-stats">
+                        <h4><i class="fas fa-chart-bar"></i> Estadísticas de Prueba</h4>
+                        <div class="stat-row">
+                            <span>Mensajes enviados</span>
+                            <span id="test-msg-count">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Tiempo promedio</span>
+                            <span id="test-avg-time">0ms</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-chat-modern">
+                    <div class="test-chat-header">
+                        <div class="chat-header-left">
+                            <div class="bot-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="bot-info">
+                                <h3 id="test-bot-name">Mi Chatbot</h3>
+                                <span class="bot-status"><i class="fas fa-circle"></i> En línea</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" id="clear-test-chat" aria-label="Limpiar chat">
                             <i class="fas fa-trash"></i> Limpiar
                         </button>
                     </div>
-                    <div id="test-messages" class="test-messages">
-                        <div class="test-message bot">
-                            <div class="message-content">¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte?</div>
+                    
+                    <div id="test-messages" class="test-messages-modern">
+                        <div class="message-wrapper bot">
+                            <div class="message-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-bubble">¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?</div>
+                                <div class="message-time">Ahora</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="test-input-container">
-                        <input type="text" id="test-input" placeholder="Escribe tu mensaje..." class="test-input"
-                            aria-label="Escribe tu mensaje">
-                        <button id="test-send" class="btn btn-primary" aria-label="Enviar mensaje">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+                    
+                    <div class="test-input-modern">
+                        <div class="input-wrapper">
+                            <input type="text" id="test-input" placeholder="Escribe tu mensaje..." 
+                                   class="test-input" aria-label="Escribe tu mensaje">
+                            <button id="test-send" class="btn-send-modern" aria-label="Enviar mensaje">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="input-hint">
+                            <i class="fas fa-keyboard"></i>
+                            <span>Presiona Enter para enviar</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <!-- Leads Page -->
         <div id="page-leads" class="page">
             <div class="leads-container">
@@ -315,7 +457,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Settings Page -->
         <div id="page-settings" class="page">
             <div class="settings-container">
@@ -351,7 +492,6 @@
                         <i class="fas fa-save"></i> Guardar Configuración
                     </button>
                 </div>
-
                 <div class="settings-section">
                     <h3>Configuración del Chatbot</h3>
                     <div class="form-group">
@@ -370,7 +510,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Functions Page -->
         <div id="page-functions" class="page">
             <div class="functions-container">
@@ -384,7 +523,6 @@
                         <i class="fas fa-plus"></i> Crear Función
                     </button>
                 </div>
-
                 <div class="functions-list" id="functions-list">
                     <!-- Functions will be loaded here -->
                     <div class="empty-state">
@@ -396,7 +534,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Quick Prompts Page -->
         <div id="page-prompts" class="page">
             <div class="prompts-container">
@@ -410,7 +547,6 @@
                         <i class="fas fa-plus"></i> Añadir Respuesta Rápida
                     </button>
                 </div>
-
                 <div class="prompts-list" id="prompts-list">
                     <!-- Prompts will be loaded here -->
                     <div class="empty-state">
@@ -422,12 +558,10 @@
                 </div>
             </div>
         </div>
-
         <!-- Appearance Page -->
         <div id="page-appearance" class="page">
             <div class="appearance-container-new">
                 <h2 class="appearance-title">Apariencia</h2>
-
                 <!-- Tabs -->
                 <div class="appearance-tabs">
                     <button class="appearance-tab active" data-tab="content">
@@ -440,24 +574,20 @@
                         <i class="fas fa-comment"></i> Burbuja de Chat
                     </button>
                 </div>
-
                 <!-- Tab Content -->
                 <div class="appearance-content">
-
                     <!-- Content Tab -->
                     <div class="appearance-tab-content active" data-content="content">
                         <div class="form-group">
                             <label for="chatbot-name">Nombre del Chatbot</label>
                             <input type="text" id="chatbot-name" class="form-control" placeholder="Mi Asistente">
                         </div>
-
                         <div class="form-group">
                             <label for="welcome-message">Mensaje de Bienvenida</label>
                             <textarea id="welcome-message" class="form-control" rows="3"
                                 placeholder="¡Hola! ¿En qué puedo ayudarte?"></textarea>
                             <small class="form-text">El primer mensaje que verán los usuarios en el chatbot.</small>
                         </div>
-
                         <div class="form-group">
                             <label for="input-placeholder">Texto del Placeholder de Entrada</label>
                             <input type="text" id="input-placeholder" class="form-control"
@@ -465,7 +595,6 @@
                             <small class="form-text">El texto por defecto que los usuarios ven antes de
                                 escribir.</small>
                         </div>
-
                         <div class="form-group">
                             <label>Avatar del Bot</label>
                             <div class="file-upload-box">
@@ -476,7 +605,6 @@
                                     aria-label="Subir avatar del bot">
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label>Logo de la Compañía</label>
                             <div class="file-upload-box">
@@ -487,7 +615,6 @@
                                     aria-label="Subir logo de la compañía">
                             </div>
                         </div>
-
                         <div class="form-group toggle-group">
                             <div class="toggle-item">
                                 <div class="toggle-info">
@@ -500,7 +627,6 @@
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
-
                             <div class="toggle-item">
                                 <div class="toggle-info">
                                     <label>Ocultar Avatar y Nombre del Bot</label>
@@ -512,7 +638,6 @@
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
-
                             <div class="toggle-item">
                                 <div class="toggle-info">
                                     <label>Ocultar Fuentes</label>
@@ -524,7 +649,6 @@
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
-
                             <div class="toggle-item">
                                 <div class="toggle-info">
                                     <label>Ocultar Marca de Support AI</label>
@@ -538,7 +662,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Colors Tab -->
                     <div class="appearance-tab-content" data-content="colors">
                         <div class="color-group">
@@ -576,7 +699,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Fondo del Encabezado</label>
                             <div class="color-palette">
@@ -613,7 +735,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color de Fuente del Encabezado</label>
                             <div class="color-palette">
@@ -652,7 +773,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color de Fondo de la Burbuja del Usuario</label>
                             <div class="color-palette">
@@ -696,7 +816,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color de Fondo de Respuestas Rápidas</label>
                             <div class="color-palette">
@@ -742,7 +861,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color del Borde de Respuestas Rápidas</label>
                             <div class="color-palette">
@@ -788,7 +906,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color de Fuente de Respuestas Rápidas</label>
                             <div class="color-palette">
@@ -834,7 +951,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color de Fondo de Respuestas Rápidas (Hover)</label>
                             <div class="color-palette">
@@ -880,7 +996,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color del Borde de Respuestas Rápidas (Hover)</label>
                             <div class="color-palette">
@@ -926,7 +1041,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color de Fuente de Respuestas Rápidas (Hover)</label>
                             <div class="color-palette">
@@ -973,7 +1087,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Chat Bubble Tab -->
                     <div class="appearance-tab-content" data-content="chat-bubble">
                         <div class="bubble-settings-row">
@@ -985,7 +1098,6 @@
                                     <option value="large">Grande (64×64 px)</option>
                                 </select>
                             </div>
-
                             <div class="form-group">
                                 <label for="position-screen">Posición en Pantalla</label>
                                 <select id="position-screen" class="form-control">
@@ -996,7 +1108,6 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="bubble-settings-row">
                             <div class="form-group">
                                 <label for="distance-bottom">Distancia desde Abajo</label>
@@ -1004,14 +1115,12 @@
                                     max="100">
                                 <small class="form-text">La vista previa de distancias no está disponible.</small>
                             </div>
-
                             <div class="form-group">
                                 <label for="distance-side">Distancia desde el Lado</label>
                                 <input type="number" id="distance-side" class="form-control" value="16" min="0"
                                     max="100">
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label>Icono de la Burbuja de Chat</label>
                             <div class="icon-selector">
@@ -1043,7 +1152,6 @@
                                     title="Negocios"><i class="fas fa-briefcase"></i></button>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color de Fondo de la Burbuja de Chat</label>
                             <div class="color-palette">
@@ -1083,7 +1191,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color del Icono de la Burbuja de Chat</label>
                             <div class="color-palette">
@@ -1119,14 +1226,12 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label for="bubble-message">Mensaje de la Burbuja de Chat</label>
                             <input type="text" id="bubble-message" class="form-control" placeholder="Consulte aquí">
                             <small class="form-text">Este mensaje aparece como un tooltip cuando tu chatbot está cerrado
                                 para los visitantes por primera vez. Déjalo vacío para eliminarlo.</small>
                         </div>
-
                         <div class="color-group">
                             <label>Color de Fondo del Mensaje de la Burbuja</label>
                             <div class="color-palette">
@@ -1162,7 +1267,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="color-group">
                             <label>Color del Texto del Mensaje de la Burbuja</label>
                             <div class="color-palette">
@@ -1198,7 +1302,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label for="custom-bubble-css">CSS Personalizado de la Burbuja</label>
                             <textarea id="custom-bubble-css" class="form-control code-textarea" rows="6"
@@ -1208,7 +1311,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Save Button -->
                 <div class="appearance-footer">
                     <button class="btn btn-primary btn-save-appearance" id="save-appearance">
@@ -1217,7 +1319,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Integrations Page -->
         <div id="page-integrations" class="page">
             <div class="integrations-container">
@@ -1236,7 +1337,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="integration-card">
                     <div class="integration-header">
                         <h3><i class="fas fa-plug"></i> Integración API</h3>
@@ -1255,7 +1355,6 @@
             </div>
         </div>
     </main>
-
     <!-- Modals -->
     <!-- Upload Files Modal -->
     <div id="upload-modal" class="modal">
@@ -1280,7 +1379,6 @@
             </div>
         </div>
     </div>
-
     <!-- URL Training Modal -->
     <div id="url-modal" class="modal">
         <div class="modal-content">
@@ -1305,7 +1403,6 @@
             </div>
         </div>
     </div>
-
     <!-- Text Training Modal -->
     <div id="text-modal" class="modal">
         <div class="modal-content">
@@ -1325,7 +1422,6 @@
             </div>
         </div>
     </div>
-
     <!-- New Chatbot Modal -->
     <div id="new-chatbot-modal" class="modal">
         <div class="modal-content">
@@ -1371,7 +1467,6 @@
             </div>
         </div>
     </div>
-
     <!-- Quick Prompt Editor Modal -->
     <div id="prompt-modal" class="modal">
         <div class="modal-content">
@@ -1388,7 +1483,6 @@
                         placeholder="Ej: Pricing, Contacto, Agendar cita" maxlength="50">
                     <small class="form-hint">Este es el texto que verán tus usuarios en el botón</small>
                 </div>
-
                 <div class="form-group">
                     <label for="prompt-link">
                         <i class="fas fa-link"></i> Enlace Externo <span class="optional">(Opcional)</span>
@@ -1396,7 +1490,6 @@
                     <input type="url" id="prompt-link" class="form-input" placeholder="https://ejemplo.com/pricing">
                     <small class="form-hint">El botón abrirá este enlace en una nueva pestaña</small>
                 </div>
-
                 <div class="form-group">
                     <label for="prompt-text">
                         <i class="fas fa-comment-dots"></i> Mensaje al Chatbot <span class="optional">(Opcional)</span>
@@ -1405,7 +1498,6 @@
                         placeholder="Ej: ¿Cuáles son sus precios y planes disponibles?" rows="4"></textarea>
                     <small class="form-hint">Este mensaje se enviará automáticamente al chatbot</small>
                 </div>
-
                 <div class="form-notice">
                     <i class="fas fa-lightbulb"></i>
                     <p>Puedes elegir entre un <strong>Enlace Externo</strong> o un <strong>Mensaje al Chatbot</strong>.
@@ -1422,7 +1514,6 @@
             </div>
         </div>
     </div>
-
     <!-- Function Editor Modal -->
     <div id="function-modal" class="modal">
         <div class="modal-content modal-large">
@@ -1437,14 +1528,12 @@
                         required>
                     <small>Solo letras, números y guiones bajos. Sin espacios.</small>
                 </div>
-
                 <div class="form-group">
                     <label for="function-description">Descripción *</label>
                     <textarea id="function-description" class="form-control" rows="2"
                         placeholder="Describe qué hace esta función..." required></textarea>
                     <small>Explica claramente qué hace la función para que el chatbot sepa cuándo usarla.</small>
                 </div>
-
                 <div class="form-group">
                     <label>Parámetros</label>
                     <div id="parameters-list" class="parameters-list">
@@ -1454,14 +1543,12 @@
                         <i class="fas fa-plus"></i> Añadir Parámetro
                     </button>
                 </div>
-
                 <div class="form-group">
                     <label for="function-endpoint">URL del Endpoint *</label>
                     <input type="url" id="function-endpoint" class="form-control"
                         placeholder="https://api.example.com/action" required>
                     <small>La URL donde se enviará la solicitud cuando se llame a esta función.</small>
                 </div>
-
                 <div class="form-group">
                     <label for="function-method">Método HTTP</label>
                     <select id="function-method" class="form-control">
@@ -1471,14 +1558,12 @@
                         <option value="DELETE">DELETE</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label for="function-headers">Headers (JSON)</label>
                     <textarea id="function-headers" class="form-control code-textarea" rows="4"
                         placeholder='{"Authorization": "Bearer tu_token", "Content-Type": "application/json"}'></textarea>
                     <small>Headers HTTP en formato JSON.</small>
                 </div>
-
                 <div class="form-group">
                     <label>
                         <input type="checkbox" id="function-enabled">
@@ -1486,7 +1571,6 @@
                     </label>
                     <small class="d-block">Si está deshabilitada, el chatbot no podrá usar esta función.</small>
                 </div>
-
                 <div class="modal-footer">
                     <button class="btn btn-secondary modal-close">Cancelar</button>
                     <button class="btn btn-primary" id="save-function-btn">
@@ -1496,9 +1580,11 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/js/dashboard.js"></script>
+    <script src="/js/training.js"></script>
+    <script src="/js/test-chatbot.js"></script>
+    <script src="/js/wizard.js"></script>
+    <script src="/js/preview.js"></script>
 </body>
-
 </html>

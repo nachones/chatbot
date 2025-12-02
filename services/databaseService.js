@@ -981,6 +981,21 @@ class DatabaseService {
       );
     });
   }
+  async addTrainingData(chatbotId, content, type, source) {
+    return new Promise((resolve, reject) => {
+      const trainingId = 'train_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const metadata = JSON.stringify({ type, source });
+
+      this.db.run(
+        `INSERT INTO training_data (chatbot_id, training_id, content, metadata) VALUES (?, ?, ?, ?)`,
+        [chatbotId, trainingId, content, metadata],
+        function (err) {
+          if (err) reject(err);
+          else resolve(this.lastID);
+        }
+      );
+    });
+  }
 }
 
 module.exports = DatabaseService;

@@ -1,3 +1,4 @@
+// Server entry point - Restart trigger
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -97,6 +98,14 @@ try {
   console.log('✓ Dashboard routes cargadas');
 } catch (error) {
   console.error('✗ Error cargando Dashboard routes:', error.message);
+}
+
+try {
+  const trainingRoutes = require('./routes/training');
+  app.use('/api/training', trainingRoutes);
+  console.log('✓ Training routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Training routes:', error.message);
 }
 
 try {

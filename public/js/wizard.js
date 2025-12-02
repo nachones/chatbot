@@ -5,13 +5,14 @@
     let currentStep = 1;
     let wizardData = {
         name: '',
-        description: '',
-        trainingType: null, // 'file' or 'url'
-        trainingFile: null,
+        objective: 'support',
+        welcomeMessage: '¡Hola! ¿En qué puedo ayudarte hoy?',
+        trainingType: 'file', // 'file' or 'url'
+        trainingFiles: [],
         trainingUrl: '',
-        color: '#2563eb',
-        welcomeMessage: '¡Hola! ¿En qué puedo ayudarte?',
-        model: 'gpt-3.5-turbo'
+        color: '#3B82F6',
+        position: 'bottom-right',
+        theme: 'light'
     };
 
     // Initialize wizard when modal opens
@@ -33,27 +34,41 @@
 
         initWizardNavigation();
         initTrainingOptions();
+        initCustomization();
+        initCopyCode();
     });
 
-    function resetWizard() {
+    // Expose resetWizard to global scope
+    window.resetWizard = function () {
         currentStep = 1;
         wizardData = {
-            name: '',
-            description: '',
-            trainingType: null,
-            trainingFile: null,
+            name: document.getElementById('wizard-chatbot-name') ? document.getElementById('wizard-chatbot-name').value : '',
+            objective: 'support',
+            welcomeMessage: '¡Hola! ¿En qué puedo ayudarte hoy?',
+            trainingType: 'file',
+            trainingFiles: [],
             trainingUrl: '',
-            color: '#2563eb',
-            welcomeMessage: '¡Hola! ¿En qué puedo ayudarte?',
-            model: 'gpt-3.5-turbo'
+            color: '#3B82F6',
+            position: 'bottom-right',
+            theme: 'light'
         };
+
+        // Reset inputs
+        if (document.getElementById('new-chatbot-name')) document.getElementById('new-chatbot-name').value = '';
+        if (document.getElementById('new-chatbot-objective')) document.getElementById('new-chatbot-objective').value = 'support';
+        if (document.getElementById('new-chatbot-welcome')) document.getElementById('new-chatbot-welcome').value = '¡Hola! ¿En qué puedo ayudarte hoy?';
+        if (document.getElementById('wizard-file-input')) document.getElementById('wizard-file-input').value = '';
+        if (document.getElementById('wizard-url-input')) document.getElementById('wizard-url-input').value = '';
+        if (document.getElementById('wizard-files-list')) document.getElementById('wizard-files-list').innerHTML = '';
+
         showStep(1);
     }
 
     function initWizardNavigation() {
         const prevBtn = document.getElementById('wizard-prev');
         const nextBtn = document.getElementById('wizard-next');
-        const finishBtn = document.getElementById('wizard-finish');
+        const createBtn = document.getElementById('wizard-create');
+        const finishBtn = document.getElementById('wizard-finish-btn');
 
         if (prevBtn) {
             prevBtn.addEventListener('click', () => {
@@ -71,19 +86,26 @@
                     if (currentStep < 3) {
                         currentStep++;
                         showStep(currentStep);
+                    } else if (currentStep === 3) {
+                        // Create chatbot before showing step 4 (deploy)
+                        createChatbot();
                     }
                 }
             });
         }
 
         if (finishBtn) {
-            finishBtn.addEventListener('click', createChatbot);
+            finishBtn.addEventListener('click', () => {
+                document.getElementById('new-chatbot-modal').classList.remove('active');
+                window.location.reload();
+            });
         }
     }
 
     function initTrainingOptions() {
         const uploadOption = document.getElementById('wizard-upload-option');
         const urlOption = document.getElementById('wizard-url-option');
+        const fileInput = document.getElementById('wizard-file-input');
 
         if (uploadOption) {
             uploadOption.addEventListener('click', () => {
@@ -96,6 +118,27 @@
                 selectTrainingOption('url');
             });
         }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                wizardData.trainingFiles = files;
+                renderFilesList(files);
+            });
+        }
+    }
+
+    function renderFilesList(files) {
+        const list = document.getElementById('wizard-files-list');
+        if (!list) return;
+
+        list.innerHTML = files.map(file => `
+            <div class="file-item">
+                <i class="fas fa-file"></i>
+                <span>${file.name}</span>
+                <span class="file-size">(${(file.size / 1024).toFixed(1)} KB)</span>
+            </div>
+        `).join('');
     }
 
     function selectTrainingOption(type) {
@@ -120,6 +163,45 @@
         }
     }
 
+    function initCustomization() {
+        const colorInput = document.getElementById('wizard-color');
+        const welcomeInput = document.getElementById('new-chatbot-welcome');
+        const nameInput = document.getElementById('new-chatbot-name');
+
+        if (colorInput) {
+            colorInput.addEventListener('input', (e) => {
+                wizardData.color = e.target.value;
+                updatePreview();
+            });
+        }
+
+        if (welcomeInput) {
+            welcomeInput.addEventListener('input', (e) => {
+                wizardData.welcomeMessage = e.target.value;
+                updatePreview();
+            });
+        }
+
+        if (nameInput) {
+            nameInput.addEventListener('input', (e) => {
+                wizardData.name = e.target.value;
+                updatePreview();
+            });
+        }
+    }
+
+    function updatePreview() {
+        const header = document.querySelector('.preview-header');
+        const sendBtn = document.querySelector('.preview-send');
+        const bubble = document.querySelector('.preview-bubble');
+        const nameEl = document.getElementById('preview-name');
+
+        if (header) header.style.backgroundColor = wizardData.color;
+        if (sendBtn) sendBtn.style.color = wizardData.color;
+        if (bubble) bubble.textContent = wizardData.welcomeMessage || '¡Hola! ¿En qué puedo ayudarte hoy?';
+        if (nameEl) nameEl.textContent = wizardData.name || 'Mi Chatbot';
+    }
+
     function showStep(step) {
         // Hide all steps
         document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
@@ -130,7 +212,8 @@
 
         // Update progress indicators
         document.querySelectorAll('.wizard-step-indicator').forEach((indicator, index) => {
-            if (index + 1 <= step) {
+            const indicatorStep = parseInt(indicator.getAttribute('data-step'));
+            if (indicatorStep <= step) {
                 indicator.classList.add('active');
             } else {
                 indicator.classList.remove('active');
@@ -140,14 +223,25 @@
         // Update navigation buttons
         const prevBtn = document.getElementById('wizard-prev');
         const nextBtn = document.getElementById('wizard-next');
-        const finishBtn = document.getElementById('wizard-finish');
+        const createBtn = document.getElementById('wizard-create');
 
-        if (prevBtn) prevBtn.style.display = step > 1 ? 'block' : 'none';
-        if (nextBtn) nextBtn.style.display = step < 3 ? 'block' : 'none';
-        if (finishBtn) finishBtn.style.display = step === 3 ? 'block' : 'none';
+        if (prevBtn) prevBtn.style.display = step > 1 && step < 4 ? 'block' : 'none';
+
+        if (nextBtn) {
+            if (step < 3) {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = 'Siguiente';
+                nextBtn.onclick = null; // Reset click handler if needed
+            } else if (step === 3) {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = 'Crear y Desplegar';
+            } else {
+                nextBtn.style.display = 'none';
+            }
+        }
 
         // Update title
-        const titles = ['Información Básica', 'Entrenamiento', 'Personalización'];
+        const titles = ['Información Básica', 'Fuentes de Datos', 'Personalización Visual', 'Integración'];
         const titleEl = document.getElementById('wizard-title');
         if (titleEl) titleEl.textContent = `Crear Nuevo Chatbot - ${titles[step - 1]}`;
     }
@@ -166,28 +260,24 @@
     function saveStepData(step) {
         if (step === 1) {
             wizardData.name = document.getElementById('new-chatbot-name')?.value || '';
-            wizardData.description = document.getElementById('new-chatbot-description')?.value || '';
+            wizardData.objective = document.getElementById('new-chatbot-objective')?.value || 'support';
+            wizardData.welcomeMessage = document.getElementById('new-chatbot-welcome')?.value || '';
         } else if (step === 2) {
-            if (wizardData.trainingType === 'file') {
-                const fileInput = document.getElementById('wizard-file-input');
-                wizardData.trainingFile = fileInput?.files[0] || null;
-            } else if (wizardData.trainingType === 'url') {
+            if (wizardData.trainingType === 'url') {
                 wizardData.trainingUrl = document.getElementById('wizard-url-input')?.value || '';
             }
         } else if (step === 3) {
-            wizardData.color = document.getElementById('wizard-color')?.value || '#2563eb';
-            wizardData.welcomeMessage = document.getElementById('wizard-welcome')?.value || '';
-            wizardData.model = document.getElementById('wizard-model')?.value || 'gpt-3.5-turbo';
+            wizardData.color = document.getElementById('wizard-color')?.value || '#3B82F6';
+            wizardData.position = document.getElementById('wizard-position')?.value || 'bottom-right';
+            wizardData.theme = document.getElementById('wizard-theme')?.value || 'light';
         }
     }
 
     async function createChatbot() {
-        saveStepData(3);
-
-        const finishBtn = document.getElementById('wizard-finish');
-        if (finishBtn) {
-            finishBtn.disabled = true;
-            finishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+        const nextBtn = document.getElementById('wizard-next');
+        if (nextBtn) {
+            nextBtn.disabled = true;
+            nextBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
         }
 
         try {
@@ -197,10 +287,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: wizardData.name,
-                    description: wizardData.description,
+                    description: `Chatbot de ${wizardData.objective}`,
                     widget_color: wizardData.color,
                     welcome_message: wizardData.welcomeMessage,
-                    model: wizardData.model
+                    model: 'gpt-3.5-turbo', // Default model
+                    widget_position: wizardData.position,
+                    theme: wizardData.theme
                 })
             });
 
@@ -210,16 +302,19 @@
                 const chatbotId = data.chatbot.id;
 
                 // Upload training data if provided
-                if (wizardData.trainingType === 'file' && wizardData.trainingFile) {
-                    await uploadTrainingFile(chatbotId, wizardData.trainingFile);
+                if (wizardData.trainingType === 'file' && wizardData.trainingFiles.length > 0) {
+                    await uploadTrainingFiles(chatbotId, wizardData.trainingFiles);
                 } else if (wizardData.trainingType === 'url' && wizardData.trainingUrl) {
                     await trainFromUrl(chatbotId, wizardData.trainingUrl);
                 }
 
-                // Close modal and reload
-                document.getElementById('new-chatbot-modal')?.classList.remove('active');
-                alert('¡Chatbot creado exitosamente!');
-                window.location.reload();
+                // Generate deploy code
+                const deployCode = generateDeployCode(chatbotId, wizardData);
+                document.getElementById('wizard-deploy-code').textContent = deployCode;
+
+                // Move to step 4
+                currentStep = 4;
+                showStep(4);
             } else {
                 throw new Error(data.error || 'Error al crear el chatbot');
             }
@@ -227,16 +322,18 @@
             console.error('Error:', error);
             alert('Error al crear el chatbot: ' + error.message);
         } finally {
-            if (finishBtn) {
-                finishBtn.disabled = false;
-                finishBtn.innerHTML = '<i class="fas fa-check"></i> Crear y Desplegar';
+            if (nextBtn) {
+                nextBtn.disabled = false;
+                nextBtn.innerHTML = 'Crear y Desplegar';
             }
         }
     }
 
-    async function uploadTrainingFile(chatbotId, file) {
+    async function uploadTrainingFiles(chatbotId, files) {
         const formData = new FormData();
-        formData.append('file', file);
+        files.forEach(file => {
+            formData.append('files', file);
+        });
         formData.append('chatbotId', chatbotId);
 
         const response = await fetch('/api/training/upload', {
@@ -255,6 +352,31 @@
         });
 
         return response.json();
+    }
+
+    function generateDeployCode(chatbotId, data) {
+        const host = window.location.origin;
+        return `<script src="${host}/widget.js"
+    data-chatbot-id="${chatbotId}"
+    data-primary-color="${data.color}"
+    data-position="${data.position}"
+    data-welcome="${data.welcomeMessage}"></script>`;
+    }
+
+    function initCopyCode() {
+        const copyBtn = document.getElementById('wizard-copy-code');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const code = document.getElementById('wizard-deploy-code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                    }, 2000);
+                });
+            });
+        }
     }
 
 })();
