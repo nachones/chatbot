@@ -148,6 +148,22 @@ router.get('/conversations/:sessionId', async (req, res) => {
   }
 });
 
+// Delete conversation
+router.delete('/conversations/:sessionId', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    await db.deleteConversation(sessionId);
+    
+    res.json({
+      success: true,
+      message: 'Conversación eliminada'
+    });
+  } catch (error) {
+    console.error('Error deleting conversation:', error);
+    res.status(500).json({ error: 'Error eliminando conversación' });
+  }
+});
+
 // Get leads
 router.get('/leads', async (req, res) => {
   try {

@@ -65,9 +65,10 @@
             <h3>Código de integración:</h3>
             <div class="code">
                 <!-- Agrega este código justo antes del </body> -->
-                <script src="http://localhost:3000/widget.js" data-api-url="http://localhost:3000/api"
-                    data-api-key="tu-api-key" data-title="Asistente Virtual"
-                    data-welcome="¡Hola! ¿En qué puedo ayudarte hoy?">
+                <script src="http://localhost:3000/chat-widget.js" data-api-url="http://localhost:3000/api"
+                    data-api-key="TU_CHATBOT_ID" data-title="Asistente Virtual"
+                    data-welcome="¡Hola! ¿En qué puedo ayudarte hoy?"
+                    data-primary-color="#6366F1">
                     </script>
             </div>
         </div>
@@ -76,10 +77,12 @@
             <h3>Personalización:</h3>
             <p>Puedes personalizar el chatbot con estos parámetros:</p>
             <ul>
+                <li><strong>data-api-key</strong>: ID del chatbot (obtenido del dashboard)</li>
+                <li><strong>data-api-url</strong>: URL del servidor API</li>
                 <li><strong>data-title</strong>: Título del chat</li>
                 <li><strong>data-welcome</strong>: Mensaje de bienvenida</li>
-                <li><strong>data-position</strong>: bottom-right, bottom-left, top-right, top-left</li>
-                <li><strong>data-theme</strong>: default, dark, light</li>
+                <li><strong>data-primary-color</strong>: Color principal (hex)</li>
+                <li><strong>data-position</strong>: bottom-right, bottom-left</li>
             </ul>
         </div>
 
@@ -95,11 +98,15 @@
     </div>
 
 
-    <!-- Chatbot Widget -->
-    <script src="http://localhost:3000/widget.js" data-api-url="http://localhost:3000/api"
-        data-api-key="chatbot_1762865264573_mmtjl923s" data-title="Asistente Demo"
+    <!-- Chatbot Widget Demo -->
+    <!-- Para usar: reemplaza TU_CHATBOT_ID con el ID real de tu chatbot -->
+    <script src="http://localhost:3000/chat-widget.js" 
+        data-api-url="http://localhost:3000/api"
+        data-api-key="demo" 
+        data-title="Asistente Demo"
+        data-primary-color="#6366F1"
         data-welcome="¡Hola! Soy tu asistente virtual de demostración. ¿En qué puedo ayudarte hoy?">
-        </script>
+    </script>
 </body>
 
 </html>

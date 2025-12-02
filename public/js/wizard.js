@@ -356,10 +356,12 @@
 
     function generateDeployCode(chatbotId, data) {
         const host = window.location.origin;
-        return `<script src="${host}/widget.js"
-    data-chatbot-id="${chatbotId}"
+        return `<script src="${host}/chat-widget.js"
+    data-api-key="${chatbotId}"
+    data-api-url="${host}/api"
     data-primary-color="${data.color}"
     data-position="${data.position}"
+    data-title="${data.name || 'Asistente Virtual'}"
     data-welcome="${data.welcomeMessage}"></script>`;
     }
 

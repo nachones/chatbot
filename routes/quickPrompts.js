@@ -52,9 +52,11 @@ router.get('/:id', async (req, res) => {
 // Create a new quick prompt
 router.post('/', async (req, res) => {
     try {
-        const { chatbotId, buttonTitle, link, prompt } = req.body;
+        const { chatbotId, buttonTitle, title, link, prompt, prompt_text, display_order } = req.body;
+        const finalTitle = buttonTitle || title; // Accept both field names
+        const finalPrompt = prompt || prompt_text; // Accept both field names
 
-        if (!chatbotId || !buttonTitle) {
+        if (!chatbotId || !finalTitle) {
             return res.status(400).json({ 
                 success: false, 
                 error: 'chatbotId and buttonTitle are required' 
@@ -62,14 +64,22 @@ router.post('/', async (req, res) => {
         }
 
         // Validate: must have either link or prompt
-        if (!link && !prompt) {
+        if (!link && !finalPrompt) {
             return res.status(400).json({ 
                 success: false, 
                 error: 'Either link or prompt must be provided' 
             });
         }
 
-        const newPrompt = await db.createQuickPrompt(req.body);
+        const promptData = {
+            chatbotId,
+            buttonTitle: finalTitle,
+            link: link || null,
+            prompt: finalPrompt || null,
+            display_order: display_order || 0
+        };
+
+        const newPrompt = await db.createQuickPrompt(promptData);
         res.status(201).json({ 
             success: true, 
             prompt: newPrompt 

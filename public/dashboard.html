@@ -651,12 +651,12 @@
                             </div>
                             <div class="toggle-item">
                                 <div class="toggle-info">
-                                    <label>Ocultar Marca de Support AI</label>
-                                    <small>Activa esto para eliminar el enlace a Support AI. Reservado para cuentas de
+                                    <label>Ocultar Marca MIABOT</label>
+                                    <small>Activa esto para eliminar el enlace a MIABOT. Reservado para cuentas de
                                         pago.</small>
                                 </div>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="hide-branding" aria-label="Ocultar marca de Support AI">
+                                    <input type="checkbox" id="hide-branding" aria-label="Ocultar marca MIABOT">
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
@@ -1328,10 +1328,12 @@
                     </div>
                     <p>Copia y pega este código en el HTML de tu sitio web:</p>
                     <div class="code-block">
-                        <pre id="integration-code"><code><script src="http://localhost:3000/widget.js"
-        data-api-url="http://localhost:3000/api"
-        data-title="Mi Asistente"
-        data-welcome="¡Hola! ¿En qué puedo ayudarte?"></script></code></pre>
+                        <pre id="integration-code"><code>&lt;script src="http://localhost:3000/chat-widget.js"
+    data-api-url="http://localhost:3000/api"
+    data-api-key="TU_CHATBOT_ID"
+    data-title="Mi Asistente"
+    data-primary-color="#6366F1"
+    data-welcome="¡Hola! ¿En qué puedo ayudarte?"&gt;&lt;/script&gt;</code></pre>
                         <button class="btn-copy" id="copy-integration-code" aria-label="Copiar código de integración">
                             <i class="fas fa-copy"></i> Copiar
                         </button>
@@ -1586,5 +1588,10 @@
     <script src="/js/test-chatbot.js"></script>
     <script src="/js/wizard.js"></script>
     <script src="/js/preview.js"></script>
+    <script src="/js/conversations.js"></script>
+    <script src="/js/settings.js"></script>
+    <script src="/js/functions.js"></script>
+    <script src="/js/prompts.js"></script>
+    <script src="/js/integrations.js"></script>
 </body>
 </html>

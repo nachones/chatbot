@@ -301,6 +301,96 @@
                 }
             });
         }
+
+        // Create chatbot button
+        const createChatbotBtn = document.getElementById('create-chatbot-btn');
+        if (createChatbotBtn) {
+            createChatbotBtn.addEventListener('click', createNewChatbot);
+        }
+
+        // Modal close buttons
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Close modal on background click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    }
+
+    async function createNewChatbot() {
+        const nameInput = document.getElementById('new-chatbot-name');
+        const descInput = document.getElementById('new-chatbot-description');
+        const apiKeyInput = document.getElementById('new-chatbot-api-key');
+        const modelSelect = document.getElementById('new-chatbot-model');
+        const promptInput = document.getElementById('new-chatbot-prompt');
+
+        const name = nameInput?.value?.trim();
+        
+        if (!name) {
+            showError('El nombre del chatbot es requerido');
+            nameInput?.focus();
+            return;
+        }
+
+        const createBtn = document.getElementById('create-chatbot-btn');
+        const originalText = createBtn.innerHTML;
+        createBtn.disabled = true;
+        createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+
+        try {
+            const response = await fetch(`${API_URL}/chatbots`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    description: descInput?.value?.trim() || '',
+                    api_key: apiKeyInput?.value?.trim() || '',
+                    model: modelSelect?.value || 'gpt-3.5-turbo',
+                    system_prompt: promptInput?.value?.trim() || 'Eres un asistente útil y amigable.'
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showSuccess('¡Chatbot creado exitosamente!');
+                
+                // Close modal
+                const modal = document.getElementById('new-chatbot-modal');
+                if (modal) modal.classList.remove('active');
+
+                // Clear form
+                if (nameInput) nameInput.value = '';
+                if (descInput) descInput.value = '';
+                if (apiKeyInput) apiKeyInput.value = '';
+                if (promptInput) promptInput.value = 'Eres un asistente útil y amigable.';
+
+                // Reload chatbots and select the new one
+                await loadChatbots();
+                if (data.chatbot?.id) {
+                    selectChatbot(data.chatbot.id);
+                }
+            } else {
+                showError(data.error || 'Error al crear el chatbot');
+            }
+        } catch (error) {
+            console.error('Error creating chatbot:', error);
+            showError('Error de conexión al crear el chatbot');
+        } finally {
+            createBtn.disabled = false;
+            createBtn.innerHTML = originalText;
+        }
     }
 
     function openNewChatbotModal() {

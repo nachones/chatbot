@@ -109,14 +109,6 @@ try {
 }
 
 try {
-  const trainingRoutes = require('./routes/training');
-  app.use('/api/training', trainingRoutes);
-  console.log('✓ Training routes cargadas');
-} catch (error) {
-  console.error('✗ Error cargando Training routes:', error.message);
-}
-
-try {
   const functionsRoutes = require('./routes/functions');
   app.use('/api/functions', functionsRoutes);
   console.log('✓ Functions routes cargadas');
@@ -138,6 +130,14 @@ try {
   console.log('✓ Usage routes cargadas');
 } catch (error) {
   console.error('✗ Error cargando Usage routes:', error.message);
+}
+
+try {
+  const leadsRoutes = require('./routes/leads');
+  app.use('/api/leads', leadsRoutes);
+  console.log('✓ Leads routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Leads routes:', error.message);
 }
 
 // Manejo de errores

@@ -102,4 +102,88 @@ router.post('/url', async (req, res) => {
   }
 });
 
+// Train from text
+router.post('/text', async (req, res) => {
+  try {
+    const { text, content, chatbotId, title } = req.body;
+    const textContent = text || content; // Accept both field names
+
+    if (!textContent) {
+      return res.status(400).json({ error: 'Texto requerido' });
+    }
+
+    if (!chatbotId) {
+      return res.status(400).json({ error: 'ID del chatbot requerido' });
+    }
+
+    // Process text into chunks
+    const chunks = await documentProcessor.processText(textContent);
+
+    // Save to database
+    for (const chunk of chunks) {
+      await db.addTrainingData(chatbotId, chunk.content, 'text', title || 'Texto manual');
+    }
+
+    res.json({
+      success: true,
+      message: 'Texto procesado correctamente',
+      chunks: chunks.length
+    });
+  } catch (error) {
+    console.error('Error processing text:', error);
+    res.status(500).json({ error: 'Error procesando texto' });
+  }
+});
+
+// Get training data for a chatbot
+router.get('/data/:chatbotId', async (req, res) => {
+  try {
+    const { chatbotId } = req.params;
+
+    const trainingData = await db.getTrainingDataByChatbot(chatbotId);
+
+    res.json({
+      success: true,
+      trainingData: trainingData || []
+    });
+  } catch (error) {
+    console.error('Error getting training data:', error);
+    res.status(500).json({ error: 'Error obteniendo datos de entrenamiento' });
+  }
+});
+
+// Delete training data item
+router.delete('/data/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.deleteTrainingData(id);
+
+    res.json({
+      success: true,
+      message: 'Dato de entrenamiento eliminado'
+    });
+  } catch (error) {
+    console.error('Error deleting training data:', error);
+    res.status(500).json({ error: 'Error eliminando dato de entrenamiento' });
+  }
+});
+
+// Get training statistics for a chatbot
+router.get('/stats/:chatbotId', async (req, res) => {
+  try {
+    const { chatbotId } = req.params;
+
+    const stats = await db.getTrainingStats(chatbotId);
+
+    res.json({
+      success: true,
+      stats: stats
+    });
+  } catch (error) {
+    console.error('Error getting training stats:', error);
+    res.status(500).json({ error: 'Error obteniendo estadísticas' });
+  }
+});
+
 module.exports = router;

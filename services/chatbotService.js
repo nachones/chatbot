@@ -1,6 +1,7 @@
 const OpenAI = require('openai');
 const DatabaseService = require('./databaseService');
 const TrainingService = require('./trainingService');
+const llmService = require('./llmService');
 
 class ChatbotService {
   constructor() {
@@ -30,11 +31,14 @@ class ChatbotService {
         }
       }
 
-      // Inicializar OpenAI con la API key del chatbot o la global
-      const apiKey = chatbotConfig?.api_key || process.env.OPENAI_API_KEY;
-      if (!this.openai) {
-        await this.initialize(apiKey);
-      }
+      // Configuración del modelo
+      const model = chatbotConfig?.model || process.env.DEFAULT_OPENAI_MODEL || 'gpt-3.5-turbo';
+      const apiKey = chatbotConfig?.api_key || process.env.OPENAI_API_KEY || process.env.GROQ_API_KEY;
+      const temperature = chatbotConfig?.temperature || 0.7;
+      const maxTokens = chatbotConfig?.max_tokens || 500;
+      
+      // Detectar proveedor basado en el modelo
+      const provider = llmService.detectProvider(model);
 
       // Generar sessionId si no se proporciona
       if (!sessionId) {
@@ -46,9 +50,6 @@ class ChatbotService {
       
       // Usar el system prompt del chatbot o el por defecto
       let systemPrompt = chatbotConfig?.system_prompt || this.systemPrompt;
-      const model = chatbotConfig?.model || 'gpt-3.5-turbo';
-      const temperature = chatbotConfig?.temperature || 0.7;
-      const maxTokens = chatbotConfig?.max_tokens || 500;
       
       // 🔥 BUSCAR CONTENIDO RELEVANTE EN TRAINING DATA
       let contextText = '';
@@ -81,7 +82,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
         }
       }
       
-      // Construir mensajes para OpenAI
+      // Construir mensajes para el LLM
       const messages = [
         { role: 'system', content: systemPrompt },
         ...history.map(h => ({ role: h.role, content: h.content })),
@@ -119,26 +120,21 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
         }
       }
 
-      // Preparar la llamada a OpenAI
-      const completionParams = {
-        model: model,
-        messages: messages,
-        max_tokens: maxTokens,
-        temperature: temperature
-      };
+      // Usar el servicio LLM unificado
+      let result = await llmService.chat({
+        messages,
+        model,
+        temperature,
+        maxTokens,
+        apiKey,
+        provider,
+        tools
+      });
 
-      // Añadir tools si hay funciones disponibles
-      if (tools && tools.length > 0) {
-        completionParams.tools = tools;
-        completionParams.tool_choice = 'auto';
-      }
+      let responseMessage = result.message;
 
-      // Obtener respuesta de OpenAI
-      let completion = await this.openai.chat.completions.create(completionParams);
-      let responseMessage = completion.choices[0].message;
-
-      // Procesar function calling si OpenAI solicita ejecutar una función
-      if (responseMessage.tool_calls) {
+      // Procesar function calling si el LLM solicita ejecutar una función
+      if (result.toolCalls && result.toolCalls.length > 0) {
         // Guardar el mensaje del usuario
         await this.db.saveMessage(sessionId, 'user', message, chatbotId);
         
@@ -146,7 +142,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
         messages.push(responseMessage);
 
         // Ejecutar cada función solicitada
-        for (const toolCall of responseMessage.tool_calls) {
+        for (const toolCall of result.toolCalls) {
           const functionName = toolCall.function.name;
           const functionArgs = JSON.parse(toolCall.function.arguments);
           
@@ -175,15 +171,17 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
           }
         }
 
-        // Obtener la respuesta final de OpenAI con los resultados de las funciones
-        completion = await this.openai.chat.completions.create({
-          model: model,
-          messages: messages,
-          max_tokens: maxTokens,
-          temperature: temperature
+        // Obtener la respuesta final del LLM con los resultados de las funciones
+        result = await llmService.chat({
+          messages,
+          model,
+          temperature,
+          maxTokens,
+          apiKey,
+          provider
         });
         
-        responseMessage = completion.choices[0].message;
+        responseMessage = result.message;
       } else {
         // Si no hay function calling, guardar el mensaje del usuario
         await this.db.saveMessage(sessionId, 'user', message, chatbotId);
@@ -195,15 +193,18 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
       await this.db.saveMessage(sessionId, 'assistant', response, chatbotId);
 
       // Actualizar uso de tokens si hay chatbotId
-      if (chatbotId && completion.usage) {
-        const totalTokens = completion.usage.total_tokens;
+      if (chatbotId && result.usage) {
+        const totalTokens = result.usage.total_tokens;
         await this.db.updateTokenUsage(chatbotId, totalTokens);
       }
 
       return {
         text: response,
         sessionId: sessionId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        provider: result.provider,
+        model: result.model,
+        responseTime: result.responseTime
       };
     } catch (error) {
       console.error('Error procesando mensaje:', error);

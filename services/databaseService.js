@@ -211,6 +211,19 @@ class DatabaseService {
     });
   }
 
+  async deleteConversation(sessionId) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'DELETE FROM conversations WHERE session_id = ?',
+        [sessionId],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ deleted: this.changes });
+        }
+      );
+    });
+  }
+
   async saveConfig(config) {
     return new Promise((resolve, reject) => {
       const promises = Object.entries(config).map(([key, value]) => {
@@ -992,6 +1005,75 @@ class DatabaseService {
         function (err) {
           if (err) reject(err);
           else resolve(this.lastID);
+        }
+      );
+    });
+  }
+
+  async getTrainingDataByChatbot(chatbotId) {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        `SELECT id, training_id, content, metadata, created_at 
+         FROM training_data 
+         WHERE chatbot_id = ? 
+         ORDER BY created_at DESC`,
+        [chatbotId],
+        (err, rows) => {
+          if (err) reject(err);
+          else {
+            const data = rows.map(row => {
+              let meta = {};
+              try {
+                meta = JSON.parse(row.metadata || '{}');
+              } catch (e) {}
+              return {
+                id: row.id,
+                trainingId: row.training_id,
+                content: row.content,
+                type: meta.type || 'unknown',
+                source: meta.source || 'Unknown',
+                title: meta.source || meta.type || 'Contenido',
+                created_at: row.created_at
+              };
+            });
+            resolve(data);
+          }
+        }
+      );
+    });
+  }
+
+  async deleteTrainingData(id) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'DELETE FROM training_data WHERE id = ?',
+        [id],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ deleted: this.changes });
+        }
+      );
+    });
+  }
+
+  async getTrainingStats(chatbotId) {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        `SELECT 
+           COUNT(*) as total,
+           SUM(CASE WHEN json_extract(metadata, '$.type') = 'file' THEN 1 ELSE 0 END) as files,
+           SUM(CASE WHEN json_extract(metadata, '$.type') = 'url' THEN 1 ELSE 0 END) as urls,
+           SUM(CASE WHEN json_extract(metadata, '$.type') = 'text' THEN 1 ELSE 0 END) as texts,
+           SUM(LENGTH(content)) as totalChars
+         FROM training_data 
+         WHERE chatbot_id = ?`,
+        [chatbotId],
+        (err, rows) => {
+          if (err) reject(err);
+          else {
+            const stats = rows[0] || { total: 0, files: 0, urls: 0, texts: 0, totalChars: 0 };
+            resolve(stats);
+          }
         }
       );
     });
