@@ -223,4 +223,110 @@
         return div.innerHTML;
     }
 
+    // ========================================
+    // SAVE APPEARANCE SETTINGS
+    // ========================================
+    function initSaveAppearance() {
+        const saveBtn = document.getElementById('save-appearance');
+        if (!saveBtn) return;
+
+        saveBtn.addEventListener('click', async () => {
+            const app = window.dashboardApp;
+            if (!app) return;
+
+            const chatbotId = app.getCurrentChatbotId();
+            if (!chatbotId) {
+                app.showError('No hay chatbot seleccionado');
+                return;
+            }
+
+            // Collect all appearance settings
+            const settings = {
+                // Content
+                name: document.getElementById('chatbot-name')?.value?.trim() || 'Mi Asistente',
+                welcome_message: document.getElementById('welcome-message')?.value?.trim() || '¡Hola! ¿En qué puedo ayudarte?',
+                input_placeholder: document.getElementById('input-placeholder')?.value?.trim() || 'Escribe tu mensaje...',
+                // Options
+                display_prompts_vertical: document.getElementById('display-prompts-vertical')?.checked || false,
+                hide_bot_avatar: document.getElementById('hide-bot-avatar')?.checked || false,
+                hide_sources: document.getElementById('hide-sources')?.checked || false,
+                hide_branding: document.getElementById('hide-branding')?.checked || false,
+                // Colors
+                primary_color: document.getElementById('primary-color-picker')?.value || '#6366F1',
+                header_bg: document.getElementById('header-bg-picker')?.value || '#FFFFFF',
+                header_font_color: document.getElementById('header-font-picker')?.value || '#111827',
+                bot_bubble_bg: document.getElementById('bot-bubble-bg-picker')?.value,
+                bot_bubble_font: document.getElementById('bot-bubble-font-picker')?.value,
+                user_bubble_bg: document.getElementById('user-bubble-bg-picker')?.value,
+                user_bubble_font: document.getElementById('user-bubble-font-picker')?.value,
+                // Bubble
+                bubble_icon: document.querySelector('.icon-option.active')?.dataset?.icon || 'comments',
+                bubble_position: document.querySelector('input[name="bubble-position"]:checked')?.value || 'right',
+                custom_css: document.getElementById('custom-bubble-css')?.value || ''
+            };
+
+            // Visual feedback: show loading state
+            const originalHTML = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.7';
+
+            try {
+                const response = await (app.authFetch || fetch)(`/api/chatbots/${chatbotId}/appearance`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Also update chatbot name via main endpoint
+                    await (app.authFetch || fetch)(`/api/chatbots/${chatbotId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: settings.name,
+                            welcome_message: settings.welcome_message
+                        })
+                    });
+
+                    // Success feedback
+                    saveBtn.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
+                    saveBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    saveBtn.style.opacity = '1';
+                    app.showSuccess('Apariencia guardada correctamente');
+
+                    // Update chatbot name in sidebar
+                    const nameEl = document.getElementById('current-chatbot-name');
+                    if (nameEl) nameEl.textContent = settings.name;
+
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        saveBtn.innerHTML = originalHTML;
+                        saveBtn.style.background = '';
+                        saveBtn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+            } catch (error) {
+                console.error('Error saving appearance:', error);
+                saveBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+                saveBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                saveBtn.style.opacity = '1';
+                app.showError('Error al guardar: ' + error.message);
+
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalHTML;
+                    saveBtn.style.background = '';
+                    saveBtn.disabled = false;
+                }, 2500);
+            }
+        });
+    }
+
+    // Initialize save button when DOM is ready
+    document.addEventListener('DOMContentLoaded', initSaveAppearance);
+
 })();
