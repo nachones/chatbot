@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const DatabaseService = require('../services/databaseService');
+const { authMiddleware } = require('./auth');
 
 const db = new DatabaseService();
 
@@ -49,8 +50,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create a new quick prompt
-router.post('/', async (req, res) => {
+// Create a new quick prompt (requires auth)
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const { chatbotId, buttonTitle, title, link, prompt, prompt_text, display_order } = req.body;
         const finalTitle = buttonTitle || title; // Accept both field names
@@ -93,8 +94,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Update a quick prompt
-router.put('/:id', async (req, res) => {
+// Update a quick prompt (requires auth)
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const { buttonTitle, link, prompt } = req.body;
 
@@ -120,8 +121,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete a quick prompt
-router.delete('/:id', async (req, res) => {
+// Delete a quick prompt (requires auth)
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await db.deleteQuickPrompt(req.params.id);
         res.json({ 

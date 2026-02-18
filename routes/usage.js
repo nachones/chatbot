@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const DatabaseService = require('../services/databaseService');
+const { authMiddleware } = require('./auth');
 
 const db = new DatabaseService();
+
+// All usage routes require authentication
+router.use(authMiddleware);
 
 // Obtener estadísticas de uso de un chatbot
 router.get('/:chatbotId', async (req, res) => {

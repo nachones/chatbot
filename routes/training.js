@@ -6,6 +6,7 @@ const fs = require('fs');
 const DocumentProcessor = require('../services/documentProcessor');
 const DatabaseService = require('../services/databaseService');
 const TrainingService = require('../services/trainingService');
+const { authMiddleware } = require('./auth');
 
 const db = new DatabaseService();
 const documentProcessor = new DocumentProcessor();
@@ -27,8 +28,23 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: function (req, file, cb) {
+    const allowedMimes = [
+      'application/pdf', 'text/plain', 'text/markdown', 'text/html',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword'
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Tipo de archivo no permitido. Use PDF, DOCX, TXT, MD o HTML.'), false);
+    }
+  }
 });
+
+// All training routes require authentication
+router.use(authMiddleware);
 
 // Upload training files
 router.post('/upload', upload.array('files', 5), async (req, res) => {

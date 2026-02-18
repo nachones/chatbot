@@ -492,13 +492,18 @@ class DatabaseService {
 
   async getTokenUsage(period, chatbotId = null) {
     return new Promise((resolve, reject) => {
-      // For now, return mock data
-      // In production, you would track tokens in a separate table
-      const mockData = {
-        inputTokens: Math.floor(Math.random() * 10000) + 5000,
-        outputTokens: Math.floor(Math.random() * 8000) + 4000
-      };
-      resolve(mockData);
+      if (chatbotId) {
+        this.db.get(
+          'SELECT tokens_used as inputTokens, messages_used as outputTokens FROM chatbots WHERE id = ?',
+          [chatbotId],
+          (err, row) => {
+            if (err) reject(err);
+            else resolve(row || { inputTokens: 0, outputTokens: 0 });
+          }
+        );
+      } else {
+        resolve({ inputTokens: 0, outputTokens: 0 });
+      }
     });
   }
 
@@ -711,14 +716,27 @@ class DatabaseService {
   }
 
   async updateChatbot(chatbotId, chatbotData) {
+    // Whitelist of allowed fields to prevent SQL injection
+    const allowedFields = [
+      'name', 'welcome_message', 'system_prompt', 'model', 'provider',
+      'api_key', 'temperature', 'max_tokens', 'widget_color', 'widget_position',
+      'is_active', 'user_id', 'input_placeholder', 'bubble_icon'
+    ];
+
     return new Promise((resolve, reject) => {
       const fields = [];
       const values = [];
 
       Object.entries(chatbotData).forEach(([key, value]) => {
-        fields.push(`${key} = ?`);
-        values.push(value);
+        if (allowedFields.includes(key)) {
+          fields.push(`${key} = ?`);
+          values.push(value);
+        }
       });
+
+      if (fields.length === 0) {
+        return resolve({ chatbotId, ...chatbotData });
+      }
 
       fields.push('updated_at = CURRENT_TIMESTAMP');
       values.push(chatbotId);

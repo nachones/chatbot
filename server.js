@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 // Import security middleware
-const { sanitizeBody, sanitizeQuery, requestLogger } = require('./services/securityMiddleware');
+const { requestLogger } = require('./services/securityMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,7 +39,20 @@ try {
 }
 
 // Middleware básico
-app.use(cors());
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : ['http://localhost:3000'];
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile, curl, etc.) and allowed origins
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Widget can be embedded anywhere
+    }
+  },
+  credentials: true
+}));
 
 // Security Middleware
 app.use(helmet({
@@ -49,7 +62,7 @@ app.use(helmet({
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500, // Limit each IP to 500 requests per windowMs
+  max: parseInt(process.env.RATE_LIMIT) || 500,
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -57,10 +70,6 @@ app.use('/api/', limiter);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Security: Sanitize inputs
-app.use(sanitizeBody);
-app.use(sanitizeQuery);
 
 // Request logging (production)
 if (isProduction) {
@@ -213,9 +222,21 @@ server.on('error', (error) => {
   process.exit(1);
 });
 
-// Mantener el proceso vivo y loguear cada 30 segundos
-setInterval(() => {
-  console.log(`[${new Date().toLocaleTimeString()}] Servidor activo - Uptime: ${Math.floor(process.uptime())}s`);
-}, 30000);
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('\nRecibida se\u00f1al SIGTERM. Cerrando servidor...');
+  server.close(() => {
+    console.log('Servidor cerrado correctamente.');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('\nRecibida se\u00f1al SIGINT. Cerrando servidor...');
+  server.close(() => {
+    console.log('Servidor cerrado correctamente.');
+    process.exit(0);
+  });
+});
 
 module.exports = app;

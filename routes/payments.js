@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const DatabaseService = require('../services/databaseService');
+const { authMiddleware } = require('./auth');
 
 const db = new DatabaseService();
-const JWT_SECRET = process.env.JWT_SECRET || 'miabot_default_secret_change_me';
 
 // Initialize Stripe only if key is configured
 let stripe = null;
@@ -13,19 +12,6 @@ if (process.env.STRIPE_SECRET_KEY) {
   console.log('✓ Stripe configurado');
 } else {
   console.log('⚠ Stripe no configurado (STRIPE_SECRET_KEY no encontrada)');
-}
-
-// Auth middleware
-function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-  if (!token) return res.status(401).json({ error: 'Token requerido' });
-  try {
-    req.user = jwt.verify(token, JWT_SECRET);
-    next();
-  } catch (e) {
-    return res.status(401).json({ error: 'Token inválido' });
-  }
 }
 
 // Get pricing info (public)
@@ -165,7 +151,8 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     if (webhookSecret) {
       event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } else {
-      event = JSON.parse(req.body);
+      console.warn('⚠ STRIPE_WEBHOOK_SECRET no configurado - webhook rechazado');
+      return res.status(503).json({ error: 'Webhook no configurado' });
     }
   } catch (err) {
     console.error('Error verificando webhook:', err.message);

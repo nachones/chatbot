@@ -5,7 +5,12 @@ const jwt = require('jsonwebtoken');
 const DatabaseService = require('../services/databaseService');
 
 const db = new DatabaseService();
-const JWT_SECRET = process.env.JWT_SECRET || 'miabot_default_secret_change_me';
+
+if (!process.env.JWT_SECRET) {
+  console.error('\u2717 FATAL: JWT_SECRET no est\u00e1 configurado en .env');
+  process.exit(1);
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 const SESSION_EXPIRY = process.env.SESSION_EXPIRY || '7d';
 
 // Middleware to verify JWT token

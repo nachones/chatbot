@@ -62,15 +62,24 @@ class DocumentProcessor {
 
   async processWebPage(url, depth = 1) {
     try {
-      const response = await axios.get(url);
+      // SSRF protection: block private/internal URLs
+      const urlObj = new URL(url);
+      const hostname = urlObj.hostname.toLowerCase();
+      const blockedPatterns = [
+        /^localhost$/i, /^127\./, /^10\./, /^172\.(1[6-9]|2\d|3[01])\./, 
+        /^192\.168\./, /^0\.0\.0\.0$/, /^::1$/, /^\[::1\]$/,
+        /\.local$/, /\.internal$/
+      ];
+      if (blockedPatterns.some(p => p.test(hostname)) || !urlObj.protocol.startsWith('http')) {
+        throw new Error('URL no permitida: no se pueden acceder direcciones internas');
+      }
+
+      const response = await axios.get(url, { timeout: 15000, maxRedirects: 3 });
       const text = this.extractTextFromHTML(response.data);
-      
-      // Si depth > 1, podríamos hacer web scraping recursivo
-      // Por ahora, solo procesamos la página principal
       
       return this.chunkContent(text);
     } catch (error) {
-      console.error('Error procesando página web:', error);
+      console.error('Error procesando página web:', error.message);
       throw error;
     }
   }

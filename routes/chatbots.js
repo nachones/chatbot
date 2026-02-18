@@ -1,47 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const DatabaseService = require('../services/databaseService');
+const { authMiddleware } = require('./auth');
 
 const db = new DatabaseService();
-const JWT_SECRET = process.env.JWT_SECRET || 'miabot_default_secret_change_me';
 
-// Optional auth middleware - extracts user if token present
-function optionalAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-  if (token) {
-    try {
-      req.user = jwt.verify(token, JWT_SECRET);
-    } catch (e) { /* ignore invalid token */ }
-  }
-  next();
+// All chatbot routes require authentication
+router.use(authMiddleware);
+
+// Helper: verify chatbot belongs to authenticated user
+async function verifyOwnership(chatbotId, userId) {
+  const chatbot = await db.getChatbot(chatbotId);
+  if (!chatbot) return null;
+  if (chatbot.user_id && chatbot.user_id !== userId) return false;
+  return chatbot;
 }
 
-router.use(optionalAuth);
-
-// Get all chatbots (filtered by user if authenticated)
+// Get all chatbots (filtered by user)
 router.get('/', async (req, res) => {
   try {
-    let chatbots;
-    if (req.user && req.user.id) {
-      chatbots = await db.getChatbotsByUser(req.user.id);
-      
-      // If user has no chatbots, claim orphan chatbots (no user_id)
-      if (chatbots.length === 0) {
-        const allBots = await db.getAllChatbots();
-        const orphans = allBots.filter(b => !b.user_id);
-        for (const bot of orphans) {
-          await db.updateChatbot(bot.id, { user_id: req.user.id });
-        }
-        if (orphans.length > 0) {
-          chatbots = await db.getChatbotsByUser(req.user.id);
-          console.log(`✓ ${orphans.length} chatbot(s) huérfano(s) asignado(s) al usuario ${req.user.email}`);
-        }
-      }
-    } else {
-      chatbots = await db.getAllChatbots();
-    }
+    const chatbots = await db.getChatbotsByUser(req.user.id);
     res.json({
       success: true,
       chatbots: chatbots
@@ -56,10 +34,13 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const chatbot = await db.getChatbot(id);
+    const chatbot = await verifyOwnership(id, req.user.id);
     
-    if (!chatbot) {
+    if (chatbot === null) {
       return res.status(404).json({ error: 'Chatbot no encontrado' });
+    }
+    if (chatbot === false) {
+      return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
     }
     
     res.json({
@@ -103,8 +84,11 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const ownership = await verifyOwnership(id, req.user.id);
+    if (ownership === null) return res.status(404).json({ error: 'Chatbot no encontrado' });
+    if (ownership === false) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
+
     const chatbotData = req.body;
-    
     const updatedChatbot = await db.updateChatbot(id, chatbotData);
     
     res.json({
@@ -122,7 +106,10 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+    const ownership = await verifyOwnership(id, req.user.id);
+    if (ownership === null) return res.status(404).json({ error: 'Chatbot no encontrado' });
+    if (ownership === false) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
+
     await db.deleteChatbot(id);
     
     res.json({

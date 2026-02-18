@@ -48,6 +48,8 @@ build/
 .idea/
 *.swp
 *.swo
+*.code-workspace
+.live-server.json
 *~
 .DS_Store
 Thumbs.db

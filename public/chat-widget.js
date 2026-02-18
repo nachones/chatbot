@@ -388,6 +388,12 @@
       return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
     }
 
+    escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
     createWidget() {
       const container = document.createElement('div');
       container.className = 'chat-widget-container';
@@ -400,13 +406,13 @@
         
         <div class="chat-widget-window" id="chat-widget-window">
           <div class="chat-widget-header">
-            <div class="chat-widget-title">${this.config.title}</div>
+            <div class="chat-widget-title">${this.escapeHtml(this.config.title)}</div>
             <button class="chat-widget-close" id="chat-widget-close" aria-label="Cerrar chat">×</button>
           </div>
           
           <div class="chat-widget-messages" id="chat-widget-messages">
             <div class="chat-widget-message bot">
-              <div class="chat-widget-message-content">${this.config.welcomeMessage}</div>
+              <div class="chat-widget-message-content">${this.escapeHtml(this.config.welcomeMessage)}</div>
             </div>
           </div>
           

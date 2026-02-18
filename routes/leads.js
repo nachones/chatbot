@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const DatabaseService = require('../services/databaseService');
+const { authMiddleware } = require('./auth');
 
 const db = new DatabaseService();
 
@@ -53,8 +54,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/leads - Obtener todos los leads
-router.get('/', async (req, res) => {
+// GET /api/leads - Obtener todos los leads (requires auth)
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const { chatbotId } = req.query;
 
@@ -76,8 +77,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/leads/:id - Obtener un lead específico
-router.get('/:id', async (req, res) => {
+// GET /api/leads/:id - Obtener un lead específico (requires auth)
+router.get('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -105,8 +106,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/leads/:id - Eliminar un lead
-router.delete('/:id', async (req, res) => {
+// DELETE /api/leads/:id - Eliminar un lead (requires auth)
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 

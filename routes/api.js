@@ -3,6 +3,7 @@ const router = express.Router();
 const ChatbotService = require('../services/chatbotService');
 const DocumentProcessor = require('../services/documentProcessor');
 const llmService = require('../services/llmService');
+const { authMiddleware } = require('./auth');
 
 // Instanciar servicios
 const chatbotService = new ChatbotService();
@@ -55,8 +56,8 @@ router.get('/history/:sessionId', async (req, res) => {
   }
 });
 
-// Endpoint para configurar el chatbot
-router.post('/config', async (req, res) => {
+// Endpoint para configurar el chatbot (requires auth)
+router.post('/config', authMiddleware, async (req, res) => {
   try {
     const { apiKey, model, systemPrompt } = req.body;
 
@@ -73,8 +74,8 @@ router.post('/config', async (req, res) => {
   }
 });
 
-// Endpoint para obtener configuración actual
-router.get('/config', async (req, res) => {
+// Endpoint para obtener configuración actual (requires auth)
+router.get('/config', authMiddleware, async (req, res) => {
   try {
     const config = await chatbotService.getConfig();
     res.json({ success: true, config });

@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const DatabaseService = require('../services/databaseService');
+const { authMiddleware } = require('./auth');
 
 const db = new DatabaseService();
+
+// All dashboard routes require authentication
+router.use(authMiddleware);
 
 // Get dashboard statistics
 router.get('/stats', async (req, res) => {
