@@ -377,9 +377,12 @@ Por ejemplo:
                     <div class="training-item-info">
                         <div class="training-item-title">${escapeHtml(item.title || item.source)}</div>
                         <div class="training-item-meta">
-                            <span>${item.type}</span>
-                            <span>${formatDate(item.created_at)}</span>
-                            <span>${formatSize(item.content?.length || 0)}</span>
+                            <span><i class="fas fa-layer-group"></i> ${item.chunks || 1} fragmentos</span>
+                            <span><i class="fas fa-calendar"></i> ${formatDate(item.created_at)}</span>
+                            <span><i class="fas fa-file-alt"></i> ${formatSize(item.totalChars || item.content?.length || 0)}</span>
+                            ${item.withEmbeddings > 0 
+                                ? `<span style="color:#10b981"><i class="fas fa-brain"></i> Embeddings</span>` 
+                                : `<span style="color:#f59e0b"><i class="fas fa-search"></i> Palabras clave</span>`}
                         </div>
                     </div>
                     <button class="btn-delete" onclick="window.deleteTrainingItem('${item.id}')" aria-label="Eliminar dato de entrenamiento">

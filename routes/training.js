@@ -5,9 +5,11 @@ const path = require('path');
 const fs = require('fs');
 const DocumentProcessor = require('../services/documentProcessor');
 const DatabaseService = require('../services/databaseService');
+const TrainingService = require('../services/trainingService');
 
 const db = new DatabaseService();
 const documentProcessor = new DocumentProcessor();
+const trainingService = new TrainingService();
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -44,12 +46,17 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
 
     const results = await documentProcessor.processMultipleFiles(files);
 
-    // Save processed data to database
+    let totalChunks = 0;
+    // Save processed data using trainingService (generates embeddings)
     for (const result of results) {
-      if (result.data) {
-        for (const chunk of result.data) {
-          await db.addTrainingData(chatbotId, chunk.content, 'file', result.filename);
-        }
+      if (result.data && result.data.length > 0) {
+        // Add source metadata to chunks
+        const chunksWithMeta = result.data.map(chunk => ({
+          content: chunk.content,
+          metadata: { type: 'file', source: result.filename, ...chunk.metadata }
+        }));
+        await trainingService.storeTrainingData(chunksWithMeta, chatbotId);
+        totalChunks += chunksWithMeta.length;
       }
     }
 
@@ -62,8 +69,9 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Archivos procesados correctamente',
-      results: results
+      message: `${files.length} archivo(s) procesado(s): ${totalChunks} fragmentos guardados con embeddings`,
+      results: results,
+      totalChunks
     });
   } catch (error) {
     console.error('Error uploading files:', error);
@@ -86,14 +94,16 @@ router.post('/url', async (req, res) => {
 
     const chunks = await documentProcessor.processWebPage(url);
 
-    // Save to database
-    for (const chunk of chunks) {
-      await db.addTrainingData(chatbotId, chunk.content, 'url', url);
-    }
+    // Save using trainingService (generates embeddings)
+    const chunksWithMeta = chunks.map(chunk => ({
+      content: chunk.content,
+      metadata: { type: 'url', source: url, ...chunk.metadata }
+    }));
+    await trainingService.storeTrainingData(chunksWithMeta, chatbotId);
 
     res.json({
       success: true,
-      message: 'URL procesada correctamente',
+      message: `URL procesada: ${chunks.length} fragmentos guardados con embeddings`,
       chunks: chunks.length
     });
   } catch (error) {
@@ -119,14 +129,16 @@ router.post('/text', async (req, res) => {
     // Process text into chunks
     const chunks = await documentProcessor.processText(textContent);
 
-    // Save to database
-    for (const chunk of chunks) {
-      await db.addTrainingData(chatbotId, chunk.content, 'text', title || 'Texto manual');
-    }
+    // Save using trainingService (generates embeddings)
+    const chunksWithMeta = chunks.map(chunk => ({
+      content: chunk.content,
+      metadata: { type: 'text', source: title || 'Texto manual', ...chunk.metadata }
+    }));
+    await trainingService.storeTrainingData(chunksWithMeta, chatbotId);
 
     res.json({
       success: true,
-      message: 'Texto procesado correctamente',
+      message: `Texto procesado: ${chunks.length} fragmentos guardados con embeddings`,
       chunks: chunks.length
     });
   } catch (error) {

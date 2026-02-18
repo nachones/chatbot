@@ -290,7 +290,7 @@
                     description: `Chatbot de ${wizardData.objective}`,
                     widget_color: wizardData.color,
                     welcome_message: wizardData.welcomeMessage,
-                    model: 'gpt-3.5-turbo', // Default model
+                    model: 'gemini-2.0-flash',
                     widget_position: wizardData.position,
                     theme: wizardData.theme
                 })

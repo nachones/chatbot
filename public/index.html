@@ -576,6 +576,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
   <!-- Header -->
@@ -592,7 +593,10 @@
           <li><a href="#pricing">Precios</a></li>
         </ul>
       </nav>
-      <a href="/dashboard.html" class="cta-button">Acceder al Dashboard</a>
+      <div class="auth-nav-buttons">
+        <a href="#" id="btn-login-nav" class="cta-button auth-nav-login">Iniciar Sesión</a>
+        <a href="#" id="btn-register-nav" class="cta-button">Registrarse Gratis</a>
+      </div>
     </div>
   </header>
 
@@ -604,12 +608,12 @@
         para tu Sitio Web
       </h1>
       <p>
-        Crea un asistente virtual potenciado por ChatGPT que responde automáticamente 
+        Crea un asistente virtual con Inteligencia Artificial que responde automáticamente 
         hasta el 80% de las consultas de tus clientes. Disponible 24/7, integración en minutos.
       </p>
       <div class="hero-buttons">
-        <a href="/dashboard.html" class="cta-button-large">
-          Crear Mi Chatbot <i class="fas fa-arrow-right"></i>
+        <a href="#" id="btn-register-hero" class="cta-button-large">
+          Crear Mi Chatbot Gratis <i class="fas fa-arrow-right"></i>
         </a>
         <a href="#how-it-works" class="cta-button-large cta-button-secondary">
           Ver Demo <i class="fas fa-play"></i>
@@ -830,73 +834,60 @@
         </p>
       </div>
       <div class="pricing-grid">
-        <div class="pricing-card">
-          <h3>Gratis</h3>
-          <div class="pricing-price">$0<span>/mes</span></div>
-          <ul class="pricing-features">
-            <li><i class="fas fa-check"></i> 20 mensajes / mes</li>
-            <li><i class="fas fa-check"></i> 1 chatbot</li>
-            <li><i class="fas fa-check"></i> 10 contenidos de entrenamiento</li>
-            <li><i class="fas fa-check"></i> Captura de leads</li>
-            <li><i class="fas fa-check"></i> Integración ilimitada</li>
-          </ul>
-          <button class="pricing-button" onclick="window.location.href='/dashboard.html'">
-            Comenzar Gratis
-          </button>
-        </div>
-        
         <div class="pricing-card featured">
           <div class="pricing-badge">Más Popular</div>
           <h3>Starter</h3>
-          <div class="pricing-price">$29<span>/mes</span></div>
+          <div class="pricing-price">9,95€<span>/mes</span></div>
           <ul class="pricing-features">
-            <li><i class="fas fa-check"></i> 2,000 mensajes / mes</li>
-            <li><i class="fas fa-check"></i> 5 chatbots</li>
-            <li><i class="fas fa-check"></i> 200 contenidos de entrenamiento</li>
+            <li><i class="fas fa-check"></i> 1.000 mensajes / mes</li>
+            <li><i class="fas fa-check"></i> 100.000 tokens incluidos</li>
+            <li><i class="fas fa-check"></i> Gemini 2.0 Flash (IA avanzada)</li>
+            <li><i class="fas fa-check"></i> 3 chatbots</li>
+            <li><i class="fas fa-check"></i> Entrenamiento con archivos y URLs</li>
             <li><i class="fas fa-check"></i> Captura de leads</li>
-            <li><i class="fas fa-check"></i> Integración ilimitada</li>
-            <li><i class="fas fa-check"></i> Acceso API</li>
-            <li><i class="fas fa-check"></i> Sin marca de agua</li>
+            <li><i class="fas fa-check"></i> Widget personalizable</li>
+            <li><i class="fas fa-check"></i> Integración en tu web</li>
           </ul>
-          <button class="pricing-button" onclick="window.location.href='/dashboard.html'">
-            Comenzar Ahora
+          <button class="pricing-button btn-register-plan" data-plan="starter">
+            Empezar Ahora
           </button>
         </div>
         
         <div class="pricing-card">
           <h3>Pro</h3>
-          <div class="pricing-price">$49<span>/mes</span></div>
+          <div class="pricing-price">25€<span>/mes</span></div>
           <ul class="pricing-features">
-            <li><i class="fas fa-check"></i> 5,000 mensajes / mes</li>
+            <li><i class="fas fa-check"></i> 5.000 mensajes / mes</li>
+            <li><i class="fas fa-check"></i> 500.000 tokens incluidos</li>
+            <li><i class="fas fa-check"></i> Todos los modelos IA</li>
             <li><i class="fas fa-check"></i> 10 chatbots</li>
-            <li><i class="fas fa-check"></i> 500 contenidos de entrenamiento</li>
-            <li><i class="fas fa-check"></i> Captura de leads</li>
-            <li><i class="fas fa-check"></i> Integración ilimitada</li>
+            <li><i class="fas fa-check"></i> Entrenamiento ilimitado</li>
+            <li><i class="fas fa-check"></i> Function calling (API externa)</li>
             <li><i class="fas fa-check"></i> Acceso API completo</li>
             <li><i class="fas fa-check"></i> Sin marca de agua</li>
             <li><i class="fas fa-check"></i> Soporte prioritario</li>
           </ul>
-          <button class="pricing-button" onclick="window.location.href='/dashboard.html'">
-            Comenzar Ahora
+          <button class="pricing-button btn-register-plan" data-plan="pro">
+            Empezar con Pro
           </button>
         </div>
         
         <div class="pricing-card">
-          <h3>Enterprise</h3>
-          <div class="pricing-price">$89<span>/mes</span></div>
+          <h3>Custom</h3>
+          <div class="pricing-price">150€<span>/año</span></div>
           <ul class="pricing-features">
             <li><i class="fas fa-check"></i> Mensajes ilimitados</li>
+            <li><i class="fas fa-check"></i> Tokens ilimitados</li>
+            <li><i class="fas fa-check"></i> Usa tu propia API key</li>
             <li><i class="fas fa-check"></i> Chatbots ilimitados</li>
-            <li><i class="fas fa-check"></i> Contenido ilimitado</li>
-            <li><i class="fas fa-check"></i> Captura de leads avanzada</li>
-            <li><i class="fas fa-check"></i> Integración ilimitada</li>
+            <li><i class="fas fa-check"></i> Todos los modelos (GPT-4, Gemini, etc.)</li>
+            <li><i class="fas fa-check"></i> Entrenamiento ilimitado</li>
+            <li><i class="fas fa-check"></i> Function calling avanzado</li>
             <li><i class="fas fa-check"></i> API empresarial</li>
-            <li><i class="fas fa-check"></i> Sin marca de agua</li>
-            <li><i class="fas fa-check"></i> Acceso a GPT-4</li>
             <li><i class="fas fa-check"></i> Soporte dedicado</li>
           </ul>
-          <button class="pricing-button" onclick="window.location.href='/dashboard.html'">
-            Comenzar Ahora
+          <button class="pricing-button btn-register-plan" data-plan="custom">
+            Empezar con Custom
           </button>
         </div>
       </div>
@@ -911,7 +902,7 @@
         Únete a cientos de empresas que ya están usando IA para mejorar 
         la experiencia de sus clientes.
       </p>
-      <a href="/dashboard.html" class="cta-button-white">
+      <a href="#" id="btn-register-cta" class="cta-button-white">
         Crear Mi Chatbot Gratis <i class="fas fa-arrow-right"></i>
       </a>
     </div>
@@ -926,7 +917,6 @@
           <li><a href="#features">Características</a></li>
           <li><a href="#how-it-works">Cómo Funciona</a></li>
           <li><a href="#pricing">Precios</a></li>
-          <li><a href="/dashboard.html">Dashboard</a></li>
         </ul>
       </div>
       <div class="footer-section">
@@ -944,7 +934,6 @@
           <li><a href="#">Acerca de</a></li>
           <li><a href="#">Blog</a></li>
           <li><a href="#">Contacto</a></li>
-          <li><a href="#">Afiliados</a></li>
         </ul>
       </div>
       <div class="footer-section">
@@ -957,16 +946,184 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>2025 © Chatbot AI. Todos los derechos reservados.</p>
+      <p>2025 © MIABOT. Todos los derechos reservados.</p>
     </div>
   </footer>
 
-  <!-- Chat Widget Demo -->
-  <script src="/chat-widget.js" 
-          data-api-url="http://localhost:3000/api"
-          data-api-key="demo_chatbot_001"
-          data-title="Asistente Virtual"
-          data-welcome="¡Hola! ¿En qué puedo ayudarte hoy?">
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="auth-modal-overlay">
+    <div class="auth-modal-container">
+      <button id="close-auth-modal" class="auth-modal-close">&times;</button>
+      
+      <!-- Tab switcher -->
+      <div class="auth-tabs">
+        <button id="tab-login" class="auth-tab active">Iniciar Sesión</button>
+        <button id="tab-register" class="auth-tab">Crear Cuenta</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form">
+        <div class="auth-field">
+          <label class="auth-label">Email</label>
+          <input type="email" id="login-email" required placeholder="tu@email.com" class="auth-input">
+        </div>
+        <div class="auth-field-last">
+          <label class="auth-label">Contraseña</label>
+          <input type="password" id="login-password" required placeholder="Tu contraseña" class="auth-input">
+        </div>
+        <div id="login-error" class="auth-error"></div>
+        <button type="submit" class="auth-submit">Iniciar Sesión</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" style="display:none">
+        <div class="auth-field">
+          <label class="auth-label">Nombre</label>
+          <input type="text" id="register-name" placeholder="Tu nombre" class="auth-input">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Email *</label>
+          <input type="email" id="register-email" required placeholder="tu@email.com" class="auth-input">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Empresa (opcional)</label>
+          <input type="text" id="register-company" placeholder="Tu empresa" class="auth-input">
+        </div>
+        <div class="auth-field-last">
+          <label class="auth-label">Contraseña * (mín. 6 caracteres)</label>
+          <input type="password" id="register-password" required minlength="6" placeholder="Crea una contraseña" class="auth-input">
+        </div>
+        <div id="register-error" class="auth-error"></div>
+        <button type="submit" class="auth-submit">Crear Cuenta Gratis</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+    const modal = document.getElementById('auth-modal');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+
+    // Check if already logged in
+    const token = localStorage.getItem('miabot_token');
+    if (token) {
+      // Update nav buttons
+      const loginNav = document.getElementById('btn-login-nav');
+      const regNav = document.getElementById('btn-register-nav');
+      if (loginNav) { loginNav.textContent = 'Mi Dashboard'; loginNav.href = '/dashboard'; }
+      if (regNav) regNav.style.display = 'none';
+    }
+
+    function openModal(tab) {
+      modal.style.display = 'flex';
+      if (tab === 'register') { switchTab('register'); }
+      else { switchTab('login'); }
+    }
+
+    function closeModal() { modal.style.display = 'none'; }
+
+    function switchTab(tab) {
+      if (tab === 'login') {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+      } else {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+      }
+    }
+
+    // Event listeners
+    document.getElementById('btn-login-nav').addEventListener('click', e => {
+      e.preventDefault();
+      if (localStorage.getItem('miabot_token')) { window.location.href = '/dashboard'; }
+      else { openModal('login'); }
+    });
+    document.getElementById('btn-register-nav').addEventListener('click', e => { e.preventDefault(); openModal('register'); });
+    document.getElementById('btn-register-hero')?.addEventListener('click', e => { e.preventDefault(); openModal('register'); });
+    document.getElementById('btn-register-cta')?.addEventListener('click', e => { e.preventDefault(); openModal('register'); });
+    document.getElementById('close-auth-modal').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    tabLogin.addEventListener('click', () => switchTab('login'));
+    tabRegister.addEventListener('click', () => switchTab('register'));
+
+    // Auto-open modal if redirected from dashboard (?login=true)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login') === 'true') { openModal('login'); }
+    if (urlParams.get('register') === 'true') { openModal('register'); }
+
+    // Plan buttons
+    document.querySelectorAll('.btn-register-plan').forEach(btn => {
+      btn.addEventListener('click', () => openModal('register'));
+    });
+
+    // Login
+    loginForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const errEl = document.getElementById('login-error');
+      errEl.style.display = 'none';
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('login-email').value,
+            password: document.getElementById('login-password').value
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('miabot_token', data.token);
+          localStorage.setItem('miabot_user', JSON.stringify(data.user));
+          window.location.href = '/dashboard';
+        } else {
+          errEl.textContent = data.error;
+          errEl.style.display = 'block';
+        }
+      } catch (err) {
+        errEl.textContent = 'Error de conexión';
+        errEl.style.display = 'block';
+      }
+    });
+
+    // Register
+    registerForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const errEl = document.getElementById('register-error');
+      errEl.style.display = 'none';
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('register-name').value,
+            email: document.getElementById('register-email').value,
+            company: document.getElementById('register-company').value,
+            password: document.getElementById('register-password').value
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('miabot_token', data.token);
+          localStorage.setItem('miabot_user', JSON.stringify(data.user));
+          window.location.href = '/dashboard';
+        } else {
+          errEl.textContent = data.error;
+          errEl.style.display = 'block';
+        }
+      } catch (err) {
+        errEl.textContent = 'Error de conexión';
+        errEl.style.display = 'block';
+      }
+    });
+  })();
   </script>
 </body>
 </html>

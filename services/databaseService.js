@@ -22,15 +22,15 @@ class DatabaseService {
 
   safeAddColumn(tableName, columnName, columnDef) {
     this.db.all(`PRAGMA table_info(${tableName})`, (err, rows) => {
-      if (err) {
-        console.error(`Error checking table info for ${tableName}:`, err);
-        return;
-      }
-      const exists = rows.some(row => row.name === columnName);
+      if (err) return;
+      const exists = rows && rows.some(row => row.name === columnName);
       if (!exists) {
         this.db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`, (err) => {
-          if (err) console.error(`Error adding column ${columnName} to ${tableName}:`, err);
-          else console.log(`✓ Columna ${columnName} agregada a ${tableName}`);
+          if (err && !err.message.includes('duplicate column')) {
+            console.error(`Error adding column ${columnName} to ${tableName}:`, err);
+          } else if (!err) {
+            console.log(`✓ Columna ${columnName} agregada a ${tableName}`);
+          }
         });
       }
     });
@@ -41,7 +41,7 @@ class DatabaseService {
       // Tabla de chatbots
       if (!(await this.tableExists('chatbots'))) {
         this.db.run(`
-          CREATE TABLE chatbots (
+          CREATE TABLE IF NOT EXISTS chatbots (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             description TEXT,
@@ -64,16 +64,16 @@ class DatabaseService {
 
       // Columnas adicionales para chatbots
       this.safeAddColumn('chatbots', 'appearance_settings', 'TEXT');
-      this.safeAddColumn('chatbots', 'plan', "TEXT DEFAULT 'free'");
+      this.safeAddColumn('chatbots', 'plan', "TEXT DEFAULT 'starter'");
       this.safeAddColumn('chatbots', 'tokens_used', "INTEGER DEFAULT 0");
-      this.safeAddColumn('chatbots', 'tokens_limit', "INTEGER DEFAULT 7000");
+      this.safeAddColumn('chatbots', 'tokens_limit', "INTEGER DEFAULT 100000");
       this.safeAddColumn('chatbots', 'messages_used', "INTEGER DEFAULT 0");
       this.safeAddColumn('chatbots', 'reset_date', "TEXT");
 
       // Tabla de conversaciones
       if (!(await this.tableExists('conversations'))) {
         this.db.run(`
-          CREATE TABLE conversations (
+          CREATE TABLE IF NOT EXISTS conversations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             chatbot_id TEXT,
             session_id TEXT NOT NULL,
@@ -87,7 +87,7 @@ class DatabaseService {
       // Tabla de configuración
       if (!(await this.tableExists('config'))) {
         this.db.run(`
-          CREATE TABLE config (
+          CREATE TABLE IF NOT EXISTS config (
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -98,7 +98,7 @@ class DatabaseService {
       // Tabla de datos de entrenamiento
       if (!(await this.tableExists('training_data'))) {
         this.db.run(`
-          CREATE TABLE training_data (
+          CREATE TABLE IF NOT EXISTS training_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             chatbot_id TEXT,
             training_id TEXT NOT NULL,
@@ -114,7 +114,7 @@ class DatabaseService {
       // Tabla de trabajos de entrenamiento
       if (!(await this.tableExists('training_jobs'))) {
         this.db.run(`
-          CREATE TABLE training_jobs (
+          CREATE TABLE IF NOT EXISTS training_jobs (
             id TEXT PRIMARY KEY,
             chatbot_id TEXT,
             status TEXT NOT NULL,
@@ -130,7 +130,7 @@ class DatabaseService {
       // Tabla de leads
       if (!(await this.tableExists('leads'))) {
         this.db.run(`
-          CREATE TABLE leads (
+          CREATE TABLE IF NOT EXISTS leads (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             chatbot_id TEXT,
             name TEXT,
@@ -145,7 +145,7 @@ class DatabaseService {
       // Tabla de funciones
       if (!(await this.tableExists('functions'))) {
         this.db.run(`
-          CREATE TABLE functions (
+          CREATE TABLE IF NOT EXISTS functions (
             id TEXT PRIMARY KEY,
             chatbot_id TEXT NOT NULL,
             name TEXT NOT NULL,
@@ -165,7 +165,7 @@ class DatabaseService {
       // Tabla de Quick Prompts
       if (!(await this.tableExists('quick_prompts'))) {
         this.db.run(`
-          CREATE TABLE quick_prompts (
+          CREATE TABLE IF NOT EXISTS quick_prompts (
             id TEXT PRIMARY KEY,
             chatbot_id TEXT NOT NULL,
             button_title TEXT NOT NULL,
@@ -179,6 +179,31 @@ class DatabaseService {
           )
         `);
       }
+
+      // Tabla de usuarios
+      if (!(await this.tableExists('users'))) {
+        this.db.run(`
+          CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            name TEXT,
+            company TEXT,
+            plan TEXT DEFAULT 'starter',
+            stripe_customer_id TEXT,
+            stripe_subscription_id TEXT,
+            is_active INTEGER DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        console.log('✓ Tabla users creada');
+      }
+      this.safeAddColumn('users', 'stripe_customer_id', 'TEXT');
+      this.safeAddColumn('users', 'stripe_subscription_id', 'TEXT');
+
+      // Añadir user_id a chatbots
+      this.safeAddColumn('chatbots', 'user_id', 'TEXT');
 
     } catch (error) {
       console.error('Error initializing tables:', error);
@@ -490,6 +515,19 @@ class DatabaseService {
     });
   }
 
+  async incrementMessageCount(chatbotId) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'UPDATE chatbots SET messages_used = messages_used + 1 WHERE id = ?',
+        [chatbotId],
+        function (err) {
+          if (err) reject(err);
+          else resolve(this.changes);
+        }
+      );
+    });
+  }
+
   async getAllConversations(page = 1, limit = 20, search = '', chatbotId = null) {
     return new Promise((resolve, reject) => {
       const offset = (page - 1) * limit;
@@ -619,24 +657,25 @@ class DatabaseService {
       this.db.run(
         `INSERT INTO chatbots (id, name, description, api_key, model, system_prompt, 
          temperature, max_tokens, widget_color, widget_position, widget_title, welcome_message,
-         plan, tokens_limit, reset_date)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         plan, tokens_limit, reset_date, user_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           id,
           chatbotData.name,
           chatbotData.description || '',
           chatbotData.api_key || '',
-          chatbotData.model || 'gpt-3.5-turbo',
+          chatbotData.model || 'gemini-2.0-flash',
           chatbotData.system_prompt || 'Eres un asistente útil y amigable.',
           chatbotData.temperature || 0.7,
-          chatbotData.max_tokens || 500,
+          chatbotData.max_tokens || 1000,
           chatbotData.widget_color || '#007bff',
           chatbotData.widget_position || 'bottom-right',
           chatbotData.widget_title || 'Chat Assistant',
           chatbotData.welcome_message || '¡Hola! ¿En qué puedo ayudarte?',
-          'free',
-          7000,
-          nextResetDate.toISOString()
+          chatbotData.plan || 'starter',
+          chatbotData.plan === 'custom' ? 999999999 : (chatbotData.plan === 'pro' ? 500000 : 100000),
+          nextResetDate.toISOString(),
+          chatbotData.user_id || null
         ],
         function (err) {
           if (err) reject(err);
@@ -881,8 +920,11 @@ class DatabaseService {
           if (err) reject(err);
           else {
             if (row) {
-              const limits = { 'free': 100, 'starter': 1000, 'pro': 5000, 'enterprise': 100000 };
-              row.messages_limit = limits[row.plan] || 100;
+              // Planes: starter (9,95€/mes, 100K tokens), pro (25€/mes, 500K tokens), custom (150€/año, API propia)
+              const tokenLimits = { 'starter': 100000, 'pro': 500000, 'custom': 999999999 };
+              const messageLimits = { 'starter': 1000, 'pro': 5000, 'custom': 999999999 };
+              row.tokens_limit = tokenLimits[row.plan] || 100000;
+              row.messages_limit = messageLimits[row.plan] || 1000;
             }
             resolve(row);
           }
@@ -907,10 +949,12 @@ class DatabaseService {
   }
 
   async updatePlan(chatbotId, plan) {
+    const tokenLimits = { 'starter': 100000, 'pro': 500000, 'custom': 999999999 };
+    const tokensLimit = tokenLimits[plan] || 100000;
     return new Promise((resolve, reject) => {
       this.db.run(
-        'UPDATE chatbots SET plan = ? WHERE id = ?',
-        [plan, chatbotId],
+        'UPDATE chatbots SET plan = ?, tokens_limit = ? WHERE id = ?',
+        [plan, tokensLimit, chatbotId],
         function (err) {
           if (err) reject(err);
           else resolve({ updated: this.changes });
@@ -1012,10 +1056,19 @@ class DatabaseService {
 
   async getTrainingDataByChatbot(chatbotId) {
     return new Promise((resolve, reject) => {
+      // Group chunks by training_id to show one entry per training session
       this.db.all(
-        `SELECT id, training_id, content, metadata, created_at 
+        `SELECT training_id, 
+                MIN(id) as id,
+                COUNT(*) as chunks,
+                GROUP_CONCAT(SUBSTR(content, 1, 200), ' | ') as preview,
+                MIN(metadata) as metadata, 
+                MIN(created_at) as created_at,
+                SUM(LENGTH(content)) as total_chars,
+                SUM(CASE WHEN embedding IS NOT NULL THEN 1 ELSE 0 END) as with_embeddings
          FROM training_data 
          WHERE chatbot_id = ? 
+         GROUP BY training_id
          ORDER BY created_at DESC`,
         [chatbotId],
         (err, rows) => {
@@ -1029,10 +1082,13 @@ class DatabaseService {
               return {
                 id: row.id,
                 trainingId: row.training_id,
-                content: row.content,
+                content: (row.preview || '').substring(0, 300),
                 type: meta.type || 'unknown',
                 source: meta.source || 'Unknown',
                 title: meta.source || meta.type || 'Contenido',
+                chunks: row.chunks,
+                totalChars: row.total_chars,
+                withEmbeddings: row.with_embeddings,
                 created_at: row.created_at
               };
             });
@@ -1045,14 +1101,20 @@ class DatabaseService {
 
   async deleteTrainingData(id) {
     return new Promise((resolve, reject) => {
-      this.db.run(
-        'DELETE FROM training_data WHERE id = ?',
-        [id],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ deleted: this.changes });
-        }
-      );
+      // First check if this id has a training_id, and delete all chunks with same training_id
+      this.db.get('SELECT training_id FROM training_data WHERE id = ?', [id], (err, row) => {
+        if (err) return reject(err);
+        if (!row) return resolve({ deleted: 0 });
+        
+        this.db.run(
+          'DELETE FROM training_data WHERE training_id = ?',
+          [row.training_id],
+          function (err) {
+            if (err) reject(err);
+            else resolve({ deleted: this.changes });
+          }
+        );
+      });
     });
   }
 
@@ -1074,6 +1136,86 @@ class DatabaseService {
             const stats = rows[0] || { total: 0, files: 0, urls: 0, texts: 0, totalChars: 0 };
             resolve(stats);
           }
+        }
+      );
+    });
+  }
+
+  // ==========================================
+  // USER MANAGEMENT
+  // ==========================================
+
+  async createUser(id, email, hashedPassword, name, company) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        `INSERT INTO users (id, email, password, name, company) VALUES (?, ?, ?, ?, ?)`,
+        [id, email, hashedPassword, name, company],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ id, email, name, company });
+        }
+      );
+    });
+  }
+
+  async getUserByEmail(email) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT * FROM users WHERE email = ?',
+        [email],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row || null);
+        }
+      );
+    });
+  }
+
+  async getUserById(id) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT id, email, name, company, plan, stripe_customer_id, stripe_subscription_id, is_active, created_at FROM users WHERE id = ?',
+        [id],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(row || null);
+        }
+      );
+    });
+  }
+
+  async updateUser(id, fields) {
+    const allowed = ['name', 'company', 'plan', 'stripe_customer_id', 'stripe_subscription_id', 'is_active'];
+    const updates = [];
+    const values = [];
+    for (const [key, val] of Object.entries(fields)) {
+      if (allowed.includes(key)) {
+        updates.push(`${key} = ?`);
+        values.push(val);
+      }
+    }
+    if (updates.length === 0) return;
+    values.push(id);
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        `UPDATE users SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        values,
+        function (err) {
+          if (err) reject(err);
+          else resolve({ changes: this.changes });
+        }
+      );
+    });
+  }
+
+  async getChatbotsByUser(userId) {
+    return new Promise((resolve, reject) => {
+      this.db.all(
+        'SELECT * FROM chatbots WHERE user_id = ? AND is_active = 1 ORDER BY created_at DESC',
+        [userId],
+        (err, rows) => {
+          if (err) reject(err);
+          else resolve(rows || []);
         }
       );
     });

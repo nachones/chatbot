@@ -62,7 +62,7 @@ router.post('/config', async (req, res) => {
 
     await chatbotService.updateConfig({
       apiKey,
-      model: model || 'gpt-3.5-turbo',
+      model: model || 'gemini-2.0-flash',
       systemPrompt: systemPrompt || 'Eres un asistente útil y amigable.'
     });
 
@@ -93,40 +93,20 @@ router.post('/test-connection', async (req, res) => {
       return res.status(400).json({ error: 'API key requerida' });
     }
 
-    // Test OpenAI connection
-    if (!provider || provider === 'openai') {
-      const OpenAI = require('openai');
-      const openai = new OpenAI({ apiKey });
-      
-      // Make a simple API call to verify the key
-      const response = await openai.models.list();
-      
-      if (response.data) {
-        return res.json({ 
-          success: true, 
-          message: 'Conexión exitosa con OpenAI',
-          models: response.data.slice(0, 5).map(m => m.id)
-        });
-      }
+    const validProviders = ['openai', 'groq', 'gemini'];
+    const selectedProvider = provider || 'gemini';
+
+    if (!validProviders.includes(selectedProvider)) {
+      return res.status(400).json({ error: 'Proveedor no soportado' });
     }
 
-    // Test Groq connection
-    if (provider === 'groq') {
-      const Groq = require('groq-sdk');
-      const groq = new Groq({ apiKey });
-      
-      const response = await groq.models.list();
-      
-      if (response.data) {
-        return res.json({ 
-          success: true, 
-          message: 'Conexión exitosa con Groq',
-          models: response.data.map(m => m.id)
-        });
-      }
-    }
+    const result = await llmService.testConnection(selectedProvider, apiKey);
 
-    res.status(400).json({ error: 'Proveedor no soportado' });
+    if (result.success) {
+      return res.json(result);
+    } else {
+      return res.status(400).json({ error: result.error });
+    }
   } catch (error) {
     console.error('Error testing connection:', error);
     res.status(400).json({ 

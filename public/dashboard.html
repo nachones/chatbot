@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Chatbot</title>
     <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -77,9 +78,13 @@
             </a>
         </div>
         <div class="sidebar-footer">
-            <a href="#" class="nav-item">
-                <i class="fas fa-question-circle"></i>
-                <span>Solicitar Funciones</span>
+            <div class="nav-item user-display">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-display-name" class="user-display-name">Usuario</span>
+            </div>
+            <a href="#" class="nav-item" onclick="window.logoutUser(); return false;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
             </a>
         </div>
     </aside>
@@ -93,9 +98,9 @@
             <div class="header-right">
                 <div class="usage-indicator" id="usage-indicator">
                     <div class="usage-text">
-                        <span>Mensajes <i class="fas fa-info-circle"
-                                title="Los mensajes se resetean mensualmente"></i></span>
-                        <span id="usage-count">0/10,000</span>
+                        <span>Tokens <i class="fas fa-info-circle"
+                                title="Los tokens se resetean mensualmente"></i></span>
+                        <span id="usage-count">0/100.000</span>
                     </div>
                     <div class="usage-bar">
                         <div class="usage-bar-fill" id="usage-bar-fill"></div>
@@ -461,17 +466,18 @@
         <div id="page-settings" class="page">
             <div class="settings-container">
                 <div class="settings-section">
-                    <h3>Configuración de OpenAI</h3>
+                    <h3>Configuración del Modelo IA</h3>
                     <div class="form-group">
-                        <label for="openai-api-key">Clave API</label>
-                        <input type="password" id="openai-api-key" class="form-control" placeholder="sk-...">
+                        <label for="openai-api-key">API Key</label>
+                        <input type="password" id="openai-api-key" class="form-control" placeholder="Tu API key...">
                     </div>
                     <div class="form-group">
                         <label for="openai-model">Modelo</label>
                         <select id="openai-model" class="form-control">
-                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                            <option value="gpt-4">GPT-4</option>
-                            <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                            <option value="gemini-2.0-flash">Gemini 2.0 Flash (Recomendado)</option>
+                            <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</option>
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -486,9 +492,9 @@
                     </div>
                     <div class="form-group">
                         <label for="max-tokens">Tokens Máximos</label>
-                        <input type="number" id="max-tokens" class="form-control" value="500" min="1" max="4000">
+                        <input type="number" id="max-tokens" class="form-control" value="1000" min="1" max="8000">
                     </div>
-                    <button class="btn btn-primary" id="save-settings" aria-label="Guardar configuración de OpenAI">
+                    <button class="btn btn-primary" id="save-settings" aria-label="Guardar configuración de IA">
                         <i class="fas fa-save"></i> Guardar Configuración
                     </button>
                 </div>
@@ -1069,16 +1075,11 @@
             <div class="integrations-container">
                 <div class="integration-card">
                     <div class="integration-header">
-                        <h3><i class="fas fa-code"></i> Integración JavaScript</h3>
+                        <h3><i class="fas fa-code"></i> Widget JavaScript</h3>
                     </div>
-                    <p>Copia y pega este código en el HTML de tu sitio web:</p>
+                    <p>Copia y pega este código antes del cierre <code>&lt;/body&gt;</code> en tu sitio web:</p>
                     <div class="code-block">
-                        <pre id="integration-code"><code>&lt;script src="http://localhost:3000/chat-widget.js"
-    data-api-url="http://localhost:3000/api"
-    data-api-key="TU_CHATBOT_ID"
-    data-title="Mi Asistente"
-    data-primary-color="#6366F1"
-    data-welcome="¡Hola! ¿En qué puedo ayudarte?"&gt;&lt;/script&gt;</code></pre>
+                        <pre id="integration-code"><code>Selecciona un chatbot para ver el código de integración</code></pre>
                         <button class="btn-copy" id="copy-integration-code" aria-label="Copiar código de integración">
                             <i class="fas fa-copy"></i> Copiar
                         </button>
@@ -1086,17 +1087,33 @@
                 </div>
                 <div class="integration-card">
                     <div class="integration-header">
-                        <h3><i class="fas fa-plug"></i> Integración API</h3>
+                        <h3><i class="fas fa-plug"></i> API REST</h3>
                     </div>
-                    <p>Usa nuestra API REST para integrar el chatbot:</p>
+                    <p>Envía mensajes a tu chatbot programáticamente:</p>
                     <div class="api-endpoint">
-                        <strong>POST</strong> /api/chat
+                        <strong>POST</strong> <span id="api-endpoint-url">/api/chat</span>
                         <div class="code-block">
-                            <pre><code>{
-  "message": "Hello",
-  "sessionId": "optional-session-id"
+                            <pre id="api-example-code"><code>{
+  "message": "Hola, ¿qué servicios ofrecen?",
+  "chatbotId": "TU_CHATBOT_ID",
+  "sessionId": "session_opcional"
 }</code></pre>
+                            <button class="btn-copy" id="copy-api-code" aria-label="Copiar ejemplo API">
+                                <i class="fas fa-copy"></i> Copiar
+                            </button>
                         </div>
+                    </div>
+                </div>
+                <div class="integration-card">
+                    <div class="integration-header">
+                        <h3><i class="fas fa-share-alt"></i> Enlace Directo</h3>
+                    </div>
+                    <p>Comparte este enlace para que tus usuarios accedan al chat:</p>
+                    <div class="code-block">
+                        <pre id="direct-link-code"><code>Selecciona un chatbot</code></pre>
+                        <button class="btn-copy" id="copy-direct-link" aria-label="Copiar enlace directo">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1188,15 +1205,17 @@
                         placeholder="Breve descripción de este chatbot..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="new-chatbot-api-key">Clave API de OpenAI (opcional)</label>
-                    <input type="password" id="new-chatbot-api-key" class="form-control" placeholder="sk-...">
-                    <small>Déjalo vacío para usar la clave API por defecto</small>
+                    <label for="new-chatbot-api-key">Clave API (opcional)</label>
+                    <input type="password" id="new-chatbot-api-key" class="form-control" placeholder="Tu API key...">
+                    <small>Déjalo vacío para usar Gemini con la clave por defecto del servidor</small>
                 </div>
                 <div class="form-group">
                     <label for="new-chatbot-model">Modelo</label>
                     <select id="new-chatbot-model" class="form-control">
-                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                        <option value="gpt-4">GPT-4</option>
+                        <option value="gemini-2.0-flash" selected>Gemini 2.0 Flash (Recomendado)</option>
+                        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                        <option value="gpt-4o-mini">GPT-4o Mini</option>
+                        <option value="gpt-4o">GPT-4o</option>
                         <option value="gpt-4-turbo">GPT-4 Turbo</option>
                     </select>
                 </div>

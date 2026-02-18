@@ -112,7 +112,21 @@ class DocumentProcessor {
       console.warn(`Contenido truncado a ${maxContentLength} caracteres para evitar problemas de memoria`);
     }
     
-    const words = content.split(/\s+/);
+    const words = content.split(/\s+/).filter(w => w.length > 0);
+    
+    // If text is small enough, return as single chunk
+    if (words.length <= chunkSize) {
+      chunks.push({
+        content: words.join(' '),
+        metadata: {
+          chunkIndex: 0,
+          startWord: 0,
+          endWord: words.length,
+          totalWords: words.length
+        }
+      });
+      return chunks;
+    }
     
     // Limitar número de chunks para evitar consumir toda la memoria
     const maxChunks = 50;
@@ -132,7 +146,14 @@ class DocumentProcessor {
         }
       });
       
+      // If we've reached the end, stop
+      if (end >= words.length) break;
+      
       start = end - overlap;
+      // Safety: ensure we always move forward
+      if (start <= chunks[chunks.length - 1].metadata.startWord) {
+        start = end;
+      }
     }
     
     return chunks;

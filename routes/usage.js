@@ -18,19 +18,33 @@ router.get('/:chatbotId', async (req, res) => {
       });
     }
 
-    // Calcular porcentaje de uso
-    const usagePercentage = (stats.messages_used / stats.messages_limit) * 100;
+    // Info de planes
+    const planInfo = {
+      starter: { name: 'Starter', price: '9,95€/mes', tokensLimit: 100000 },
+      pro: { name: 'Pro', price: '25€/mes', tokensLimit: 500000 },
+      custom: { name: 'Custom', price: '150€/año', tokensLimit: null }
+    };
+
+    const currentPlan = planInfo[stats.plan] || planInfo.starter;
+    const tokensLimit = stats.plan === 'custom' ? null : (currentPlan.tokensLimit || 100000);
+    const tokensPercentage = tokensLimit ? Math.min(100, Math.round((stats.tokens_used / tokensLimit) * 100)) : 0;
+    const messagesPercentage = stats.messages_limit ? Math.min(100, Math.round((stats.messages_used / stats.messages_limit) * 100)) : 0;
 
     res.json({
       success: true,
       usage: {
         plan: stats.plan,
+        planName: currentPlan.name,
+        planPrice: currentPlan.price,
+        isCustomApi: stats.plan === 'custom',
         messagesUsed: stats.messages_used,
         messagesLimit: stats.messages_limit,
-        messagesRemaining: stats.messages_limit - stats.messages_used,
-        usagePercentage: Math.min(100, Math.round(usagePercentage)),
+        messagesRemaining: Math.max(0, stats.messages_limit - stats.messages_used),
+        messagesPercentage,
         tokensUsed: stats.tokens_used,
-        tokensLimit: stats.tokens_limit,
+        tokensLimit: tokensLimit,
+        tokensRemaining: tokensLimit ? Math.max(0, tokensLimit - stats.tokens_used) : null,
+        tokensPercentage,
         resetDate: stats.reset_date
       }
     });
@@ -69,11 +83,11 @@ router.put('/:chatbotId/plan', async (req, res) => {
     const { chatbotId } = req.params;
     const { plan } = req.body;
     
-    const validPlans = ['free', 'starter', 'pro', 'enterprise'];
+    const validPlans = ['starter', 'pro', 'custom'];
     if (!validPlans.includes(plan)) {
       return res.status(400).json({
         success: false,
-        error: 'Plan inválido. Debe ser: free, starter, pro o enterprise'
+        error: 'Plan inválido. Debe ser: starter, pro o custom'
       });
     }
     

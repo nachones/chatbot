@@ -3,53 +3,49 @@
     'use strict';
 
     document.addEventListener('DOMContentLoaded', function () {
-        initIntegrationTabs();
-        initExampleTabs();
+        initCopyButtons();
     });
 
-    // Integration Tabs (Widget / API / Platforms)
-    function initIntegrationTabs() {
-        const tabs = document.querySelectorAll('.integration-tab');
-        const contents = document.querySelectorAll('.integration-content');
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const targetTab = tab.getAttribute('data-tab');
-
-                // Remove active class from all tabs and contents
-                tabs.forEach(t => t.classList.remove('active'));
-                contents.forEach(c => c.classList.remove('active'));
-
-                // Add active class to clicked tab and corresponding content
-                tab.classList.add('active');
-                const targetContent = document.querySelector(`[data-content="${targetTab}"]`);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
-            });
-        });
+    function initCopyButtons() {
+        // Copy integration code
+        addCopyHandler('copy-integration-code', 'integration-code');
+        addCopyHandler('copy-api-code', 'api-example-code');
+        addCopyHandler('copy-direct-link', 'direct-link-code');
     }
 
-    // API Example Tabs (JavaScript / Python / cURL)
-    function initExampleTabs() {
-        const exampleTabs = document.querySelectorAll('.example-tab');
-        const exampleContents = document.querySelectorAll('.example-content');
+    function addCopyHandler(buttonId, sourceId) {
+        const btn = document.getElementById(buttonId);
+        if (!btn) return;
 
-        exampleTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const targetLang = tab.getAttribute('data-lang');
+        btn.addEventListener('click', async () => {
+            const source = document.getElementById(sourceId);
+            if (!source) return;
 
-                // Remove active class from all tabs and contents
-                exampleTabs.forEach(t => t.classList.remove('active'));
-                exampleContents.forEach(c => c.classList.remove('active'));
-
-                // Add active class to clicked tab and corresponding content
-                tab.classList.add('active');
-                const targetContent = document.querySelector(`[data-lang-content="${targetLang}"]`);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
-            });
+            const text = source.textContent;
+            try {
+                await navigator.clipboard.writeText(text);
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                btn.style.color = '#10b981';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.color = '';
+                }, 2000);
+            } catch (err) {
+                // Fallback para navegadores que no soportan clipboard API
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+            }
         });
     }
 

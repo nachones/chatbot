@@ -25,6 +25,19 @@ requiredDirs.forEach(dir => {
   }
 });
 
+// Stripe webhook needs raw body - must be before json middleware
+try {
+  const paymentsRoutes = require('./routes/payments');
+  // Mount webhook FIRST with raw body parser
+  app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
+    // Forward to payments router webhook handler
+    req.url = '/webhook';
+    paymentsRoutes(req, res, next);
+  });
+} catch (error) {
+  console.error('⚠ Payments webhook pre-mount error:', error.message);
+}
+
 // Middleware básico
 app.use(cors());
 
@@ -36,7 +49,7 @@ app.use(helmet({
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 500, // Limit each IP to 500 requests per windowMs
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -79,6 +92,10 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
 app.get('/widget.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'chat-widget.js'));
 });
@@ -96,6 +113,14 @@ try {
   console.log('✓ API routes cargadas');
 } catch (error) {
   console.error('✗ Error cargando API routes:', error.message);
+}
+
+try {
+  const authRoutes = require('./routes/auth');
+  app.use('/api/auth', authRoutes);
+  console.log('✓ Auth routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Auth routes:', error.message);
 }
 
 try {
@@ -152,6 +177,14 @@ try {
   console.log('✓ Leads routes cargadas');
 } catch (error) {
   console.error('✗ Error cargando Leads routes:', error.message);
+}
+
+try {
+  const paymentsRoutes = require('./routes/payments');
+  app.use('/api/payments', paymentsRoutes);
+  console.log('✓ Payments routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Payments routes:', error.message);
 }
 
 // Manejo de errores

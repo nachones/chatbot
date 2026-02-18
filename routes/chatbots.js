@@ -1,13 +1,47 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const DatabaseService = require('../services/databaseService');
 
 const db = new DatabaseService();
+const JWT_SECRET = process.env.JWT_SECRET || 'miabot_default_secret_change_me';
 
-// Get all chatbots
+// Optional auth middleware - extracts user if token present
+function optionalAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+  if (token) {
+    try {
+      req.user = jwt.verify(token, JWT_SECRET);
+    } catch (e) { /* ignore invalid token */ }
+  }
+  next();
+}
+
+router.use(optionalAuth);
+
+// Get all chatbots (filtered by user if authenticated)
 router.get('/', async (req, res) => {
   try {
-    const chatbots = await db.getAllChatbots();
+    let chatbots;
+    if (req.user && req.user.id) {
+      chatbots = await db.getChatbotsByUser(req.user.id);
+      
+      // If user has no chatbots, claim orphan chatbots (no user_id)
+      if (chatbots.length === 0) {
+        const allBots = await db.getAllChatbots();
+        const orphans = allBots.filter(b => !b.user_id);
+        for (const bot of orphans) {
+          await db.updateChatbot(bot.id, { user_id: req.user.id });
+        }
+        if (orphans.length > 0) {
+          chatbots = await db.getChatbotsByUser(req.user.id);
+          console.log(`✓ ${orphans.length} chatbot(s) huérfano(s) asignado(s) al usuario ${req.user.email}`);
+        }
+      }
+    } else {
+      chatbots = await db.getAllChatbots();
+    }
     res.json({
       success: true,
       chatbots: chatbots
@@ -45,6 +79,11 @@ router.post('/', async (req, res) => {
     
     if (!chatbotData.name) {
       return res.status(400).json({ error: 'El nombre es requerido' });
+    }
+
+    // Associate with user if authenticated
+    if (req.user && req.user.id) {
+      chatbotData.user_id = req.user.id;
     }
     
     const newChatbot = await db.createChatbot(chatbotData);

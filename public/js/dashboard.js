@@ -6,9 +6,56 @@
     const API_URL = '/api';
     let currentChatbotId = null;
     let allChatbots = [];
+    let authToken = localStorage.getItem('miabot_token');
+    let currentUser = null;
+
+    // Auth helper - add token to fetch requests
+    function authFetch(url, options = {}) {
+        if (!options.headers) options.headers = {};
+        if (authToken) options.headers['Authorization'] = 'Bearer ' + authToken;
+        return fetch(url, options);
+    }
+
+    // Check authentication on load
+    async function checkAuth() {
+        if (!authToken) {
+            window.location.href = '/?login=true';
+            return false;
+        }
+        try {
+            const res = await fetch(API_URL + '/auth/verify', {
+                headers: { 'Authorization': 'Bearer ' + authToken }
+            });
+            const data = await res.json();
+            if (!data.success) {
+                localStorage.removeItem('miabot_token');
+                localStorage.removeItem('miabot_user');
+                window.location.href = '/?login=true';
+                return false;
+            }
+            currentUser = data.user;
+            // Show user info in header
+            const userEl = document.getElementById('user-display-name');
+            if (userEl) userEl.textContent = currentUser.name || currentUser.email;
+            return true;
+        } catch {
+            // Don't redirect on network error - let dashboard work offline
+            return true;
+        }
+    }
+
+    // Logout function
+    window.logoutUser = function() {
+        localStorage.removeItem('miabot_token');
+        localStorage.removeItem('miabot_user');
+        window.location.href = '/';
+    };
 
     // Initialize Dashboard
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
+        const isAuth = await checkAuth();
+        if (!isAuth) return;
+        
         initNavigation();
         initChatbotSelector();
         initModals();
@@ -177,7 +224,7 @@
 
     async function loadChatbots() {
         try {
-            const response = await fetch(`${API_URL}/chatbots`);
+            const response = await authFetch(`${API_URL}/chatbots`);
             const data = await response.json();
 
             if (data.success && data.chatbots) {
@@ -260,9 +307,23 @@
                 updateStatElement('total-conversations', stats.conversations || 0);
                 updateStatElement('total-training', stats.training || 0);
                 updateStatElement('total-leads', stats.leads || 0);
+            }
 
-                // Update usage indicator
-                updateUsageIndicator(stats.usage || { used: 0, limit: 10000 });
+            // Load usage from usage endpoint
+            try {
+                const usageRes = await fetch(`${API_URL}/usage/${currentChatbotId}`);
+                const usageData = await usageRes.json();
+                if (usageData.success && usageData.usage) {
+                    const u = usageData.usage;
+                    updateUsageIndicator({
+                        used: u.tokensUsed || 0,
+                        limit: u.tokensLimit || 10000,
+                        plan: u.planName || 'Starter',
+                        isCustom: u.isCustomApi || false
+                    });
+                }
+            } catch (usageErr) {
+                console.error('Error loading usage:', usageErr);
             }
         } catch (error) {
             console.error('Error loading stats:', error);
@@ -302,12 +363,24 @@
         const fillEl = document.getElementById('usage-bar-fill');
 
         if (countEl) {
-            countEl.textContent = `${usage.used.toLocaleString()}/${usage.limit.toLocaleString()}`;
+            if (usage.isCustom) {
+                countEl.textContent = `Custom (API propia)`;
+            } else {
+                countEl.textContent = `${usage.used.toLocaleString('es-ES')}/${usage.limit.toLocaleString('es-ES')}`;
+            }
         }
 
         if (fillEl) {
-            const percentage = (usage.used / usage.limit) * 100;
-            fillEl.style.width = `${Math.min(percentage, 100)}%`;
+            if (usage.isCustom) {
+                fillEl.style.width = '0%';
+                fillEl.style.backgroundColor = '#10b981';
+            } else {
+                const percentage = usage.limit > 0 ? (usage.used / usage.limit) * 100 : 0;
+                fillEl.style.width = `${Math.min(percentage, 100)}%`;
+                if (percentage >= 90) fillEl.style.backgroundColor = '#ef4444';
+                else if (percentage >= 70) fillEl.style.backgroundColor = '#f59e0b';
+                else fillEl.style.backgroundColor = '#6366f1';
+            }
         }
     }
 
@@ -319,12 +392,16 @@
         const primaryColor = bot?.widget_color || '#6366f1';
         const position = bot?.widget_position || 'bottom-right';
         const welcomeMsg = bot?.welcome_message || '¡Hola! ¿En qué puedo ayudarte?';
+        const title = bot?.widget_title || 'Mi Asistente';
+        const origin = window.location.origin;
 
-        const scriptCode = `<!-- Chatbot Widget -->
+        // Widget script code
+        const scriptCode = `<!-- Chatbot Widget MIABOT -->
 <script 
-  src="${window.location.origin}/chat-widget.js"
-  data-api-url="${window.location.origin}/api"
+  src="${origin}/chat-widget.js"
+  data-api-url="${origin}/api"
   data-api-key="${currentChatbotId}"
+  data-title="${escapeHtml(title)}"
   data-primary-color="${primaryColor}"
   data-position="${position}"
   data-welcome="${escapeHtml(welcomeMsg)}"
@@ -334,6 +411,32 @@
         const codeEl = document.getElementById('integration-code');
         if (codeEl) {
             codeEl.textContent = scriptCode;
+        }
+
+        // API example
+        const apiExample = document.getElementById('api-example-code');
+        if (apiExample) {
+            apiExample.textContent = `// Ejemplo con fetch
+const response = await fetch("${origin}/api/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    message: "Hola, ¿qué servicios ofrecen?",
+    chatbotId: "${currentChatbotId}",
+    sessionId: "session_" + Date.now()
+  })
+});
+const data = await response.json();
+console.log(data.text);`;
+        }
+
+        const apiUrl = document.getElementById('api-endpoint-url');
+        if (apiUrl) apiUrl.textContent = `${origin}/api/chat`;
+
+        // Direct link
+        const directLink = document.getElementById('direct-link-code');
+        if (directLink) {
+            directLink.textContent = `${origin}/widget-preview.html?id=${currentChatbotId}`;
         }
     }
 
@@ -411,14 +514,14 @@
         createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
 
         try {
-            const response = await fetch(`${API_URL}/chatbots`, {
+            const response = await authFetch(`${API_URL}/chatbots`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: name,
                     description: descInput?.value?.trim() || '',
                     api_key: apiKeyInput?.value?.trim() || '',
-                    model: modelSelect?.value || 'gpt-3.5-turbo',
+                    model: modelSelect?.value || 'gemini-2.0-flash',
                     system_prompt: promptInput?.value?.trim() || 'Eres un asistente útil y amigable.'
                 })
             });
@@ -642,7 +745,8 @@
         getCurrentChatbotId: () => currentChatbotId,
         loadChatbots,
         showSuccess,
-        showError
+        showError,
+        authFetch
     };
 
 })();

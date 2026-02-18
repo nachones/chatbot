@@ -32,13 +32,68 @@ class ChatbotService {
       }
 
       // Configuración del modelo
-      const model = chatbotConfig?.model || process.env.DEFAULT_OPENAI_MODEL || 'gpt-3.5-turbo';
-      const apiKey = chatbotConfig?.api_key || process.env.OPENAI_API_KEY || process.env.GROQ_API_KEY;
+      let model = chatbotConfig?.model || process.env.DEFAULT_GEMINI_MODEL || 'gemini-2.0-flash';
       const temperature = chatbotConfig?.temperature || 0.7;
-      const maxTokens = chatbotConfig?.max_tokens || 500;
+      const maxTokens = chatbotConfig?.max_tokens || 1000;
       
       // Detectar proveedor basado en el modelo
-      const provider = llmService.detectProvider(model);
+      let provider = llmService.detectProvider(model);
+
+      // Buscar API key: primero la del chatbot, luego la del proveedor detectado, luego cualquier disponible
+      let apiKey = chatbotConfig?.api_key;
+      if (!apiKey) {
+        // Intentar con la key del proveedor detectado
+        const providerKeyMap = {
+          gemini: process.env.GEMINI_API_KEY,
+          openai: process.env.OPENAI_API_KEY,
+          groq: process.env.GROQ_API_KEY
+        };
+        apiKey = providerKeyMap[provider];
+
+        // Si no hay key para ese proveedor, buscar otro que sí tenga
+        if (!apiKey) {
+          const fallbackOrder = ['gemini', 'groq', 'openai'];
+          const defaultModels = {
+            gemini: process.env.DEFAULT_GEMINI_MODEL || 'gemini-2.0-flash',
+            groq: process.env.DEFAULT_GROQ_MODEL || 'llama-3.3-70b-versatile',
+            openai: process.env.DEFAULT_OPENAI_MODEL || 'gpt-4o-mini'
+          };
+          for (const p of fallbackOrder) {
+            if (providerKeyMap[p]) {
+              apiKey = providerKeyMap[p];
+              provider = p;
+              model = defaultModels[p];
+              console.log(`Fallback: usando ${p} (${model}) porque no hay key para el proveedor original`);
+              break;
+            }
+          }
+        }
+
+        if (!apiKey) {
+          throw new Error('No hay API key configurada. Ve a Configuración para añadir una.');
+        }
+      }
+
+      // === VERIFICAR CUOTA DE TOKENS ===
+      if (chatbotId && chatbotConfig) {
+        const plan = chatbotConfig.plan || 'starter';
+        const tokenLimits = { 'starter': 100000, 'pro': 500000, 'custom': 999999999 };
+        const limit = tokenLimits[plan] || 100000;
+        const used = chatbotConfig.tokens_used || 0;
+
+        // Verificar si necesita reset mensual
+        if (chatbotConfig.reset_date) {
+          const resetDate = new Date(chatbotConfig.reset_date);
+          if (new Date() >= resetDate) {
+            await this.db.resetMonthlyUsage(chatbotId);
+            console.log(`Reset mensual aplicado para ${chatbotId}`);
+          }
+        }
+
+        if (plan !== 'custom' && used >= limit) {
+          throw new Error(`Has alcanzado el límite de tokens de tu plan ${plan === 'starter' ? 'Starter (100.000)' : 'Pro (500.000)'}. Actualiza tu plan para seguir usando el chatbot.`);
+        }
+      }
 
       // Generar sessionId si no se proporciona
       if (!sessionId) {
@@ -192,10 +247,11 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
       // Guardar respuesta final del asistente
       await this.db.saveMessage(sessionId, 'assistant', response, chatbotId);
 
-      // Actualizar uso de tokens si hay chatbotId
+      // Actualizar uso de tokens y mensajes si hay chatbotId
       if (chatbotId && result.usage) {
         const totalTokens = result.usage.total_tokens;
         await this.db.updateTokenUsage(chatbotId, totalTokens);
+        await this.db.incrementMessageCount(chatbotId);
       }
 
       return {
@@ -315,7 +371,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
     } catch (error) {
       console.error('Error obteniendo configuración:', error);
       return {
-        model: 'gpt-3.5-turbo',
+        model: 'gemini-2.0-flash',
         systemPrompt: this.systemPrompt
       };
     }

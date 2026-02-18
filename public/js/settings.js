@@ -65,8 +65,9 @@
             console.error('Error loading models:', error);
             // Default models
             modelsData = {
+                gemini: ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash', 'gemini-1.5-pro'],
                 openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo'],
-                groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768']
+                groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768', 'gemma2-9b-it']
             };
         }
     }
@@ -80,11 +81,12 @@
         formGroup.innerHTML = `
             <label for="llm-provider">Proveedor LLM</label>
             <select id="llm-provider" class="form-control">
-                <option value="openai">OpenAI (Pago - Más avanzado)</option>
-                <option value="groq">Groq (Gratis - Rápido)</option>
+                <option value="gemini">Google Gemini (Capa gratuita generosa)</option>
+                <option value="groq">Groq (Gratis - Ultra rápido)</option>
+                <option value="openai">OpenAI (Pago - GPT-4o)</option>
             </select>
             <small style="color: #888; font-size: 12px; margin-top: 4px; display: block;">
-                Groq es gratuito y muy rápido, ideal para pruebas.
+                Gemini ofrece una capa gratuita muy generosa. Groq es gratis y ultra rápido.
             </small>
         `;
         
@@ -130,7 +132,12 @@
             'llama-3.3-70b-versatile': 'Llama 3.3 70B (Potente)',
             'llama-3.1-8b-instant': 'Llama 3.1 8B (Ultra rápido)',
             'mixtral-8x7b-32768': 'Mixtral 8x7B',
-            'gemma2-9b-it': 'Gemma 2 9B'
+            'gemma2-9b-it': 'Gemma 2 9B',
+            // Gemini
+            'gemini-2.0-flash': 'Gemini 2.0 Flash (Recomendado)',
+            'gemini-2.0-flash-lite': 'Gemini 2.0 Flash Lite (Ultra rápido)',
+            'gemini-1.5-flash': 'Gemini 1.5 Flash',
+            'gemini-1.5-pro': 'Gemini 1.5 Pro (Máxima calidad)'
         };
         return names[model] || model;
     }
@@ -149,7 +156,10 @@
             apiKeyInput.parentNode.appendChild(helpText);
         }
         
-        if (provider === 'groq') {
+        if (provider === 'gemini') {
+            if (label) label.textContent = 'Google Gemini API Key';
+            helpText.innerHTML = 'Obtén tu API key gratis en <a href="https://aistudio.google.com/apikey" target="_blank" style="color: #6366f1;">aistudio.google.com</a>';
+        } else if (provider === 'groq') {
             if (label) label.textContent = 'Groq API Key';
             helpText.innerHTML = 'Obtén tu API key gratis en <a href="https://console.groq.com/keys" target="_blank" style="color: #6366f1;">console.groq.com</a>';
         } else {
@@ -159,7 +169,8 @@
     }
 
     function detectProvider(model) {
-        if (!model) return 'openai';
+        if (!model) return 'gemini';
+        if (model.startsWith('gemini')) return 'gemini';
         const groqModels = ['llama', 'mixtral', 'gemma'];
         const modelLower = model.toLowerCase();
         
@@ -206,7 +217,7 @@
                     updateApiKeyHelp(provider);
                 }
                 
-                setSelectValue('openai-model', bot.model || 'gpt-3.5-turbo');
+                setSelectValue('openai-model', bot.model || 'gemini-2.0-flash');
                 setInputValue('system-prompt', bot.system_prompt || '');
                 
                 const tempSlider = document.getElementById('temperature');
@@ -216,7 +227,7 @@
                     if (tempValue) tempValue.textContent = bot.temperature || 0.7;
                 }
                 
-                setInputValue('max-tokens', bot.max_tokens || 500);
+                setInputValue('max-tokens', bot.max_tokens || 1000);
 
                 // Chatbot settings
                 setInputValue('chatbot-name-input', bot.name || '');
@@ -237,7 +248,7 @@
         const model = document.getElementById('openai-model')?.value;
         const systemPrompt = document.getElementById('system-prompt')?.value?.trim();
         const temperature = parseFloat(document.getElementById('temperature')?.value) || 0.7;
-        const maxTokens = parseInt(document.getElementById('max-tokens')?.value) || 500;
+        const maxTokens = parseInt(document.getElementById('max-tokens')?.value) || 1000;
 
         try {
             showLoading('Guardando configuración...');

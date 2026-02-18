@@ -9,7 +9,7 @@
   class ChatWidget {
     constructor(config) {
       this.config = {
-        apiUrl: config.apiUrl || 'http://localhost:3000/api',
+        apiUrl: config.apiUrl || (window.location.origin + '/api'),
         apiKey: config.apiKey || '',
         position: config.position || 'bottom-right',
         theme: config.theme || 'default',
@@ -607,8 +607,9 @@
     }
 
     // Configuración por defecto si no se encuentra el script (caso raro)
+    const scriptOrigin = script ? new URL(script.src, window.location.href).origin : window.location.origin;
     const config = {
-      apiUrl: 'http://localhost:3000/api',
+      apiUrl: scriptOrigin + '/api',
       apiKey: '',
       position: 'bottom-right',
       theme: 'default',

@@ -1,34 +1,18 @@
 const DatabaseService = require('./databaseService');
-const OpenAI = require('openai');
+const llmService = require('./llmService');
 
 class TrainingService {
   constructor() {
     this.db = new DatabaseService();
-    this.openai = null;
-  }
-
-  async initializeOpenAI(apiKey) {
-    this.openai = new OpenAI({
-      apiKey: apiKey || process.env.OPENAI_API_KEY
-    });
   }
 
   async generateEmbedding(text) {
     try {
-      if (!this.openai) {
-        await this.initializeOpenAI();
-      }
-
-      const response = await this.openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: text,
-        encoding_format: "float",
-      });
-
-      return response.data[0].embedding;
+      const embedding = await llmService.generateEmbedding(text);
+      return embedding; // Can be null if no API key available
     } catch (error) {
-      console.error('Error generando embedding:', error);
-      throw error;
+      console.warn('Embeddings no disponibles (sin API key configurada):', error.message);
+      return null;
     }
   }
 
@@ -59,9 +43,6 @@ class TrainingService {
   }
 
   async startTraining(trainingId, modelType = 'fine-tune') {
-    if (!this.openai) {
-      await this.initializeOpenAI();
-    }
 
     const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
@@ -138,15 +119,9 @@ class TrainingService {
   async searchRelevantContent(query, limit = 5, chatbotId = null) {
     try {
       // 1. Generar embedding de la consulta
-      if (!this.openai) {
-        await this.initializeOpenAI(); // Usar API key por defecto o la que ya esté
-      }
-
-      let queryEmbedding;
-      try {
-        queryEmbedding = await this.generateEmbedding(query);
-      } catch (error) {
-        console.error('Error generando embedding para query, fallback a búsqueda simple:', error);
+      const queryEmbedding = await this.generateEmbedding(query);
+      if (!queryEmbedding) {
+        console.log('Embeddings no disponibles, usando búsqueda por palabras clave');
         return this.searchRelevantContentSimple(query, limit, chatbotId);
       }
 
