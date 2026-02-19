@@ -972,7 +972,13 @@
           <input type="password" id="login-password" required placeholder="Tu contraseña" class="auth-input">
         </div>
         <div id="login-error" class="auth-error"></div>
+        <div id="login-verification" style="display:none;" class="auth-info">
+          <p>Debes verificar tu email. <a href="#" id="resend-verification-login">Reenviar email de verificación</a></p>
+        </div>
         <button type="submit" class="auth-submit">Iniciar Sesión</button>
+        <div style="text-align:center; margin-top:12px;">
+          <a href="#" id="forgot-password-link" style="color:#6C63FF; font-size:14px; text-decoration:none;">¿Olvidaste tu contraseña?</a>
+        </div>
       </form>
 
       <!-- Register Form -->
@@ -994,8 +1000,44 @@
           <input type="password" id="register-password" required minlength="6" placeholder="Crea una contraseña" class="auth-input">
         </div>
         <div id="register-error" class="auth-error"></div>
+        <div id="register-success" class="auth-success" style="display:none;"></div>
         <button type="submit" class="auth-submit">Crear Cuenta</button>
       </form>
+
+      <!-- Forgot Password Form -->
+      <form id="forgot-form" style="display:none">
+        <p style="color:#555; margin-bottom:20px; font-size:14px;">Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
+        <div class="auth-field-last">
+          <label class="auth-label">Email</label>
+          <input type="email" id="forgot-email" required placeholder="tu@email.com" class="auth-input">
+        </div>
+        <div id="forgot-error" class="auth-error"></div>
+        <div id="forgot-success" class="auth-success" style="display:none;"></div>
+        <button type="submit" class="auth-submit">Enviar enlace</button>
+        <div style="text-align:center; margin-top:12px;">
+          <a href="#" id="back-to-login" style="color:#6C63FF; font-size:14px; text-decoration:none;">Volver a iniciar sesión</a>
+        </div>
+      </form>
+
+      <!-- Reset Password Form -->
+      <form id="reset-form" style="display:none">
+        <p style="color:#555; margin-bottom:20px; font-size:14px;">Introduce tu nueva contraseña.</p>
+        <div class="auth-field-last">
+          <label class="auth-label">Nueva contraseña (mín. 6 caracteres)</label>
+          <input type="password" id="reset-password" required minlength="6" placeholder="Nueva contraseña" class="auth-input">
+        </div>
+        <div id="reset-error" class="auth-error"></div>
+        <div id="reset-success" class="auth-success" style="display:none;"></div>
+        <button type="submit" class="auth-submit">Restablecer contraseña</button>
+      </form>
+
+      <!-- Verification message -->
+      <div id="verify-message" style="display:none; padding:30px; text-align:center;">
+        <div id="verify-icon" style="font-size:48px; margin-bottom:15px;"></div>
+        <h3 id="verify-title" style="margin-bottom:10px;"></h3>
+        <p id="verify-text" style="color:#555;"></p>
+        <button onclick="document.getElementById('verify-message').style.display='none'; document.getElementById('login-form').style.display='block'; document.querySelector('.auth-tabs').style.display='flex';" class="auth-submit" style="margin-top:20px;">Iniciar Sesión</button>
+      </div>
     </div>
   </div>
 
@@ -1084,6 +1126,10 @@
           localStorage.setItem('miabot_user', JSON.stringify(data.user));
           window.location.href = '/dashboard';
         } else {
+          if (data.requiresVerification) {
+            pendingVerificationEmail = data.email;
+            verificationDiv.style.display = 'block';
+          }
           errEl.textContent = data.error;
           errEl.style.display = 'block';
         }
@@ -1097,7 +1143,9 @@
     registerForm.addEventListener('submit', async e => {
       e.preventDefault();
       const errEl = document.getElementById('register-error');
+      const successEl = document.getElementById('register-success');
       errEl.style.display = 'none';
+      successEl.style.display = 'none';
       try {
         const res = await fetch('/api/auth/register', {
           method: 'POST',
@@ -1111,9 +1159,15 @@
         });
         const data = await res.json();
         if (data.success) {
-          localStorage.setItem('miabot_token', data.token);
-          localStorage.setItem('miabot_user', JSON.stringify(data.user));
-          window.location.href = '/dashboard';
+          if (data.requiresVerification) {
+            successEl.textContent = data.message;
+            successEl.style.display = 'block';
+            registerForm.querySelector('button[type=submit]').style.display = 'none';
+          } else {
+            localStorage.setItem('miabot_token', data.token);
+            localStorage.setItem('miabot_user', JSON.stringify(data.user));
+            window.location.href = '/dashboard';
+          }
         } else {
           errEl.textContent = data.error;
           errEl.style.display = 'block';
@@ -1123,6 +1177,153 @@
         errEl.style.display = 'block';
       }
     });
+
+    // Login - handle verification required
+    const verificationDiv = document.getElementById('login-verification');
+    const resendLink = document.getElementById('resend-verification-login');
+    let pendingVerificationEmail = '';
+
+    if (resendLink) {
+      resendLink.addEventListener('click', async e => {
+        e.preventDefault();
+        if (!pendingVerificationEmail) return;
+        try {
+          const res = await fetch('/api/auth/resend-verification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: pendingVerificationEmail })
+          });
+          const data = await res.json();
+          resendLink.textContent = 'Email reenviado';
+          setTimeout(() => { resendLink.textContent = 'Reenviar email de verificacion'; }, 3000);
+        } catch (err) { /* silenciar */ }
+      });
+    }
+
+    // Forgot password
+    const forgotForm = document.getElementById('forgot-form');
+    const forgotLink = document.getElementById('forgot-password-link');
+    const backToLogin = document.getElementById('back-to-login');
+
+    if (forgotLink) {
+      forgotLink.addEventListener('click', e => {
+        e.preventDefault();
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'none';
+        forgotForm.style.display = 'block';
+        document.querySelector('.auth-tabs').style.display = 'none';
+      });
+    }
+
+    if (backToLogin) {
+      backToLogin.addEventListener('click', e => {
+        e.preventDefault();
+        forgotForm.style.display = 'none';
+        loginForm.style.display = 'block';
+        document.querySelector('.auth-tabs').style.display = 'flex';
+        switchTab('login');
+      });
+    }
+
+    if (forgotForm) {
+      forgotForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const errEl = document.getElementById('forgot-error');
+        const successEl = document.getElementById('forgot-success');
+        errEl.style.display = 'none';
+        successEl.style.display = 'none';
+        try {
+          const res = await fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: document.getElementById('forgot-email').value })
+          });
+          const data = await res.json();
+          if (data.success) {
+            successEl.textContent = data.message;
+            successEl.style.display = 'block';
+          } else {
+            errEl.textContent = data.error;
+            errEl.style.display = 'block';
+          }
+        } catch (err) {
+          errEl.textContent = 'Error de conexion';
+          errEl.style.display = 'block';
+        }
+      });
+    }
+
+    // Reset password form
+    const resetForm = document.getElementById('reset-form');
+    if (resetForm) {
+      resetForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const errEl = document.getElementById('reset-error');
+        const successEl = document.getElementById('reset-success');
+        errEl.style.display = 'none';
+        successEl.style.display = 'none';
+        const resetToken = new URLSearchParams(window.location.search).get('reset-token');
+        try {
+          const res = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: resetToken, password: document.getElementById('reset-password').value })
+          });
+          const data = await res.json();
+          if (data.success) {
+            successEl.textContent = data.message;
+            successEl.style.display = 'block';
+            resetForm.querySelector('button[type=submit]').style.display = 'none';
+          } else {
+            errEl.textContent = data.error;
+            errEl.style.display = 'block';
+          }
+        } catch (err) {
+          errEl.textContent = 'Error de conexion';
+          errEl.style.display = 'block';
+        }
+      });
+    }
+
+    // Check URL for verify/reset params on load
+    const verifyParam = urlParams.get('verify');
+    const resetToken = urlParams.get('reset-token');
+
+    if (verifyParam) {
+      const verifyMsg = document.getElementById('verify-message');
+      const verifyIcon = document.getElementById('verify-icon');
+      const verifyTitle = document.getElementById('verify-title');
+      const verifyText = document.getElementById('verify-text');
+      if (verifyMsg) {
+        openModal('login');
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'none';
+        document.querySelector('.auth-tabs').style.display = 'none';
+        verifyMsg.style.display = 'block';
+        if (verifyParam === 'success') {
+          verifyIcon.textContent = '\u2705';
+          verifyTitle.textContent = 'Email verificado';
+          verifyText.textContent = 'Tu cuenta ha sido activada. Ya puedes iniciar sesion.';
+        } else if (verifyParam === 'expired') {
+          verifyIcon.textContent = '\u23F0';
+          verifyTitle.textContent = 'Enlace expirado';
+          verifyText.textContent = 'El enlace de verificacion ha expirado. Solicita uno nuevo.';
+        } else {
+          verifyIcon.textContent = '\u274C';
+          verifyTitle.textContent = 'Error de verificacion';
+          verifyText.textContent = 'No se pudo verificar tu email. Intenta de nuevo.';
+        }
+      }
+    }
+
+    if (resetToken) {
+      openModal('login');
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'none';
+      forgotForm.style.display = 'none';
+      resetForm.style.display = 'block';
+      document.querySelector('.auth-tabs').style.display = 'none';
+    }
   })();
   </script>
 </body>

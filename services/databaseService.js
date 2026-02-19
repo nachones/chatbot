@@ -201,6 +201,11 @@ class DatabaseService {
       }
       this.safeAddColumn('users', 'stripe_customer_id', 'TEXT');
       this.safeAddColumn('users', 'stripe_subscription_id', 'TEXT');
+      this.safeAddColumn('users', 'email_verified', 'INTEGER DEFAULT 0');
+      this.safeAddColumn('users', 'verification_token', 'TEXT');
+      this.safeAddColumn('users', 'verification_expires', 'DATETIME');
+      this.safeAddColumn('users', 'reset_token', 'TEXT');
+      this.safeAddColumn('users', 'reset_token_expires', 'DATETIME');
 
       // Añadir user_id a chatbots
       this.safeAddColumn('chatbots', 'user_id', 'TEXT');
@@ -1221,6 +1226,89 @@ class DatabaseService {
         function (err) {
           if (err) reject(err);
           else resolve({ changes: this.changes });
+        }
+      );
+    });
+  }
+
+  // ==========================================
+  // EMAIL VERIFICATION & PASSWORD RESET
+  // ==========================================
+
+  async setVerificationToken(userId, token, expiresAt) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'UPDATE users SET verification_token = ?, verification_expires = ?, email_verified = 0 WHERE id = ?',
+        [token, expiresAt, userId],
+        function (err) {
+          if (err) reject(err);
+          else resolve({ changes: this.changes });
+        }
+      );
+    });
+  }
+
+  async verifyEmail(token) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT id, email, name FROM users WHERE verification_token = ? AND verification_expires > datetime("now")',
+        [token],
+        (err, user) => {
+          if (err) return reject(err);
+          if (!user) return resolve(null);
+
+          this.db.run(
+            'UPDATE users SET email_verified = 1, verification_token = NULL, verification_expires = NULL, is_active = 1 WHERE id = ?',
+            [user.id],
+            function (err2) {
+              if (err2) reject(err2);
+              else resolve(user);
+            }
+          );
+        }
+      );
+    });
+  }
+
+  async setResetToken(email, token, expiresAt) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT id, name FROM users WHERE email = ? AND is_active = 1',
+        [email],
+        (err, user) => {
+          if (err) return reject(err);
+          if (!user) return resolve(null);
+
+          this.db.run(
+            'UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?',
+            [token, expiresAt, user.id],
+            function (err2) {
+              if (err2) reject(err2);
+              else resolve(user);
+            }
+          );
+        }
+      );
+    });
+  }
+
+  async resetPassword(token, hashedPassword) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT id FROM users WHERE reset_token = ? AND reset_token_expires > datetime("now")',
+        [token],
+        (err, user) => {
+          if (err) return reject(err);
+          if (!user) return resolve(null);
+
+          this.db.run(
+            'UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
+            [hashedPassword, user.id],
+            function (err2) {
+              if (err2) reject(err2);
+              else resolve(user);
+            }
+          );
         }
       );
     });
