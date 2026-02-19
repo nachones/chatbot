@@ -1208,7 +1208,7 @@ class DatabaseService {
   }
 
   async updateUser(id, fields) {
-    const allowed = ['name', 'company', 'plan', 'stripe_customer_id', 'stripe_subscription_id', 'is_active'];
+    const allowed = ['name', 'company', 'plan', 'stripe_customer_id', 'stripe_subscription_id', 'is_active', 'password'];
     const updates = [];
     const values = [];
     for (const [key, val] of Object.entries(fields)) {
@@ -1223,6 +1223,22 @@ class DatabaseService {
       this.db.run(
         `UPDATE users SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
         values,
+        function (err) {
+          if (err) reject(err);
+          else resolve({ changes: this.changes });
+        }
+      );
+    });
+  }
+
+  /**
+   * Verify email directly (for paid users — no token needed)
+   */
+  async verifyEmailDirect(userId) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'UPDATE users SET email_verified = 1, verification_token = NULL, verification_expires = NULL WHERE id = ?',
+        [userId],
         function (err) {
           if (err) reject(err);
           else resolve({ changes: this.changes });

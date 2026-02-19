@@ -833,66 +833,105 @@
           cancela cuando quieras.
         </p>
       </div>
+
+      <!-- Billing Toggle -->
+      <div style="text-align:center; margin-bottom:30px;">
+        <div style="display:inline-flex; background:#f1f1f1; border-radius:30px; padding:4px;">
+          <button id="billing-monthly" class="billing-toggle active" onclick="switchBilling('monthly')">Mensual</button>
+          <button id="billing-annual" class="billing-toggle" onclick="switchBilling('annual')">
+            Anual <span style="background:#6C63FF; color:white; padding:2px 8px; border-radius:10px; font-size:11px; margin-left:4px;">-17%</span>
+          </button>
+        </div>
+      </div>
+
       <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-badge">Más Popular</div>
+        <div class="pricing-card">
           <h3>Starter</h3>
-          <div class="pricing-price">9,95€<span>/mes</span></div>
+          <div class="pricing-price" id="price-starter">9,95€<span>/mes</span></div>
           <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> 1 chatbot</li>
             <li><i class="fas fa-check"></i> 1.000 mensajes / mes</li>
             <li><i class="fas fa-check"></i> 100.000 tokens incluidos</li>
             <li><i class="fas fa-check"></i> Gemini 2.0 Flash (IA avanzada)</li>
-            <li><i class="fas fa-check"></i> 3 chatbots</li>
             <li><i class="fas fa-check"></i> Entrenamiento con archivos y URLs</li>
             <li><i class="fas fa-check"></i> Captura de leads</li>
             <li><i class="fas fa-check"></i> Widget personalizable</li>
             <li><i class="fas fa-check"></i> Integración en tu web</li>
           </ul>
-          <button class="pricing-button btn-register-plan" data-plan="starter">
+          <button class="pricing-button btn-checkout-plan" data-plan="starter">
             Empezar Ahora
           </button>
         </div>
         
-        <div class="pricing-card">
+        <div class="pricing-card featured">
+          <div class="pricing-badge">Más Popular</div>
           <h3>Pro</h3>
-          <div class="pricing-price">25€<span>/mes</span></div>
+          <div class="pricing-price" id="price-pro">39,95€<span>/mes</span></div>
           <ul class="pricing-features">
-            <li><i class="fas fa-check"></i> 5.000 mensajes / mes</li>
+            <li><i class="fas fa-check"></i> 10 chatbots</li>
+            <li><i class="fas fa-check"></i> 10.000 mensajes / mes</li>
             <li><i class="fas fa-check"></i> 500.000 tokens incluidos</li>
             <li><i class="fas fa-check"></i> Todos los modelos IA</li>
-            <li><i class="fas fa-check"></i> 10 chatbots</li>
             <li><i class="fas fa-check"></i> Entrenamiento ilimitado</li>
             <li><i class="fas fa-check"></i> Function calling (API externa)</li>
             <li><i class="fas fa-check"></i> Acceso API completo</li>
             <li><i class="fas fa-check"></i> Sin marca de agua</li>
             <li><i class="fas fa-check"></i> Soporte prioritario</li>
           </ul>
-          <button class="pricing-button btn-register-plan" data-plan="pro">
+          <button class="pricing-button btn-checkout-plan" data-plan="pro">
             Empezar con Pro
           </button>
         </div>
         
         <div class="pricing-card">
-          <h3>Custom</h3>
-          <div class="pricing-price">150€<span>/año</span></div>
+          <h3>Empresas</h3>
+          <div class="pricing-price" id="price-empresas">850€<span>/año</span></div>
           <ul class="pricing-features">
+            <li><i class="fas fa-check"></i> Chatbots ilimitados</li>
             <li><i class="fas fa-check"></i> Mensajes ilimitados</li>
             <li><i class="fas fa-check"></i> Tokens ilimitados</li>
             <li><i class="fas fa-check"></i> Usa tu propia API key</li>
-            <li><i class="fas fa-check"></i> Chatbots ilimitados</li>
             <li><i class="fas fa-check"></i> Todos los modelos (GPT-4, Gemini, etc.)</li>
-            <li><i class="fas fa-check"></i> Entrenamiento ilimitado</li>
             <li><i class="fas fa-check"></i> Function calling avanzado</li>
             <li><i class="fas fa-check"></i> API empresarial</li>
+            <li><i class="fas fa-check"></i> Entrenamiento ilimitado</li>
             <li><i class="fas fa-check"></i> Soporte dedicado</li>
           </ul>
-          <button class="pricing-button btn-register-plan" data-plan="custom">
-            Empezar con Custom
+          <button class="pricing-button btn-checkout-plan" data-plan="empresas">
+            Empezar con Empresas
           </button>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Checkout Modal -->
+  <div id="checkout-modal" class="auth-modal-overlay" style="display:none;">
+    <div class="auth-modal-container">
+      <button id="close-checkout-modal" class="auth-modal-close">&times;</button>
+      <div style="text-align:center; margin-bottom:20px;">
+        <h1 style="color:#6C63FF; margin:0; font-size:24px;">🤖 MIABOT</h1>
+        <p id="checkout-plan-label" style="color:#888; margin-top:5px;">Plan Starter — 9,95€/mes</p>
+      </div>
+      <form id="checkout-form">
+        <div class="auth-field">
+          <label class="auth-label">Nombre</label>
+          <input type="text" id="checkout-name" placeholder="Tu nombre" class="auth-input">
+        </div>
+        <div class="auth-field-last">
+          <label class="auth-label">Email *</label>
+          <input type="email" id="checkout-email" required placeholder="tu@email.com" class="auth-input">
+        </div>
+        <div id="checkout-error" class="auth-error"></div>
+        <button type="submit" class="auth-submit" style="background:#6C63FF;">
+          <i class="fas fa-lock" style="margin-right:6px;"></i> Continuar al pago seguro
+        </button>
+        <p style="text-align:center; color:#aaa; font-size:12px; margin-top:12px;">
+          <i class="fas fa-shield-alt"></i> Pago seguro con Stripe. Tu cuenta se creará automáticamente.
+        </p>
+      </form>
+    </div>
+  </div>
 
   <!-- CTA Section -->
   <section class="cta-section">
@@ -1050,10 +1089,12 @@
     const tabLogin = document.getElementById('tab-login');
     const tabRegister = document.getElementById('tab-register');
 
+    // Current billing mode
+    let currentBilling = 'monthly';
+
     // Check if already logged in
     const token = localStorage.getItem('miabot_token');
     if (token) {
-      // Update nav buttons
       const loginNav = document.getElementById('btn-login-nav');
       const regNav = document.getElementById('btn-register-nav');
       if (loginNav) { loginNav.textContent = 'Mi Dashboard'; loginNav.href = '/dashboard'; }
@@ -1062,24 +1103,18 @@
 
     function openModal(tab) {
       modal.style.display = 'flex';
-      if (tab === 'register') { switchTab('register'); }
-      else { switchTab('login'); }
+      // Only show login — register is hidden (accounts created via Stripe)
+      switchTab('login');
     }
 
     function closeModal() { modal.style.display = 'none'; }
 
     function switchTab(tab) {
-      if (tab === 'login') {
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
-      } else {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        tabRegister.classList.add('active');
-        tabLogin.classList.remove('active');
-      }
+      // Only login is available — registration happens via Stripe checkout
+      loginForm.style.display = 'block';
+      registerForm.style.display = 'none';
+      tabLogin.classList.add('active');
+      tabRegister.style.display = 'none'; // Hide register tab
     }
 
     // Event listeners
@@ -1088,22 +1123,118 @@
       if (localStorage.getItem('miabot_token')) { window.location.href = '/dashboard'; }
       else { openModal('login'); }
     });
-    document.getElementById('btn-register-nav').addEventListener('click', e => { e.preventDefault(); openModal('register'); });
-    document.getElementById('btn-register-hero')?.addEventListener('click', e => { e.preventDefault(); openModal('register'); });
-    document.getElementById('btn-register-cta')?.addEventListener('click', e => { e.preventDefault(); openModal('register'); });
+    document.getElementById('btn-register-nav').addEventListener('click', e => { e.preventDefault(); openModal('login'); });
+    document.getElementById('btn-register-hero')?.addEventListener('click', e => { e.preventDefault(); document.getElementById('pricing').scrollIntoView({behavior:'smooth'}); });
+    document.getElementById('btn-register-cta')?.addEventListener('click', e => { e.preventDefault(); document.getElementById('pricing').scrollIntoView({behavior:'smooth'}); });
     document.getElementById('close-auth-modal').addEventListener('click', closeModal);
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
     tabLogin.addEventListener('click', () => switchTab('login'));
-    tabRegister.addEventListener('click', () => switchTab('register'));
 
-    // Auto-open modal if redirected from dashboard (?login=true)
+    // Auto-open modal if redirected
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('login') === 'true') { openModal('login'); }
-    if (urlParams.get('register') === 'true') { openModal('register'); }
 
-    // Plan buttons
-    document.querySelectorAll('.btn-register-plan').forEach(btn => {
-      btn.addEventListener('click', () => openModal('register'));
+    // Handle payment success/cancelled from Stripe redirect
+    if (urlParams.get('payment') === 'success') {
+      openModal('login');
+      const errEl = document.getElementById('login-error');
+      const loginVerDiv = document.getElementById('login-verification');
+      if (loginVerDiv) loginVerDiv.style.display = 'none';
+      errEl.style.display = 'none';
+      // Show success message
+      const successDiv = document.createElement('div');
+      successDiv.className = 'auth-success';
+      successDiv.style.display = 'block';
+      successDiv.innerHTML = '<strong>¡Pago completado!</strong> Revisa tu email para obtener tus credenciales de acceso.';
+      loginForm.insertBefore(successDiv, loginForm.firstChild);
+    }
+
+    // ==========================================
+    // BILLING TOGGLE
+    // ==========================================
+    window.switchBilling = function(mode) {
+      currentBilling = mode;
+      const btnMonthly = document.getElementById('billing-monthly');
+      const btnAnnual = document.getElementById('billing-annual');
+      
+      if (mode === 'annual') {
+        btnAnnual.classList.add('active');
+        btnMonthly.classList.remove('active');
+        document.getElementById('price-starter').innerHTML = '99€<span>/año</span>';
+        document.getElementById('price-pro').innerHTML = '399€<span>/año</span>';
+        document.getElementById('price-empresas').innerHTML = '850€<span>/año</span>';
+      } else {
+        btnMonthly.classList.add('active');
+        btnAnnual.classList.remove('active');
+        document.getElementById('price-starter').innerHTML = '9,95€<span>/mes</span>';
+        document.getElementById('price-pro').innerHTML = '39,95€<span>/mes</span>';
+        document.getElementById('price-empresas').innerHTML = '850€<span>/año</span>';
+      }
+    };
+
+    // ==========================================
+    // CHECKOUT FLOW (Plan buttons → Stripe)
+    // ==========================================
+    const checkoutModal = document.getElementById('checkout-modal');
+    let selectedPlan = 'starter';
+
+    document.querySelectorAll('.btn-checkout-plan').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedPlan = btn.dataset.plan;
+        const planNames = { starter: 'Starter', pro: 'Pro', empresas: 'Empresas' };
+        const prices = {
+          starter: currentBilling === 'annual' ? '99€/año' : '9,95€/mes',
+          pro: currentBilling === 'annual' ? '399€/año' : '39,95€/mes',
+          empresas: '850€/año'
+        };
+        document.getElementById('checkout-plan-label').textContent = 
+          `Plan ${planNames[selectedPlan]} — ${prices[selectedPlan]}`;
+        document.getElementById('checkout-error').style.display = 'none';
+        checkoutModal.style.display = 'flex';
+      });
+    });
+
+    document.getElementById('close-checkout-modal').addEventListener('click', () => {
+      checkoutModal.style.display = 'none';
+    });
+    checkoutModal.addEventListener('click', e => {
+      if (e.target === checkoutModal) checkoutModal.style.display = 'none';
+    });
+
+    document.getElementById('checkout-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const errEl = document.getElementById('checkout-error');
+      errEl.style.display = 'none';
+      const submitBtn = e.target.querySelector('button[type=submit]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirigiendo a Stripe...';
+
+      try {
+        const res = await fetch('/api/payments/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            planId: selectedPlan,
+            billing: selectedPlan === 'empresas' ? 'annual' : currentBilling,
+            email: document.getElementById('checkout-email').value,
+            name: document.getElementById('checkout-name').value
+          })
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          window.location.href = data.url;
+        } else {
+          errEl.textContent = data.error || 'Error al crear sesión de pago';
+          errEl.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-lock" style="margin-right:6px;"></i> Continuar al pago seguro';
+        }
+      } catch (err) {
+        errEl.textContent = 'Error de conexión';
+        errEl.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-lock" style="margin-right:6px;"></i> Continuar al pago seguro';
+      }
     });
 
     // Login

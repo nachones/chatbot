@@ -16,6 +16,9 @@
         title: config.title || 'Asistente Virtual',
         welcomeMessage: config.welcomeMessage || '¡Hola! ¿En qué puedo ayudarte?',
         primaryColor: config.primaryColor || '#007bff',
+        leadCapture: config.leadCapture !== false, // enabled by default
+        leadTitle: config.leadTitle || 'Antes de empezar...',
+        leadSubtitle: config.leadSubtitle || 'Déjanos tus datos para poder ayudarte mejor',
         ...config
       };
 
@@ -23,6 +26,7 @@
       this.isOpen = false;
       this.messages = [];
       this.quickPrompts = [];
+      this.leadCaptured = this.checkLeadCaptured();
 
       // Esperar a que marked cargue antes de inicializar si es posible, 
       // pero no bloquear la UI
@@ -361,6 +365,31 @@
             border-color: var(--primary-color);
           }
 
+          /* Lead Capture Form */
+          .chat-widget-lead-form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 30px 20px;
+            background: #f8f9fa;
+          }
+
+          .chat-widget-lead-form input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.1);
+          }
+
+          .chat-widget-lead-form button:hover:not(:disabled) {
+            filter: brightness(1.1);
+          }
+
+          .chat-widget-lead-form button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+          }
+
           /* Responsive */
           @media (max-width: 480px) {
             .chat-widget-window {
@@ -381,6 +410,21 @@
       `;
 
       document.head.insertAdjacentHTML('beforeend', styles);
+    }
+
+    checkLeadCaptured() {
+      try {
+        const key = 'miabot_lead_' + (this.config.apiKey || 'default');
+        return !!sessionStorage.getItem(key);
+      } catch (e) { return false; }
+    }
+
+    markLeadCaptured() {
+      try {
+        const key = 'miabot_lead_' + (this.config.apiKey || 'default');
+        sessionStorage.setItem(key, '1');
+        this.leadCaptured = true;
+      } catch (e) { this.leadCaptured = true; }
     }
 
     // Helper para oscurecer colores
@@ -409,8 +453,27 @@
             <div class="chat-widget-title">${this.escapeHtml(this.config.title)}</div>
             <button class="chat-widget-close" id="chat-widget-close" aria-label="Cerrar chat">×</button>
           </div>
+
+          <!-- Lead Capture Form -->
+          <div class="chat-widget-lead-form" id="chat-widget-lead-form" style="display:${this.config.leadCapture && !this.leadCaptured ? 'flex' : 'none'};">
+            <div style="text-align:center; padding:10px 0;">
+              <h3 style="margin:0 0 6px 0; font-size:16px; color:#333;">${this.escapeHtml(this.config.leadTitle)}</h3>
+              <p style="margin:0; font-size:13px; color:#888;">${this.escapeHtml(this.config.leadSubtitle)}</p>
+            </div>
+            <input type="text" id="chat-widget-lead-name" placeholder="Tu nombre *" 
+                   style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; box-sizing:border-box; margin-bottom:10px; outline:none;">
+            <input type="email" id="chat-widget-lead-email" placeholder="Tu email *" 
+                   style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; box-sizing:border-box; margin-bottom:10px; outline:none;">
+            <input type="tel" id="chat-widget-lead-phone" placeholder="Tu teléfono (opcional)" 
+                   style="width:100%; padding:10px 14px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; box-sizing:border-box; margin-bottom:14px; outline:none;">
+            <div id="chat-widget-lead-error" style="display:none; color:#ef4444; font-size:12px; margin-bottom:8px; text-align:center;"></div>
+            <button id="chat-widget-lead-submit" 
+                    style="width:100%; padding:12px; background:var(--primary-color); color:white; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:filter 0.2s;">
+              Empezar a chatear
+            </button>
+          </div>
           
-          <div class="chat-widget-messages" id="chat-widget-messages">
+          <div class="chat-widget-messages" id="chat-widget-messages" style="display:${this.config.leadCapture && !this.leadCaptured ? 'none' : 'block'};">
             <div class="chat-widget-message bot">
               <div class="chat-widget-message-content">${this.escapeHtml(this.config.welcomeMessage)}</div>
             </div>
@@ -422,7 +485,7 @@
           
           <div class="chat-widget-prompts hidden" id="chat-widget-prompts"></div>
           
-          <div class="chat-widget-input-container">
+          <div class="chat-widget-input-container" id="chat-widget-input-area" style="display:${this.config.leadCapture && !this.leadCaptured ? 'none' : 'flex'};">
             <input type="text" class="chat-widget-input" id="chat-widget-input" 
                    placeholder="Escribe tu mensaje..." maxlength="500">
             <button class="chat-widget-send" id="chat-widget-send" aria-label="Enviar mensaje">
@@ -450,6 +513,72 @@
       input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') this.sendMessage();
       });
+
+      // Lead capture form
+      const leadSubmit = document.getElementById('chat-widget-lead-submit');
+      if (leadSubmit) {
+        leadSubmit.addEventListener('click', () => this.submitLead());
+      }
+    }
+
+    async submitLead() {
+      const nameEl = document.getElementById('chat-widget-lead-name');
+      const emailEl = document.getElementById('chat-widget-lead-email');
+      const phoneEl = document.getElementById('chat-widget-lead-phone');
+      const errorEl = document.getElementById('chat-widget-lead-error');
+      const submitBtn = document.getElementById('chat-widget-lead-submit');
+
+      const name = nameEl.value.trim();
+      const email = emailEl.value.trim();
+      const phone = phoneEl.value.trim();
+
+      // Validate
+      if (!name) {
+        errorEl.textContent = 'Por favor, introduce tu nombre';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errorEl.textContent = 'Por favor, introduce un email válido';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      errorEl.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      try {
+        await fetch(`${this.config.apiUrl}/leads`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            phone: phone || null,
+            chatbotId: this.config.apiKey || null
+          })
+        });
+      } catch (e) {
+        // Silently continue even if lead save fails
+        console.log('Lead save skipped:', e.message);
+      }
+
+      // Mark lead as captured and show chat
+      this.markLeadCaptured();
+      document.getElementById('chat-widget-lead-form').style.display = 'none';
+      document.getElementById('chat-widget-messages').style.display = 'block';
+      document.getElementById('chat-widget-input-area').style.display = 'flex';
+
+      // Show prompts if available
+      const promptsEl = document.getElementById('chat-widget-prompts');
+      if (promptsEl && this.quickPrompts.length > 0) {
+        promptsEl.classList.remove('hidden');
+      }
+
+      setTimeout(() => {
+        document.getElementById('chat-widget-input').focus();
+      }, 200);
     }
 
     toggle() {
@@ -632,6 +761,12 @@
       config.title = script.getAttribute('data-title') || config.title;
       config.welcomeMessage = script.getAttribute('data-welcome') || config.welcomeMessage;
       config.primaryColor = script.getAttribute('data-primary-color') || config.primaryColor;
+      
+      // Lead capture config
+      const leadAttr = script.getAttribute('data-lead-capture');
+      if (leadAttr === 'false') config.leadCapture = false;
+      config.leadTitle = script.getAttribute('data-lead-title') || config.leadTitle;
+      config.leadSubtitle = script.getAttribute('data-lead-subtitle') || config.leadSubtitle;
     }
 
     // Evitar múltiples instancias

@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const DatabaseService = require('../services/databaseService');
+const emailService = require('../services/emailService');
 const { authMiddleware } = require('./auth');
 
 const db = new DatabaseService();
@@ -14,97 +17,171 @@ if (process.env.STRIPE_SECRET_KEY) {
   console.log('⚠ Stripe no configurado (STRIPE_SECRET_KEY no encontrada)');
 }
 
+// ==========================================
+// PLAN DEFINITIONS
+// ==========================================
+const PLANS = {
+  starter: {
+    id: 'starter',
+    name: 'Starter',
+    monthlyPrice: '9,95€/mes',
+    annualPrice: '99€/año',
+    monthlyAmount: 995,
+    annualAmount: 9900,
+    tokens: 100000,
+    messages: 1000,
+    chatbots: 1,
+    features: [
+      '1 chatbot',
+      '1.000 mensajes / mes',
+      '100.000 tokens incluidos',
+      'Gemini 2.0 Flash (IA avanzada)',
+      'Entrenamiento con archivos y URLs',
+      'Captura de leads',
+      'Widget personalizable',
+      'Integración en tu web'
+    ],
+    monthlyPriceId: process.env.STRIPE_STARTER_PRICE_ID || null,
+    annualPriceId: process.env.STRIPE_STARTER_ANNUAL_PRICE_ID || null
+  },
+  pro: {
+    id: 'pro',
+    name: 'Pro',
+    monthlyPrice: '39,95€/mes',
+    annualPrice: '399€/año',
+    monthlyAmount: 3995,
+    annualAmount: 39900,
+    tokens: 500000,
+    messages: 10000,
+    chatbots: 10,
+    popular: true,
+    features: [
+      '10 chatbots',
+      '10.000 mensajes / mes',
+      '500.000 tokens incluidos',
+      'Todos los modelos IA',
+      'Function calling (API externa)',
+      'Acceso API completo',
+      'Entrenamiento ilimitado',
+      'Sin marca de agua',
+      'Soporte prioritario'
+    ],
+    monthlyPriceId: process.env.STRIPE_PRO_PRICE_ID || null,
+    annualPriceId: process.env.STRIPE_PRO_ANNUAL_PRICE_ID || null
+  },
+  empresas: {
+    id: 'empresas',
+    name: 'Empresas',
+    annualPrice: '850€/año',
+    annualAmount: 85000,
+    tokens: 999999999,
+    messages: 999999999,
+    chatbots: 999,
+    annualOnly: true,
+    features: [
+      'Chatbots ilimitados',
+      'Mensajes ilimitados',
+      'Tokens ilimitados',
+      'Usa tu propia API key',
+      'Todos los modelos (GPT-4, Gemini, etc.)',
+      'Function calling avanzado',
+      'API empresarial',
+      'Entrenamiento ilimitado',
+      'Soporte dedicado'
+    ],
+    annualPriceId: process.env.STRIPE_EMPRESAS_PRICE_ID || null
+  }
+};
+
 // Get pricing info (public)
 router.get('/plans', (req, res) => {
   res.json({
     success: true,
-    plans: [
-      {
-        id: 'starter',
-        name: 'Starter',
-        price: '9,95€/mes',
-        priceAmount: 995, // cents
-        interval: 'month',
-        tokens: 100000,
-        messages: 1000,
-        chatbots: 3,
-        features: ['100.000 tokens/mes', '1.000 mensajes', '3 chatbots', 'Gemini 2.0 Flash', 'Widget personalizable', 'Entrenamiento con archivos'],
-        stripePriceId: process.env.STRIPE_STARTER_PRICE_ID || null
-      },
-      {
-        id: 'pro',
-        name: 'Pro',
-        price: '25€/mes',
-        priceAmount: 2500,
-        interval: 'month',
-        tokens: 500000,
-        messages: 5000,
-        chatbots: 10,
-        features: ['500.000 tokens/mes', '5.000 mensajes', '10 chatbots', 'Todos los modelos IA', 'Function calling', 'API completo', 'Sin marca de agua'],
-        stripePriceId: process.env.STRIPE_PRO_PRICE_ID || null
-      },
-      {
-        id: 'custom',
-        name: 'Custom',
-        price: '150€/año',
-        priceAmount: 15000,
-        interval: 'year',
-        tokens: 999999999,
-        messages: 999999999,
-        chatbots: 999,
-        features: ['Tokens ilimitados', 'Mensajes ilimitados', 'Chatbots ilimitados', 'Usa tu propia API key', 'Todos los modelos', 'Soporte dedicado'],
-        stripePriceId: process.env.STRIPE_CUSTOM_PRICE_ID || null
-      }
-    ],
+    plans: Object.values(PLANS),
     stripeConfigured: !!stripe
   });
 });
 
-// Create Stripe checkout session
-router.post('/checkout', authMiddleware, async (req, res) => {
+// Create Stripe checkout session (PUBLIC - no auth required)
+// Users pay first, account is created on webhook
+router.post('/checkout', async (req, res) => {
   if (!stripe) {
     return res.status(503).json({ error: 'Stripe no está configurado. Contacta al administrador.' });
   }
 
   try {
-    const { planId } = req.body;
-    const user = await db.getUserById(req.user.id);
-    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    const { planId, billing, email, name } = req.body;
 
-    // Map plan to Stripe price ID
-    const priceMap = {
-      starter: process.env.STRIPE_STARTER_PRICE_ID,
-      pro: process.env.STRIPE_PRO_PRICE_ID,
-      custom: process.env.STRIPE_CUSTOM_PRICE_ID
-    };
-
-    const priceId = priceMap[planId];
-    if (!priceId) {
-      return res.status(400).json({ error: 'Plan no válido o precio de Stripe no configurado' });
+    if (!email) {
+      return res.status(400).json({ error: 'Email es obligatorio' });
     }
 
-    // Create or get Stripe customer
-    let customerId = user.stripe_customer_id;
-    if (!customerId) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Email no válido' });
+    }
+
+    const plan = PLANS[planId];
+    if (!plan) {
+      return res.status(400).json({ error: 'Plan no válido' });
+    }
+
+    // Determine billing period and price ID
+    const isAnnual = billing === 'annual';
+    let priceId;
+
+    if (plan.annualOnly) {
+      priceId = plan.annualPriceId;
+    } else {
+      priceId = isAnnual ? plan.annualPriceId : plan.monthlyPriceId;
+    }
+
+    if (!priceId) {
+      return res.status(400).json({ error: 'Precio de Stripe no configurado para este plan' });
+    }
+
+    // Check if user already exists
+    const existingUser = await db.getUserByEmail(email.toLowerCase());
+
+    let customerId = null;
+    if (existingUser && existingUser.stripe_customer_id) {
+      customerId = existingUser.stripe_customer_id;
+    } else {
+      // Create Stripe customer
       const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.name,
-        metadata: { userId: user.id }
+        email: email.toLowerCase(),
+        name: name || '',
+        metadata: { source: 'checkout' }
       });
       customerId = customer.id;
-      await db.updateUser(user.id, { stripe_customer_id: customerId });
+
+      // If user exists but has no Stripe customer, update it
+      if (existingUser) {
+        await db.updateUser(existingUser.id, { stripe_customer_id: customerId });
+      }
     }
 
     // Create checkout session
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
-      success_url: `${baseUrl}/dashboard?payment=success&plan=${planId}`,
-      cancel_url: `${baseUrl}/dashboard?payment=cancelled`,
-      metadata: { userId: user.id, planId }
+      success_url: `${baseUrl}/?payment=success&plan=${planId}`,
+      cancel_url: `${baseUrl}/?payment=cancelled`,
+      metadata: {
+        planId,
+        billing: isAnnual ? 'annual' : 'monthly',
+        customerName: name || '',
+        customerEmail: email.toLowerCase()
+      },
+      subscription_data: {
+        metadata: {
+          planId,
+          billing: isAnnual ? 'annual' : 'monthly'
+        }
+      }
     });
 
     res.json({ success: true, url: session.url, sessionId: session.id });
@@ -163,49 +240,117 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
-        const userId = session.metadata?.userId;
         const planId = session.metadata?.planId;
+        const billing = session.metadata?.billing || 'monthly';
+        const customerEmail = session.metadata?.customerEmail || session.customer_details?.email;
+        const customerName = session.metadata?.customerName || session.customer_details?.name || '';
         const subscriptionId = session.subscription;
+        const customerId = session.customer;
 
-        if (userId && planId) {
-          await db.updateUser(userId, {
+        if (!customerEmail || !planId) {
+          console.error('⚠ Webhook: falta email o planId en metadata');
+          break;
+        }
+
+        const plan = PLANS[planId];
+        if (!plan) {
+          console.error(`⚠ Webhook: plan desconocido "${planId}"`);
+          break;
+        }
+
+        // Check if user already exists
+        let user = await db.getUserByEmail(customerEmail.toLowerCase());
+
+        if (user) {
+          // User exists: upgrade plan
+          await db.updateUser(user.id, {
             plan: planId,
-            stripe_subscription_id: subscriptionId
+            stripe_subscription_id: subscriptionId,
+            stripe_customer_id: customerId,
+            is_active: 1
           });
-          
-          // Update all user's chatbots to new plan
-          const chatbots = await db.getChatbotsByUser(userId);
-          const tokenLimits = { starter: 100000, pro: 500000, custom: 999999999 };
+
+          // Update chatbot limits
+          const chatbots = await db.getChatbotsByUser(user.id);
           for (const bot of chatbots) {
             await db.updateChatbot(bot.id, {
               plan: planId,
-              tokens_limit: tokenLimits[planId] || 100000
+              tokens_limit: plan.tokens
             });
           }
-          console.log(`✓ Plan actualizado para usuario ${userId}: ${planId}`);
+
+          // Send upgrade confirmation email
+          await emailService.sendPlanUpgradeEmail(customerEmail, customerName || user.name, planId, billing);
+          console.log(`✓ Plan actualizado para usuario existente ${customerEmail}: ${planId} (${billing})`);
+        } else {
+          // NEW USER: create account automatically
+          const rawPassword = crypto.randomBytes(6).toString('base64url'); // ~8 chars, URL-safe
+          const hashedPassword = await bcrypt.hash(rawPassword, 10);
+          const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+          await db.createUser(userId, customerEmail.toLowerCase(), hashedPassword, customerName, '');
+
+          // Activate and set plan
+          await db.updateUser(userId, {
+            plan: planId,
+            stripe_subscription_id: subscriptionId,
+            stripe_customer_id: customerId,
+            is_active: 1
+          });
+
+          // Mark email as verified (they paid, so email is real)
+          await db.verifyEmailDirect(userId);
+
+          // Send welcome email with credentials
+          await emailService.sendPaymentWelcomeEmail(
+            customerEmail.toLowerCase(),
+            customerName,
+            rawPassword,
+            planId,
+            billing
+          );
+
+          console.log(`✓ Nueva cuenta creada para ${customerEmail}: plan ${planId} (${billing})`);
         }
         break;
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
-        // Downgrade to starter when subscription cancelled
         const customer = await stripe.customers.retrieve(subscription.customer);
-        const userId = customer.metadata?.userId;
-        if (userId) {
-          await db.updateUser(userId, { plan: 'starter', stripe_subscription_id: null });
-          const chatbots = await db.getChatbotsByUser(userId);
-          for (const bot of chatbots) {
-            await db.updateChatbot(bot.id, { plan: 'starter', tokens_limit: 100000 });
+        const email = customer.email;
+
+        if (email) {
+          const user = await db.getUserByEmail(email.toLowerCase());
+          if (user) {
+            // Deactivate account (no free plan)
+            await db.updateUser(user.id, {
+              plan: 'expired',
+              stripe_subscription_id: null,
+              is_active: 0
+            });
+
+            // Deactivate chatbots
+            const chatbots = await db.getChatbotsByUser(user.id);
+            for (const bot of chatbots) {
+              await db.updateChatbot(bot.id, { plan: 'expired', tokens_limit: 0 });
+            }
+
+            await emailService.sendSubscriptionCancelledEmail(email, user.name);
+            console.log(`⚠ Suscripción cancelada para ${email}, cuenta desactivada`);
           }
-          console.log(`⚠ Suscripción cancelada para usuario ${userId}, downgrade a starter`);
         }
         break;
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
-        console.log(`⚠ Pago fallido para customer ${invoice.customer}`);
+        const customerEmail = invoice.customer_email;
+        if (customerEmail) {
+          const user = await db.getUserByEmail(customerEmail.toLowerCase());
+          await emailService.sendPaymentFailedEmail(customerEmail, user?.name || '');
+          console.log(`⚠ Pago fallido para ${customerEmail}`);
+        }
         break;
       }
     }
