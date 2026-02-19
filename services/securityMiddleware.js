@@ -30,22 +30,6 @@ function sanitizeObject(obj) {
     return obj;
 }
 
-// Middleware para sanitizar body de requests
-function sanitizeBody(req, res, next) {
-    if (req.body && typeof req.body === 'object') {
-        req.body = sanitizeObject(req.body);
-    }
-    next();
-}
-
-// Middleware para sanitizar query params
-function sanitizeQuery(req, res, next) {
-    if (req.query && typeof req.query === 'object') {
-        req.query = sanitizeObject(req.query);
-    }
-    next();
-}
-
 // Validar que el chatbotId sea válido
 function validateChatbotId(req, res, next) {
     const chatbotId = req.params.chatbotId || req.body.chatbotId || req.query.chatbotId;
@@ -147,8 +131,6 @@ function verifyApiKey(req, res, next) {
 }
 
 module.exports = {
-    sanitizeBody,
-    sanitizeQuery,
     sanitizeString,
     sanitizeObject,
     validateChatbotId,
