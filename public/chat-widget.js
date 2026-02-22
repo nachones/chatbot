@@ -201,6 +201,7 @@
 
           .chat-widget-message-content {
             max-width: 85%;
+            min-width: 40px;
             padding: 12px 16px;
             border-radius: 18px;
             word-wrap: break-word;

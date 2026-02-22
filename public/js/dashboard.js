@@ -166,6 +166,7 @@
             'dashboard': 'Panel de Control',
             'conversations': 'Conversaciones',
             'leads': 'Contactos',
+            'calendar': 'Agendar con Google',
             'train': 'Entrenar Chatbot',
             'test': 'Probar Chatbot',
             'appearance': 'Apariencia',
@@ -184,6 +185,8 @@
         if (pageName === 'integrations') generateIntegrationCode();
         if (pageName === 'conversations') loadConversations();
         if (pageName === 'leads') loadLeads();
+        if (pageName === 'calendar') window.initCalendarPage && window.initCalendarPage();
+        if (pageName === 'appearance') window.loadAppearanceSettings && window.loadAppearanceSettings();
     }
 
     // --- Chatbot Selector ---
@@ -280,6 +283,12 @@
             }
             loadDashboardStats();
             generateIntegrationCode();
+
+            // Reload appearance if that page is active
+            const appearancePage = document.getElementById('page-appearance');
+            if (appearancePage && appearancePage.classList.contains('active')) {
+                window.loadAppearanceSettings && window.loadAppearanceSettings();
+            }
         }
     }
 

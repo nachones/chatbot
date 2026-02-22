@@ -42,8 +42,8 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Email y contrasena son obligatorios' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'La contrasena debe tener al menos 6 caracteres' });
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'La contrasena debe tener al menos 8 caracteres' });
     }
 
     // Validate email format
@@ -189,8 +189,8 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ error: 'Token y contrasena son requeridos' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'La contrasena debe tener al menos 6 caracteres' });
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'La contrasena debe tener al menos 8 caracteres' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

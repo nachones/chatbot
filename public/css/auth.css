@@ -196,3 +196,90 @@
   color: #333;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
+/* Password field with generate button */
+.auth-password-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.auth-password-input-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.auth-password-input-wrap .auth-input {
+  width: 100%;
+  height: 100%;
+}
+
+.auth-generate-btn {
+  flex-shrink: 0;
+  padding: 0.5rem 0.75rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.auth-generate-btn:hover {
+  filter: brightness(1.1);
+}
+
+.auth-generate-btn:active {
+  transform: scale(0.95);
+}
+
+.auth-password-hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  line-height: 1.3;
+}
+
+.auth-password-hint strong {
+  color: #ef4444;
+}
+
+/* Generated password visible */
+.auth-password-visible {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.auth-password-visible code {
+  font-family: monospace;
+  font-weight: 600;
+  color: #166534;
+  flex: 1;
+  word-break: break-all;
+}
+
+.auth-password-copy {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #6b7280;
+  transition: background 0.15s;
+}
+
+.auth-password-copy:hover {
+  background: #e5e7eb;
+}

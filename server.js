@@ -196,6 +196,14 @@ try {
   console.error('✗ Error cargando Payments routes:', error.message);
 }
 
+try {
+  const calendarRoutes = require('./routes/calendar');
+  app.use('/api/calendar', calendarRoutes);
+  console.log('✓ Calendar routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Calendar routes:', error.message);
+}
+
 // Manejo de errores
 app.use((err, req, res, next) => {
   console.error('Error en request:', err);

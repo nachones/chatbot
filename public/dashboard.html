@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Chatbot</title>
     <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/calendar.css">
     <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -51,6 +52,10 @@
             <a href="#leads" class="nav-item" data-page="leads">
                 <i class="fas fa-users"></i>
                 <span>Contactos</span>
+            </a>
+            <a href="#calendar" class="nav-item" data-page="calendar">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Agendar con Google</span>
             </a>
         </nav>
         <div class="sidebar-section">
@@ -198,7 +203,7 @@
                     </div>
                     <div class="token-stat">
                         <div class="token-label">Coste Estimado</div>
-                        <div class="token-value cost" id="estimated-cost">$0.00</div>
+                        <div class="token-value cost" id="estimated-cost">0,00€</div>
                     </div>
                 </div>
                 <div class="token-chart">
@@ -463,6 +468,192 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Calendar / Google Agenda Page -->
+        <div id="page-calendar" class="page">
+            <div class="calendar-container">
+                <!-- Estado: No conectado -->
+                <div id="calendar-not-connected" class="calendar-setup">
+                    <div class="calendar-setup-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h2>Agendar Citas con Google Calendar</h2>
+                    <p>Permite que tu chatbot gestione citas automáticamente. Los visitantes podrán agendar directamente desde el chat.</p>
+                    
+                    <div class="calendar-features-grid">
+                        <div class="calendar-feature">
+                            <i class="fas fa-clock"></i>
+                            <h4>Disponibilidad en tiempo real</h4>
+                            <p>El chatbot consulta tu calendario y ofrece huecos libres.</p>
+                        </div>
+                        <div class="calendar-feature">
+                            <i class="fas fa-robot"></i>
+                            <h4>Agendado automático</h4>
+                            <p>El visitante elige hora y el bot crea el evento.</p>
+                        </div>
+                        <div class="calendar-feature">
+                            <i class="fas fa-envelope"></i>
+                            <h4>Confirmación por email</h4>
+                            <p>Ambas partes reciben notificación del evento.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="calendar-plan-block" style="display:none;">
+                        <div class="calendar-upgrade-notice">
+                            <i class="fas fa-lock"></i>
+                            <p>Esta función está disponible en los planes <strong>Pro</strong> y <strong>Empresas</strong>.</p>
+                            <button class="btn btn-primary" onclick="window.location.href='/#pricing'">Mejorar Plan</button>
+                        </div>
+                    </div>
+                    
+                    <div id="calendar-connect-section">
+                        <button class="btn btn-primary btn-lg" id="btn-connect-google">
+                            <img src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" alt="Google Calendar" style="width:24px; height:24px; vertical-align:middle; margin-right:8px;">
+                            Conectar Google Calendar
+                        </button>
+                        <p class="calendar-hint">Se abrirá una ventana de Google para autorizar el acceso a tu calendario.</p>
+                    </div>
+                </div>
+                
+                <!-- Estado: Conectado -->
+                <div id="calendar-connected" style="display:none;">
+                    <div class="calendar-status-bar">
+                        <div class="calendar-status-info">
+                            <span class="status-dot connected"></span>
+                            <strong>Google Calendar conectado</strong>
+                            <span id="calendar-email" class="calendar-email"></span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" id="btn-disconnect-google">
+                            <i class="fas fa-unlink"></i> Desconectar
+                        </button>
+                    </div>
+                    
+                    <!-- Configuración de disponibilidad -->
+                    <div class="calendar-config-section">
+                        <h3><i class="fas fa-clock"></i> Horario de Disponibilidad</h3>
+                        <p class="section-desc">Define cuándo el chatbot puede agendar citas.</p>
+                        
+                        <div class="schedule-grid">
+                            <div class="schedule-day">
+                                <label class="schedule-toggle">
+                                    <input type="checkbox" id="day-mon" checked> <span>Lunes</span>
+                                </label>
+                                <div class="schedule-hours">
+                                    <input type="time" id="start-mon" value="09:00"> — <input type="time" id="end-mon" value="18:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <label class="schedule-toggle">
+                                    <input type="checkbox" id="day-tue" checked> <span>Martes</span>
+                                </label>
+                                <div class="schedule-hours">
+                                    <input type="time" id="start-tue" value="09:00"> — <input type="time" id="end-tue" value="18:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <label class="schedule-toggle">
+                                    <input type="checkbox" id="day-wed" checked> <span>Miércoles</span>
+                                </label>
+                                <div class="schedule-hours">
+                                    <input type="time" id="start-wed" value="09:00"> — <input type="time" id="end-wed" value="18:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <label class="schedule-toggle">
+                                    <input type="checkbox" id="day-thu" checked> <span>Jueves</span>
+                                </label>
+                                <div class="schedule-hours">
+                                    <input type="time" id="start-thu" value="09:00"> — <input type="time" id="end-thu" value="18:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <label class="schedule-toggle">
+                                    <input type="checkbox" id="day-fri" checked> <span>Viernes</span>
+                                </label>
+                                <div class="schedule-hours">
+                                    <input type="time" id="start-fri" value="09:00"> — <input type="time" id="end-fri" value="18:00">
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <label class="schedule-toggle">
+                                    <input type="checkbox" id="day-sat"> <span>Sábado</span>
+                                </label>
+                                <div class="schedule-hours">
+                                    <input type="time" id="start-sat" value="10:00" disabled> — <input type="time" id="end-sat" value="14:00" disabled>
+                                </div>
+                            </div>
+                            <div class="schedule-day">
+                                <label class="schedule-toggle">
+                                    <input type="checkbox" id="day-sun"> <span>Domingo</span>
+                                </label>
+                                <div class="schedule-hours">
+                                    <input type="time" id="start-sun" value="10:00" disabled> — <input type="time" id="end-sun" value="14:00" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="calendar-options">
+                            <div class="form-group">
+                                <label>Duración de la cita (minutos)</label>
+                                <select id="appointment-duration">
+                                    <option value="15">15 minutos</option>
+                                    <option value="30" selected>30 minutos</option>
+                                    <option value="45">45 minutos</option>
+                                    <option value="60">1 hora</option>
+                                    <option value="90">1 hora 30 min</option>
+                                    <option value="120">2 horas</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Margen entre citas (minutos)</label>
+                                <select id="appointment-buffer">
+                                    <option value="0">Sin margen</option>
+                                    <option value="5">5 minutos</option>
+                                    <option value="10" selected>10 minutos</option>
+                                    <option value="15">15 minutos</option>
+                                    <option value="30">30 minutos</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Antelación mínima para agendar</label>
+                                <select id="appointment-advance">
+                                    <option value="1">1 hora</option>
+                                    <option value="2">2 horas</option>
+                                    <option value="4" selected>4 horas</option>
+                                    <option value="24">1 día</option>
+                                    <option value="48">2 días</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Días máximos a futuro</label>
+                                <select id="appointment-max-days">
+                                    <option value="7">1 semana</option>
+                                    <option value="14" selected>2 semanas</option>
+                                    <option value="30">1 mes</option>
+                                    <option value="60">2 meses</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="btn-save-calendar-config">
+                            <i class="fas fa-save"></i> Guardar Configuración
+                        </button>
+                    </div>
+                    
+                    <!-- Próximas citas -->
+                    <div class="calendar-upcoming-section">
+                        <h3><i class="fas fa-calendar-check"></i> Próximas Citas Agendadas</h3>
+                        <div id="upcoming-appointments" class="appointments-list">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-plus"></i>
+                                <p>No hay citas agendadas. Cuando un visitante agende a través del chatbot, aparecerán aquí.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Settings Page -->
         <div id="page-settings" class="page">
             <div class="settings-container">
@@ -1359,5 +1550,6 @@
     <script src="/js/functions.js"></script>
     <script src="/js/prompts.js"></script>
     <script src="/js/integrations.js"></script>
+    <script src="/js/calendar.js"></script>
 </body>
 </html>

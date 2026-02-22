@@ -53,10 +53,10 @@ const PLANS = {
     annualAmount: 39900,
     tokens: 500000,
     messages: 10000,
-    chatbots: 10,
+    chatbots: 3,
     popular: true,
     features: [
-      '10 chatbots',
+      '3 chatbots',
       '10.000 mensajes / mes',
       '500.000 tokens incluidos',
       'Todos los modelos IA',
@@ -64,7 +64,8 @@ const PLANS = {
       'Acceso API completo',
       'Entrenamiento ilimitado',
       'Sin marca de agua',
-      'Soporte prioritario'
+      'Soporte prioritario',
+      'Agendar citas con Google Calendar'
     ],
     monthlyPriceId: process.env.STRIPE_PRO_PRICE_ID || null,
     annualPriceId: process.env.STRIPE_PRO_ANNUAL_PRICE_ID || null
@@ -87,7 +88,9 @@ const PLANS = {
       'Function calling avanzado',
       'API empresarial',
       'Entrenamiento ilimitado',
-      'Soporte dedicado'
+      'Soporte dedicado',
+      'Agendar citas con Google Calendar',
+      'Revende chatbots a tus clientes'
     ],
     annualPriceId: process.env.STRIPE_EMPRESAS_PRICE_ID || null
   }

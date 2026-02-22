@@ -1992,11 +1992,13 @@ textarea.form-control {
 
 .message-bubble {
     max-width: 70%;
+    min-width: 40px;
     padding: 10px 14px;
     border-radius: 12px;
     font-size: 14px;
     line-height: 1.4;
-    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .message-user {
@@ -3157,6 +3159,7 @@ textarea.form-control {
 
 .message-content {
     max-width: 70%;
+    min-width: 60px;
 }
 
 .message-bubble {
@@ -3165,6 +3168,10 @@ textarea.form-control {
     font-size: 14px;
     line-height: 1.5;
     box-shadow: var(--shadow-sm);
+    min-width: 40px;
+    display: inline-block;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .message-wrapper.bot .message-bubble {
@@ -4369,6 +4376,10 @@ textarea.input-modern {
 .btn-upload-modern:hover {
     background: var(--gray-50);
     border-color: var(--primary);
+}
+
+.hidden-file-input {
+    display: none;
 }
 
 /* Toggle List Modern */

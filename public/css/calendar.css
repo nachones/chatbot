@@ -1,0 +1,345 @@
+/* ========================================
+   GOOGLE CALENDAR INTEGRATION STYLES
+   ======================================== */
+
+/* Container */
+.calendar-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+}
+
+/* Setup (not connected) */
+.calendar-setup {
+    text-align: center;
+    padding: var(--space-xl) 0;
+}
+
+.calendar-setup-icon {
+    font-size: 4rem;
+    color: var(--primary);
+    margin-bottom: var(--space-lg);
+}
+
+.calendar-setup h2 {
+    font-size: 1.75rem;
+    color: var(--gray-800);
+    margin-bottom: var(--space-sm);
+}
+
+.calendar-setup > p {
+    color: var(--gray-500);
+    font-size: 1rem;
+    max-width: 500px;
+    margin: 0 auto var(--space-xl);
+    line-height: 1.6;
+}
+
+/* Feature cards grid */
+.calendar-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.calendar-feature {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    text-align: center;
+}
+
+.calendar-feature i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: var(--space-sm);
+}
+
+.calendar-feature h4 {
+    font-size: 0.95rem;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.calendar-feature p {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Connect button */
+.btn-lg {
+    padding: 0.875rem 2rem !important;
+    font-size: 1.1rem !important;
+    border-radius: var(--radius-lg) !important;
+}
+
+.calendar-hint {
+    color: var(--gray-400);
+    font-size: 0.8rem;
+    margin-top: var(--space-sm);
+}
+
+/* Upgrade notice */
+.calendar-upgrade-notice {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.calendar-upgrade-notice i {
+    font-size: 1.5rem;
+    color: #d97706;
+}
+
+.calendar-upgrade-notice p {
+    margin: 0;
+    color: #92400e;
+    font-size: 0.95rem;
+}
+
+/* Connected state */
+.calendar-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--radius-lg);
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.calendar-status-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.connected {
+    background: #16a34a;
+    box-shadow: 0 0 6px rgba(22, 163, 74, 0.4);
+}
+
+.calendar-email {
+    color: var(--gray-500);
+    font-size: 0.85rem;
+    margin-left: var(--space-sm);
+}
+
+/* Config section */
+.calendar-config-section {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.calendar-config-section h3 {
+    font-size: 1.15rem;
+    color: var(--gray-800);
+    margin-bottom: 0.25rem;
+}
+
+.calendar-config-section h3 i {
+    color: var(--primary);
+    margin-right: 0.5rem;
+}
+
+.section-desc {
+    color: var(--gray-500);
+    font-size: 0.85rem;
+    margin-bottom: var(--space-lg);
+}
+
+/* Schedule grid */
+.schedule-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xl);
+}
+
+.schedule-day {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+}
+
+.schedule-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 130px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.schedule-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+}
+
+.schedule-hours {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--gray-500);
+}
+
+.schedule-hours input[type="time"] {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    color: var(--gray-700);
+}
+
+.schedule-hours input[type="time"]:disabled {
+    opacity: 0.4;
+}
+
+/* Calendar options row */
+.calendar-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.calendar-options .form-group label {
+    display: block;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--gray-700);
+    margin-bottom: 0.4rem;
+}
+
+.calendar-options select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    background: white;
+}
+
+/* Upcoming appointments */
+.calendar-upcoming-section {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+}
+
+.calendar-upcoming-section h3 {
+    font-size: 1.15rem;
+    color: var(--gray-800);
+    margin-bottom: var(--space-lg);
+}
+
+.calendar-upcoming-section h3 i {
+    color: var(--success);
+    margin-right: 0.5rem;
+}
+
+.appointments-list .empty-state {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--gray-400);
+}
+
+.appointments-list .empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-sm);
+}
+
+.appointment-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.appointment-item:last-child {
+    border-bottom: none;
+}
+
+.appointment-date {
+    background: var(--primary);
+    color: white;
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    text-align: center;
+    min-width: 60px;
+}
+
+.appointment-date .day {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.appointment-date .month {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.85;
+}
+
+.appointment-info {
+    flex: 1;
+}
+
+.appointment-info .time {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.appointment-info .visitor {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+}
+
+.appointment-actions .btn-sm {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .calendar-features-grid {
+        grid-template-columns: 1fr;
+    }
+    .calendar-options {
+        grid-template-columns: 1fr;
+    }
+    .schedule-day {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

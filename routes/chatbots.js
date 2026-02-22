@@ -65,6 +65,21 @@ router.post('/', async (req, res) => {
     // Associate with user if authenticated
     if (req.user && req.user.id) {
       chatbotData.user_id = req.user.id;
+
+      // Check chatbot limit by plan
+      const user = await db.getUserById(req.user.id);
+      const plan = user?.plan || 'starter';
+      const planLimits = { starter: 1, pro: 3, empresas: 999 };
+      const maxChatbots = planLimits[plan] || 1;
+
+      const existingChatbots = await db.getChatbotsByUser(req.user.id);
+      if (existingChatbots.length >= maxChatbots) {
+        return res.status(403).json({ 
+          error: `Tu plan ${plan} permite máximo ${maxChatbots} chatbot${maxChatbots > 1 ? 's' : ''}. Mejora tu plan para crear más.`,
+          limitReached: true,
+          currentPlan: plan
+        });
+      }
     }
     
     const newChatbot = await db.createChatbot(chatbotData);

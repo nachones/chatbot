@@ -210,6 +210,21 @@ class DatabaseService {
       // Añadir user_id a chatbots
       this.safeAddColumn('chatbots', 'user_id', 'TEXT');
 
+      // Tabla de conexiones de Google Calendar
+      if (!(await this.tableExists('calendar_connections'))) {
+        this.db.run(`
+          CREATE TABLE IF NOT EXISTS calendar_connections (
+            chatbot_id TEXT PRIMARY KEY,
+            tokens TEXT,
+            calendar_email TEXT,
+            config TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        console.log('✓ Tabla calendar_connections creada');
+      }
+
     } catch (error) {
       console.error('Error initializing tables:', error);
     }

@@ -2,12 +2,14 @@ const OpenAI = require('openai');
 const DatabaseService = require('./databaseService');
 const TrainingService = require('./trainingService');
 const llmService = require('./llmService');
+const CalendarService = require('./calendarService');
 
 class ChatbotService {
   constructor() {
     this.openai = null;
     this.db = new DatabaseService();
     this.trainingService = new TrainingService();
+    this.calendarService = new CalendarService();
     this.systemPrompt = 'Eres un asistente inteligente y útil. Responde de manera clara y concisa.';
   }
 
@@ -147,6 +149,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
       // Obtener funciones habilitadas del chatbot
       let tools = null;
       let availableFunctions = [];
+      let calendarConnected = false;
       if (chatbotId) {
         const functions = await this.db.getFunctions(chatbotId);
         availableFunctions = functions.filter(f => f.enabled);
@@ -172,6 +175,17 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
               }
             }
           }));
+        }
+
+        // Inject Google Calendar tools if connected
+        try {
+          calendarConnected = await this.calendarService.isConnected(chatbotId);
+          if (calendarConnected) {
+            const calendarTools = CalendarService.getCalendarTools();
+            tools = tools ? [...tools, ...calendarTools] : calendarTools;
+          }
+        } catch (e) {
+          console.warn('Error checking calendar connection:', e.message);
         }
       }
 
@@ -201,27 +215,48 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
           const functionName = toolCall.function.name;
           const functionArgs = JSON.parse(toolCall.function.arguments);
           
-          // Buscar la función en las disponibles
-          const functionDef = availableFunctions.find(f => f.name === functionName);
-          
-          if (functionDef) {
+          // Check if it's a calendar function
+          const isCalendarFunction = ['check_calendar_availability', 'book_calendar_appointment'].includes(functionName);
+
+          if (isCalendarFunction && calendarConnected) {
             try {
-              // Ejecutar la función
-              const functionResult = await this.executeFunction(functionDef, functionArgs);
-              
-              // Añadir el resultado al historial de mensajes
+              const calendarResult = await this.calendarService.executeCalendarTool(chatbotId, functionName, functionArgs);
               messages.push({
                 role: 'tool',
                 tool_call_id: toolCall.id,
-                content: JSON.stringify(functionResult)
+                content: JSON.stringify(calendarResult)
               });
             } catch (error) {
-              console.error(`Error ejecutando función ${functionName}:`, error);
+              console.error(`Error ejecutando función calendario ${functionName}:`, error);
               messages.push({
                 role: 'tool',
                 tool_call_id: toolCall.id,
                 content: JSON.stringify({ error: error.message })
               });
+            }
+          } else {
+            // Buscar la función en las disponibles (HTTP functions)
+            const functionDef = availableFunctions.find(f => f.name === functionName);
+          
+            if (functionDef) {
+              try {
+                // Ejecutar la función
+                const functionResult = await this.executeFunction(functionDef, functionArgs);
+              
+                // Añadir el resultado al historial de mensajes
+                messages.push({
+                  role: 'tool',
+                  tool_call_id: toolCall.id,
+                  content: JSON.stringify(functionResult)
+                });
+              } catch (error) {
+                console.error(`Error ejecutando función ${functionName}:`, error);
+                messages.push({
+                  role: 'tool',
+                  tool_call_id: toolCall.id,
+                  content: JSON.stringify({ error: error.message })
+                });
+              }
             }
           }
         }

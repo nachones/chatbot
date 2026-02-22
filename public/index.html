@@ -868,7 +868,7 @@
           <h3>Pro</h3>
           <div class="pricing-price" id="price-pro">39,95€<span>/mes</span></div>
           <ul class="pricing-features">
-            <li><i class="fas fa-check"></i> 10 chatbots</li>
+            <li><i class="fas fa-check"></i> 3 chatbots</li>
             <li><i class="fas fa-check"></i> 10.000 mensajes / mes</li>
             <li><i class="fas fa-check"></i> 500.000 tokens incluidos</li>
             <li><i class="fas fa-check"></i> Todos los modelos IA</li>
@@ -877,13 +877,15 @@
             <li><i class="fas fa-check"></i> Acceso API completo</li>
             <li><i class="fas fa-check"></i> Sin marca de agua</li>
             <li><i class="fas fa-check"></i> Soporte prioritario</li>
+            <li><i class="fas fa-check" style="color:#16a34a;"></i> <strong>Agendar citas con Google Calendar</strong></li>
           </ul>
           <button class="pricing-button btn-checkout-plan" data-plan="pro">
             Empezar con Pro
           </button>
         </div>
         
-        <div class="pricing-card">
+        <div class="pricing-card featured">
+          <div class="pricing-badge" style="background:linear-gradient(135deg, #f59e0b, #d97706);">Crea Tu Negocio</div>
           <h3>Empresas</h3>
           <div class="pricing-price" id="price-empresas">850€<span>/año</span></div>
           <ul class="pricing-features">
@@ -896,12 +898,15 @@
             <li><i class="fas fa-check"></i> API empresarial</li>
             <li><i class="fas fa-check"></i> Entrenamiento ilimitado</li>
             <li><i class="fas fa-check"></i> Soporte dedicado</li>
+            <li><i class="fas fa-check" style="color:#16a34a;"></i> <strong>Agendar citas con Google Calendar</strong></li>
+            <li><i class="fas fa-check" style="color:#16a34a;"></i> <strong>Revende chatbots a tus clientes</strong></li>
           </ul>
           <button class="pricing-button btn-checkout-plan" data-plan="empresas">
             Empezar con Empresas
           </button>
         </div>
       </div>
+      <p style="text-align:center; color:#9ca3af; font-size:13px; margin-top:12px;">Precios en EUR (€). Si pagas en otra moneda, tu banco aplicará el tipo de cambio del día.</p>
     </div>
   </section>
 
@@ -1008,7 +1013,13 @@
         </div>
         <div class="auth-field-last">
           <label class="auth-label">Contraseña</label>
-          <input type="password" id="login-password" required placeholder="Tu contraseña" class="auth-input">
+          <div class="auth-password-row">
+            <div class="auth-password-input-wrap">
+              <input type="password" id="login-password" required placeholder="Mín. 8 caract. sin $ % & #" class="auth-input">
+            </div>
+            <button type="button" class="auth-generate-btn" onclick="generateSecurePassword('login-password')" title="Generar contraseña segura">🔑 Generar</button>
+          </div>
+          <small class="auth-password-hint">Mín. 8 caracteres. Evita símbolos: <strong>$ % & # { } | \ ` ~</strong></small>
         </div>
         <div id="login-error" class="auth-error"></div>
         <div id="login-verification" style="display:none;" class="auth-info">
@@ -1035,8 +1046,14 @@
           <input type="text" id="register-company" placeholder="Tu empresa" class="auth-input">
         </div>
         <div class="auth-field-last">
-          <label class="auth-label">Contraseña * (mín. 6 caracteres)</label>
-          <input type="password" id="register-password" required minlength="6" placeholder="Crea una contraseña" class="auth-input">
+          <label class="auth-label">Contraseña * (mín. 8 caracteres)</label>
+          <div class="auth-password-row">
+            <div class="auth-password-input-wrap">
+              <input type="password" id="register-password" required minlength="8" placeholder="Mín. 8 caract. sin $ % & #" class="auth-input">
+            </div>
+            <button type="button" class="auth-generate-btn" onclick="generateSecurePassword('register-password')" title="Generar contraseña segura">🔑 Generar</button>
+          </div>
+          <small class="auth-password-hint">Usa letras, números y caracteres simples. Evita: <strong>$ % & # { } | \\ ` ~</strong></small>
         </div>
         <div id="register-error" class="auth-error"></div>
         <div id="register-success" class="auth-success" style="display:none;"></div>
@@ -1062,8 +1079,14 @@
       <form id="reset-form" style="display:none">
         <p style="color:#555; margin-bottom:20px; font-size:14px;">Introduce tu nueva contraseña.</p>
         <div class="auth-field-last">
-          <label class="auth-label">Nueva contraseña (mín. 6 caracteres)</label>
-          <input type="password" id="reset-password" required minlength="6" placeholder="Nueva contraseña" class="auth-input">
+          <label class="auth-label">Nueva contraseña (mín. 8 caracteres)</label>
+          <div class="auth-password-row">
+            <div class="auth-password-input-wrap">
+              <input type="password" id="reset-password" required minlength="8" placeholder="Mín. 8 caract. sin $ % & #" class="auth-input">
+            </div>
+            <button type="button" class="auth-generate-btn" onclick="generateSecurePassword('reset-password')" title="Generar contraseña segura">🔑 Generar</button>
+          </div>
+          <small class="auth-password-hint">Usa letras, números y caracteres simples. Evita: <strong>$ % & # { } | \\ ` ~</strong></small>
         </div>
         <div id="reset-error" class="auth-error"></div>
         <div id="reset-success" class="auth-success" style="display:none;"></div>
@@ -1081,6 +1104,50 @@
   </div>
 
   <script>
+  // Generador de contraseñas seguras (sin caracteres problemáticos)
+  function generateSecurePassword(inputId) {
+    const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const lower = 'abcdefghjkmnpqrstuvwxyz';
+    const digits = '23456789';
+    const safe = '!?@._-+:=';
+    const all = upper + lower + digits + safe;
+
+    // Garantizar al menos uno de cada tipo
+    let pass = '';
+    pass += upper[Math.floor(Math.random() * upper.length)];
+    pass += lower[Math.floor(Math.random() * lower.length)];
+    pass += digits[Math.floor(Math.random() * digits.length)];
+    pass += safe[Math.floor(Math.random() * safe.length)];
+
+    for (let i = 4; i < 12; i++) {
+      pass += all[Math.floor(Math.random() * all.length)];
+    }
+    // Mezclar
+    pass = pass.split('').sort(() => Math.random() - 0.5).join('');
+
+    const input = document.getElementById(inputId);
+    input.type = 'text';
+    input.value = pass;
+
+    // Mostrar la contraseña generada debajo
+    const parent = input.closest('.auth-field-last');
+    let preview = parent.querySelector('.auth-password-visible');
+    if (preview) preview.remove();
+
+    preview = document.createElement('div');
+    preview.className = 'auth-password-visible';
+    preview.innerHTML = '<code>' + pass + '</code><button type="button" class="auth-password-copy" title="Copiar">📋</button>';
+    preview.querySelector('.auth-password-copy').onclick = function() {
+      navigator.clipboard.writeText(pass);
+      this.textContent = '✓';
+      setTimeout(() => this.textContent = '📋', 1500);
+    };
+    parent.appendChild(preview);
+
+    // Tras 8s volver a ocultar el input
+    setTimeout(() => { input.type = 'password'; }, 8000);
+  }
+
   (function() {
     'use strict';
     const modal = document.getElementById('auth-modal');
