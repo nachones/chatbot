@@ -18,6 +18,10 @@
     bindEvents();
   };
 
+  // Helper to show/hide elements (handles .initially-hidden class)
+  function showEl(el) { if (el) { el.classList.remove('initially-hidden'); el.style.display = ''; } }
+  function hideEl(el) { if (el) el.style.display = 'none'; }
+
   // ---- Check if Google Calendar is connected ----
   async function checkCalendarStatus() {
     try {
@@ -32,24 +36,24 @@
 
       if (data.planBlocked) {
         // Plan starter — block
-        notConnected.style.display = '';
-        connected.style.display = 'none';
-        planBlock.style.display = '';
-        connectSection.style.display = 'none';
+        showEl(notConnected);
+        hideEl(connected);
+        showEl(planBlock);
+        hideEl(connectSection);
         return;
       }
 
       if (data.connected) {
-        notConnected.style.display = 'none';
-        connected.style.display = '';
+        hideEl(notConnected);
+        showEl(connected);
         document.getElementById('calendar-email').textContent = data.email || '';
         loadCalendarConfig(data.config);
         loadUpcomingAppointments();
       } else {
-        notConnected.style.display = '';
-        connected.style.display = 'none';
-        planBlock.style.display = 'none';
-        connectSection.style.display = '';
+        showEl(notConnected);
+        hideEl(connected);
+        hideEl(planBlock);
+        showEl(connectSection);
       }
     } catch (err) {
       console.error('Error checking calendar status:', err);
