@@ -83,8 +83,8 @@ router.get('/config', authMiddleware, async (req, res) => {
   }
 });
 
-// Test API connection
-router.post('/test-connection', async (req, res) => {
+// Test API connection (requires auth to prevent abuse)
+router.post('/test-connection', authMiddleware, async (req, res) => {
   try {
     const { apiKey, provider } = req.body;
     

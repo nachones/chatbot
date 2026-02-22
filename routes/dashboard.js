@@ -157,6 +157,13 @@ router.get('/conversations', async (req, res) => {
 router.get('/conversations/:sessionId', async (req, res) => {
   try {
     const { sessionId } = req.params;
+    
+    // Verify conversation belongs to a chatbot owned by this user
+    const owns = await db.verifyConversationOwnership(sessionId, req.user.id);
+    if (!owns) {
+      return res.status(403).json({ error: 'No tienes acceso a esta conversación' });
+    }
+    
     const conversation = await db.getConversationHistory(sessionId);
     
     res.json({
@@ -173,6 +180,13 @@ router.get('/conversations/:sessionId', async (req, res) => {
 router.delete('/conversations/:sessionId', async (req, res) => {
   try {
     const { sessionId } = req.params;
+    
+    // Verify conversation belongs to a chatbot owned by this user
+    const owns = await db.verifyConversationOwnership(sessionId, req.user.id);
+    if (!owns) {
+      return res.status(403).json({ error: 'No tienes acceso a esta conversación' });
+    }
+    
     await db.deleteConversation(sessionId);
     
     res.json({

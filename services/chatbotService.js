@@ -72,7 +72,6 @@ class ChatbotService {
       if (chatbotId && chatbotConfig) {
         const plan = chatbotConfig.plan || 'starter';
         const { tokensLimit } = getPlanLimits(plan);
-        const used = chatbotConfig.tokens_used || 0;
 
         // Verificar si necesita reset mensual
         if (chatbotConfig.reset_date) {
@@ -82,7 +81,9 @@ class ChatbotService {
           }
         }
 
-        if (tokensLimit < 999999999 && used >= tokensLimit) {
+        // Atomic check to prevent race conditions on concurrent requests
+        const quota = await this.db.checkAndReserveTokens(chatbotId, tokensLimit);
+        if (!quota.allowed) {
           throw new Error(`Has alcanzado el límite de tokens de tu plan. Actualiza tu plan para seguir usando el chatbot.`);
         }
       }
@@ -203,7 +204,18 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
         // Ejecutar cada función solicitada
         for (const toolCall of result.toolCalls) {
           const functionName = toolCall.function.name;
-          const functionArgs = JSON.parse(toolCall.function.arguments);
+          let functionArgs;
+          try {
+            functionArgs = JSON.parse(toolCall.function.arguments);
+          } catch (parseErr) {
+            console.error(`Error parsing arguments for ${functionName}:`, parseErr.message);
+            messages.push({
+              role: 'tool',
+              tool_call_id: toolCall.id,
+              content: JSON.stringify({ error: 'Argumentos inválidos recibidos del modelo' })
+            });
+            continue;
+          }
           
           // Check if it's a calendar function
           const isCalendarFunction = ['check_calendar_availability', 'book_calendar_appointment'].includes(functionName);
@@ -293,8 +305,45 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
     }
   }
 
+  // Validate URL is not targeting internal/private networks (SSRF protection)
+  _isUrlSafe(url) {
+    try {
+      const parsed = new URL(url);
+      const hostname = parsed.hostname.toLowerCase();
+      
+      // Block private/internal hostnames
+      const blockedHostnames = ['localhost', '127.0.0.1', '0.0.0.0', '[::1]', 'metadata.google.internal'];
+      if (blockedHostnames.includes(hostname)) return false;
+      
+      // Block private IP ranges
+      const parts = hostname.split('.');
+      if (parts.length === 4 && parts.every(p => !isNaN(p))) {
+        const [a, b] = parts.map(Number);
+        if (a === 10) return false;                           // 10.x.x.x
+        if (a === 172 && b >= 16 && b <= 31) return false;    // 172.16-31.x.x
+        if (a === 192 && b === 168) return false;             // 192.168.x.x
+        if (a === 169 && b === 254) return false;             // 169.254.x.x (link-local)
+      }
+      
+      // Block non-http(s) protocols
+      if (!['http:', 'https:'].includes(parsed.protocol)) return false;
+      
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async executeFunction(functionDef, args) {
     try {
+      // SSRF protection: validate endpoint URL
+      if (!this._isUrlSafe(functionDef.endpoint)) {
+        return {
+          error: true,
+          message: 'URL de endpoint no permitida (IPs privadas/localhost bloqueados)'
+        };
+      }
+
       const axios = require('axios');
       
       // Preparar headers
@@ -375,9 +424,6 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
 
   async updateConfig(config) {
     try {
-      if (config.apiKey) {
-        await this.initialize(config.apiKey);
-      }
       if (config.systemPrompt) {
         this.systemPrompt = config.systemPrompt;
       }

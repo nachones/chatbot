@@ -5,7 +5,25 @@ const { getPlanLimits } = require('./planConfig');
 class DatabaseService {
   constructor() {
     this.db = new sqlite3.Database(path.join(__dirname, '../database.sqlite'));
-    this.initTables();
+    // Enable foreign keys and WAL mode for better concurrency
+    this.db.run('PRAGMA foreign_keys = ON');
+    this.db.run('PRAGMA journal_mode = WAL');
+    this.ready = this.initTables();
+  }
+
+  // Wait for DB to be ready (call from server.js before listening)
+  async waitReady() {
+    return this.ready;
+  }
+
+  // Close the database connection gracefully
+  close() {
+    return new Promise((resolve, reject) => {
+      this.db.close((err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
   }
 
   async tableExists(tableName) {
@@ -226,9 +244,38 @@ class DatabaseService {
         console.log('✓ Tabla calendar_connections creada');
       }
 
+      // ---- Create indexes for performance ----
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_conversations_session ON conversations(session_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_conversations_chatbot ON conversations(chatbot_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_conversations_timestamp ON conversations(timestamp)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_training_data_chatbot ON training_data(chatbot_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_training_data_training ON training_data(training_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_leads_chatbot ON leads(chatbot_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_chatbots_user ON chatbots(user_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_training_jobs_chatbot ON training_jobs(chatbot_id)');
+      this.db.run('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
+
+      console.log('✓ Base de datos inicializada correctamente');
     } catch (error) {
       console.error('Error initializing tables:', error);
     }
+  }
+
+  // Verify that a conversation (by sessionId) belongs to a chatbot owned by the user
+  async verifyConversationOwnership(sessionId, userId) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        `SELECT c.chatbot_id FROM conversations c
+         INNER JOIN chatbots cb ON c.chatbot_id = cb.id
+         WHERE c.session_id = ? AND cb.user_id = ?
+         LIMIT 1`,
+        [sessionId, userId],
+        (err, row) => {
+          if (err) reject(err);
+          else resolve(!!row);
+        }
+      );
+    });
   }
 
   async saveMessage(sessionId, role, content, chatbotId = null) {
@@ -538,6 +585,40 @@ class DatabaseService {
           else resolve(this.changes);
         }
       );
+    });
+  }
+
+  // Atomic check-and-reserve tokens to prevent race conditions
+  // Returns { allowed: true } if under limit, { allowed: false } if over limit
+  async checkAndReserveTokens(chatbotId, tokensLimit) {
+    return new Promise((resolve, reject) => {
+      this.db.serialize(() => {
+        this.db.run('BEGIN IMMEDIATE', (err) => {
+          if (err) return reject(err);
+
+          this.db.get(
+            'SELECT tokens_used FROM chatbots WHERE id = ?',
+            [chatbotId],
+            (err, row) => {
+              if (err) {
+                this.db.run('ROLLBACK');
+                return reject(err);
+              }
+              const used = row ? (row.tokens_used || 0) : 0;
+              if (tokensLimit < 999999999 && used >= tokensLimit) {
+                this.db.run('ROLLBACK', () => {
+                  resolve({ allowed: false, used });
+                });
+              } else {
+                this.db.run('COMMIT', (err) => {
+                  if (err) return reject(err);
+                  resolve({ allowed: true, used });
+                });
+              }
+            }
+          );
+        });
+      });
     });
   }
 

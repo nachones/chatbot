@@ -9,6 +9,8 @@ require('dotenv').config();
 
 // Import security middleware
 const { requestLogger } = require('./services/securityMiddleware');
+const db = require('./services/databaseService');
+const logger = require('./services/logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -98,13 +100,27 @@ if (isProduction) {
 
 app.use(express.static('public'));
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
+// Health check (verifies DB connectivity)
+app.get('/health', async (req, res) => {
+  try {
+    await new Promise((resolve, reject) => {
+      db.db.get('SELECT 1', (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      error: 'Database unavailable',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Rutas básicas
@@ -250,21 +266,47 @@ server.on('error', (error) => {
   process.exit(1);
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('\nRecibida se\u00f1al SIGTERM. Cerrando servidor...');
-  server.close(() => {
+// ---- Graceful shutdown ----
+const SHUTDOWN_TIMEOUT = 10000;
+
+function gracefulShutdown(signal) {
+  console.log(`\nRecibida se\u00f1al ${signal}. Cerrando servidor...`);
+  
+  const forceExit = setTimeout(() => {
+    console.error('Shutdown forzado por timeout');
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT);
+  forceExit.unref();
+  
+  server.close(async () => {
+    try {
+      await db.close();
+      console.log('Base de datos cerrada correctamente.');
+    } catch (err) {
+      console.error('Error cerrando base de datos:', err);
+    }
     console.log('Servidor cerrado correctamente.');
     process.exit(0);
   });
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// ---- Unhandled errors ----
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION:', reason);
+  if (logger && logger.error) {
+    logger.error('unhandledRejection', { reason: String(reason) });
+  }
 });
 
-process.on('SIGINT', () => {
-  console.log('\nRecibida se\u00f1al SIGINT. Cerrando servidor...');
-  server.close(() => {
-    console.log('Servidor cerrado correctamente.');
-    process.exit(0);
-  });
+process.on('uncaughtException', (error) => {
+  console.error('UNCAUGHT EXCEPTION:', error);
+  if (logger && logger.error) {
+    logger.error('uncaughtException', { error: error.message, stack: error.stack });
+  }
+  setTimeout(() => process.exit(1), 1000);
 });
 
 module.exports = app;
