@@ -38,8 +38,8 @@ router.post('/chat', async (req, res) => {
   }
 });
 
-// Endpoint para obtener historial de conversación
-router.get('/history/:sessionId', async (req, res) => {
+// Endpoint para obtener historial de conversación (requires auth)
+router.get('/history/:sessionId', authMiddleware, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const history = await chatbotService.getConversationHistory(sessionId);
@@ -109,7 +109,7 @@ router.post('/test-connection', async (req, res) => {
   } catch (error) {
     console.error('Error testing connection:', error);
     res.status(400).json({ 
-      error: 'Error de conexión: ' + (error.message || 'API key inválida')
+      error: 'Error de conexión. Verifica tu API key e inténtalo de nuevo.'
     });
   }
 });

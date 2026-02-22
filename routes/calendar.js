@@ -36,7 +36,7 @@ router.get('/auth-url', authMiddleware, async (req, res) => {
     res.json({ url });
   } catch (error) {
     console.error('Error getting auth URL:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener URL de autorización' });
   }
 });
 
@@ -48,7 +48,16 @@ router.get('/callback', async (req, res) => {
       return res.redirect('/dashboard.html#calendar?error=missing_params');
     }
 
-    const { chatbotId, userId } = JSON.parse(state);
+    let chatbotId, userId;
+    try {
+      ({ chatbotId, userId } = JSON.parse(state));
+    } catch (e) {
+      return res.redirect('/dashboard.html#calendar?error=invalid_state');
+    }
+
+    if (!chatbotId || !userId) {
+      return res.redirect('/dashboard.html#calendar?error=invalid_state');
+    }
 
     // Exchange code for tokens
     const { tokens, email } = await calendarService.handleCallback(code);
@@ -110,7 +119,7 @@ router.get('/status', authMiddleware, async (req, res) => {
     res.json(status);
   } catch (error) {
     console.error('Error getting status:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener estado del calendario' });
   }
 });
 
@@ -135,7 +144,7 @@ router.post('/config', authMiddleware, async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error('Error saving config:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al guardar configuración' });
   }
 });
 
@@ -151,7 +160,7 @@ router.get('/config', authMiddleware, async (req, res) => {
     res.json({ config });
   } catch (error) {
     console.error('Error getting config:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al obtener configuración' });
   }
 });
 
@@ -167,7 +176,7 @@ router.get('/availability', async (req, res) => {
     res.json(availability);
   } catch (error) {
     console.error('Error checking availability:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al comprobar disponibilidad' });
   }
 });
 
@@ -185,7 +194,7 @@ router.post('/book', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Error booking appointment:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al reservar cita' });
   }
 });
 
@@ -207,7 +216,7 @@ router.get('/appointments', authMiddleware, async (req, res) => {
     res.json({ appointments });
   } catch (error) {
     console.error('Error getting appointments:', error);
-    res.status(500).json({ error: error.message, appointments: [] });
+    res.status(500).json({ error: 'Error al obtener citas', appointments: [] });
   }
 });
 
@@ -229,7 +238,7 @@ router.post('/disconnect', authMiddleware, async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error('Disconnect error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al desconectar calendario' });
   }
 });
 

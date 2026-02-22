@@ -61,8 +61,11 @@ app.use(cors({
 
 // Security Middleware
 app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
+  contentSecurityPolicy: false, // Widget needs to be embedded in external sites
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow widget JS to be loaded cross-origin
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  hsts: isProduction ? { maxAge: 31536000, includeSubDomains: true } : false
 }));
 
 const limiter = rateLimit({
@@ -72,6 +75,18 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 app.use('/api/', limiter);
+
+// Stricter rate limit for auth endpoints (brute force protection)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20, // 20 attempts per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiados intentos. Inténtalo de nuevo en unos minutos.' }
+});
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/forgot-password', authLimiter);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -212,7 +227,7 @@ try {
 // Manejo de errores
 app.use((err, req, res, next) => {
   console.error('Error en request:', err);
-  res.status(500).json({ error: 'Error interno del servidor', message: err.message });
+  res.status(500).json({ error: 'Error interno del servidor' });
 });
 
 // 404

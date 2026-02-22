@@ -56,10 +56,10 @@ router.post('/register', async (req, res) => {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user
-    const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
     await db.createUser(userId, email.toLowerCase(), hashedPassword, name || '', company || '');
 
     // Email verification flow
@@ -190,7 +190,7 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ error: 'La contrasena debe tener al menos 8 caracteres' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
     const user = await db.resetPassword(token, hashedPassword);
 
     if (!user) {

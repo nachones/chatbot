@@ -17,7 +17,7 @@ class TrainingService {
   }
 
   async storeTrainingData(chunks, chatbotId = null) {
-    const trainingId = 'training_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const trainingId = 'training_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
 
     try {
       // Generar embeddings para cada chunk
@@ -44,7 +44,7 @@ class TrainingService {
 
   async startTraining(trainingId, modelType = 'fine-tune') {
 
-    const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const jobId = 'job_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
 
     try {
       // Crear registro del trabajo

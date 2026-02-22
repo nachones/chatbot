@@ -234,7 +234,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     }
   } catch (err) {
     console.error('Error verificando webhook:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    return res.status(400).send('Webhook signature verification failed');
   }
 
   try {
@@ -285,7 +285,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         } else {
           // NEW USER: create account automatically
           const rawPassword = crypto.randomBytes(6).toString('base64url'); // ~8 chars, URL-safe
-          const hashedPassword = await bcrypt.hash(rawPassword, 10);
+          const hashedPassword = await bcrypt.hash(rawPassword, 12);
           const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
 
           await db.createUser(userId, customerEmail.toLowerCase(), hashedPassword, customerName, '');

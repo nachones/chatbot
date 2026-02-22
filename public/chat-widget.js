@@ -623,7 +623,25 @@
       // Renderizar Markdown si es mensaje del bot y marked está disponible
       if (role === 'bot' && typeof marked !== 'undefined') {
         try {
-          contentDiv.innerHTML = marked.parse(content);
+          // Configure marked to not allow raw HTML (XSS prevention)
+          const rendered = marked.parse(content, {
+            breaks: true,
+            gfm: true,
+            sanitize: true // deprecated but safe fallback
+          });
+          // Strip any remaining HTML tags that could execute scripts
+          const temp = document.createElement('div');
+          temp.innerHTML = rendered;
+          // Remove script tags and event handlers
+          temp.querySelectorAll('script,iframe,object,embed,form').forEach(el => el.remove());
+          temp.querySelectorAll('*').forEach(el => {
+            for (const attr of [...el.attributes]) {
+              if (attr.name.startsWith('on') || attr.value.startsWith('javascript:')) {
+                el.removeAttribute(attr.name);
+              }
+            }
+          });
+          contentDiv.innerHTML = temp.innerHTML;
         } catch (e) {
           console.warn('Error parsing markdown:', e);
           contentDiv.textContent = content;

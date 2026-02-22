@@ -17,6 +17,14 @@ router.post('/', async (req, res) => {
       });
     }
 
+    // Validar longitudes (prevenir spam/abuse)
+    if (name.length > 200 || email.length > 320 || (phone && phone.length > 30)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Datos demasiado largos'
+      });
+    }
+
     // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {

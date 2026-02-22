@@ -21,7 +21,12 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
+    // Sanitize filename: remove path separators, allow only safe chars
+    const safeName = file.originalname
+      .replace(/[/\\]/g, '')
+      .replace(/\.\./g, '')
+      .replace(/[^a-zA-Z0-9._-]/g, '_');
+    cb(null, Date.now() + '-' + safeName);
   }
 });
 
