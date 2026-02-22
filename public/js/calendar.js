@@ -6,15 +6,7 @@
 
   const API_URL = window.API_URL || '/api';
 
-  function authFetch(url, opts = {}) {
-    const token = localStorage.getItem('miabot_token');
-    opts.headers = opts.headers || {};
-    opts.headers['Authorization'] = 'Bearer ' + token;
-    if (opts.body && typeof opts.body === 'string') {
-      opts.headers['Content-Type'] = 'application/json';
-    }
-    return fetch(url, opts);
-  }
+  // authFetch → utils.js
 
   function getChatbotId() {
     return window.dashboardApp ? window.dashboardApp.getCurrentChatbotId() : null;

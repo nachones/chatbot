@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
+const { verifyOwnership } = require('../services/planConfig');
 
-const db = new DatabaseService();
-
-// POST /api/leads - Guardar nuevo lead
+// POST /api/leads - Guardar nuevo lead (público - desde el widget)
 router.post('/', async (req, res) => {
   try {
-    const { name, email, phone, chatbotId, metadata } = req.body;
+    const { name, email, phone, chatbotId } = req.body;
 
     // Validación básica
     if (!name || !email) {
@@ -36,8 +35,6 @@ router.post('/', async (req, res) => {
       created_at: new Date().toISOString()
     });
 
-    console.log(`✓ Lead guardado: ${name} (${email}) - ID: ${leadId}`);
-
     res.json({
       success: true,
       message: 'Lead guardado correctamente',
@@ -48,16 +45,20 @@ router.post('/', async (req, res) => {
     console.error('Error guardando lead:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al guardar el lead',
-      message: error.message
+      error: 'Error al guardar el lead'
     });
   }
 });
 
-// GET /api/leads - Obtener todos los leads (requires auth)
+// GET /api/leads - Obtener todos los leads (requires auth + ownership)
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { chatbotId } = req.query;
+
+    if (chatbotId) {
+      const owns = await verifyOwnership(db, chatbotId, req.user.id);
+      if (!owns) return res.status(403).json({ success: false, error: 'No tienes acceso a este chatbot' });
+    }
 
     const leads = await db.getLeads(chatbotId);
 
@@ -71,8 +72,7 @@ router.get('/', authMiddleware, async (req, res) => {
     console.error('Error obteniendo leads:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener leads',
-      message: error.message
+      error: 'Error al obtener leads'
     });
   }
 });
@@ -91,6 +91,12 @@ router.get('/:id', authMiddleware, async (req, res) => {
       });
     }
 
+    // Verify ownership via chatbot_id
+    if (lead.chatbot_id) {
+      const owns = await verifyOwnership(db, lead.chatbot_id, req.user.id);
+      if (!owns) return res.status(403).json({ success: false, error: 'No tienes acceso a este lead' });
+    }
+
     res.json({
       success: true,
       lead: lead
@@ -100,16 +106,23 @@ router.get('/:id', authMiddleware, async (req, res) => {
     console.error('Error obteniendo lead:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al obtener el lead',
-      message: error.message
+      error: 'Error al obtener el lead'
     });
   }
 });
 
-// DELETE /api/leads/:id - Eliminar un lead (requires auth)
+// DELETE /api/leads/:id - Eliminar un lead (requires auth + ownership)
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
+
+    const lead = await db.getLead(id);
+    if (!lead) return res.status(404).json({ success: false, error: 'Lead no encontrado' });
+
+    if (lead.chatbot_id) {
+      const owns = await verifyOwnership(db, lead.chatbot_id, req.user.id);
+      if (!owns) return res.status(403).json({ success: false, error: 'No tienes acceso a este lead' });
+    }
 
     await db.deleteLead(id);
 
@@ -122,8 +135,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     console.error('Error eliminando lead:', error);
     res.status(500).json({
       success: false,
-      error: 'Error al eliminar el lead',
-      message: error.message
+      error: 'Error al eliminar el lead'
     });
   }
 });

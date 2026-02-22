@@ -58,7 +58,7 @@
         if (!container) return;
 
         try {
-            const response = await fetch(`${API_URL}/quick-prompts?chatbotId=${currentChatbotId}`);
+            const response = await authFetch(`${API_URL}/quick-prompts?chatbotId=${currentChatbotId}`);
             const data = await response.json();
 
             if (data.success && data.prompts && data.prompts.length > 0) {
@@ -142,7 +142,7 @@
 
     async function loadPromptData(promptId) {
         try {
-            const response = await fetch(`${API_URL}/quick-prompts/${promptId}`);
+            const response = await authFetch(`${API_URL}/quick-prompts/${promptId}`);
             const data = await response.json();
 
             if (data.success && data.prompt) {
@@ -199,7 +199,7 @@
                 ? `${API_URL}/quick-prompts/${editingPromptId}`
                 : `${API_URL}/quick-prompts`;
             
-            const response = await fetch(url, {
+            const response = await authFetch(url, {
                 method: editingPromptId ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(promptData)
@@ -232,7 +232,7 @@
         }
 
         try {
-            const response = await fetch(`${API_URL}/quick-prompts/${id}`, {
+            const response = await authFetch(`${API_URL}/quick-prompts/${id}`, {
                 method: 'DELETE'
             });
 
@@ -250,13 +250,7 @@
         }
     };
 
-    // Utility functions
-    function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // Utility functions (escapeHtml, showSuccess, showError → utils.js)
 
     function isValidUrl(string) {
         try {
@@ -264,18 +258,6 @@
             return true;
         } catch (_) {
             return false;
-        }
-    }
-
-    function showSuccess(message) {
-        if (window.dashboardApp && window.dashboardApp.showSuccess) {
-            window.dashboardApp.showSuccess(message);
-        }
-    }
-
-    function showError(message) {
-        if (window.dashboardApp && window.dashboardApp.showError) {
-            window.dashboardApp.showError(message);
         }
     }
 

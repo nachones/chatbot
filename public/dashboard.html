@@ -498,7 +498,7 @@
                         </div>
                     </div>
                     
-                    <div id="calendar-plan-block" style="display:none;">
+                    <div id="calendar-plan-block" class="initially-hidden">
                         <div class="calendar-upgrade-notice">
                             <i class="fas fa-lock"></i>
                             <p>Esta función está disponible en los planes <strong>Pro</strong> y <strong>Empresas</strong>.</p>
@@ -508,7 +508,7 @@
                     
                     <div id="calendar-connect-section">
                         <button class="btn btn-primary btn-lg" id="btn-connect-google">
-                            <img src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" alt="Google Calendar" style="width:24px; height:24px; vertical-align:middle; margin-right:8px;">
+                            <img src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" alt="Google Calendar" class="google-calendar-icon">
                             Conectar Google Calendar
                         </button>
                         <p class="calendar-hint">Se abrirá una ventana de Google para autorizar el acceso a tu calendario.</p>
@@ -516,7 +516,7 @@
                 </div>
                 
                 <!-- Estado: Conectado -->
-                <div id="calendar-connected" style="display:none;">
+                <div id="calendar-connected" class="initially-hidden">
                     <div class="calendar-status-bar">
                         <div class="calendar-status-info">
                             <span class="status-dot connected"></span>
@@ -539,7 +539,7 @@
                                     <input type="checkbox" id="day-mon" checked> <span>Lunes</span>
                                 </label>
                                 <div class="schedule-hours">
-                                    <input type="time" id="start-mon" value="09:00"> — <input type="time" id="end-mon" value="18:00">
+                                    <input type="time" id="start-mon" value="09:00" title="Hora inicio lunes"> — <input type="time" id="end-mon" value="18:00" title="Hora fin lunes">
                                 </div>
                             </div>
                             <div class="schedule-day">
@@ -547,7 +547,7 @@
                                     <input type="checkbox" id="day-tue" checked> <span>Martes</span>
                                 </label>
                                 <div class="schedule-hours">
-                                    <input type="time" id="start-tue" value="09:00"> — <input type="time" id="end-tue" value="18:00">
+                                    <input type="time" id="start-tue" value="09:00" title="Hora inicio martes"> — <input type="time" id="end-tue" value="18:00" title="Hora fin martes">
                                 </div>
                             </div>
                             <div class="schedule-day">
@@ -555,7 +555,7 @@
                                     <input type="checkbox" id="day-wed" checked> <span>Miércoles</span>
                                 </label>
                                 <div class="schedule-hours">
-                                    <input type="time" id="start-wed" value="09:00"> — <input type="time" id="end-wed" value="18:00">
+                                    <input type="time" id="start-wed" value="09:00" title="Hora inicio miércoles"> — <input type="time" id="end-wed" value="18:00" title="Hora fin miércoles">
                                 </div>
                             </div>
                             <div class="schedule-day">
@@ -563,7 +563,7 @@
                                     <input type="checkbox" id="day-thu" checked> <span>Jueves</span>
                                 </label>
                                 <div class="schedule-hours">
-                                    <input type="time" id="start-thu" value="09:00"> — <input type="time" id="end-thu" value="18:00">
+                                    <input type="time" id="start-thu" value="09:00" title="Hora inicio jueves"> — <input type="time" id="end-thu" value="18:00" title="Hora fin jueves">
                                 </div>
                             </div>
                             <div class="schedule-day">
@@ -571,7 +571,7 @@
                                     <input type="checkbox" id="day-fri" checked> <span>Viernes</span>
                                 </label>
                                 <div class="schedule-hours">
-                                    <input type="time" id="start-fri" value="09:00"> — <input type="time" id="end-fri" value="18:00">
+                                    <input type="time" id="start-fri" value="09:00" title="Hora inicio viernes"> — <input type="time" id="end-fri" value="18:00" title="Hora fin viernes">
                                 </div>
                             </div>
                             <div class="schedule-day">
@@ -579,7 +579,7 @@
                                     <input type="checkbox" id="day-sat"> <span>Sábado</span>
                                 </label>
                                 <div class="schedule-hours">
-                                    <input type="time" id="start-sat" value="10:00" disabled> — <input type="time" id="end-sat" value="14:00" disabled>
+                                    <input type="time" id="start-sat" value="10:00" disabled title="Hora inicio sábado"> — <input type="time" id="end-sat" value="14:00" disabled title="Hora fin sábado">
                                 </div>
                             </div>
                             <div class="schedule-day">
@@ -587,7 +587,7 @@
                                     <input type="checkbox" id="day-sun"> <span>Domingo</span>
                                 </label>
                                 <div class="schedule-hours">
-                                    <input type="time" id="start-sun" value="10:00" disabled> — <input type="time" id="end-sun" value="14:00" disabled>
+                                    <input type="time" id="start-sun" value="10:00" disabled title="Hora inicio domingo"> — <input type="time" id="end-sun" value="14:00" disabled title="Hora fin domingo">
                                 </div>
                             </div>
                         </div>
@@ -595,7 +595,7 @@
                         <div class="calendar-options">
                             <div class="form-group">
                                 <label>Duración de la cita (minutos)</label>
-                                <select id="appointment-duration">
+                                <select id="appointment-duration" title="Duración de la cita">
                                     <option value="15">15 minutos</option>
                                     <option value="30" selected>30 minutos</option>
                                     <option value="45">45 minutos</option>
@@ -606,7 +606,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Margen entre citas (minutos)</label>
-                                <select id="appointment-buffer">
+                                <select id="appointment-buffer" title="Margen entre citas">
                                     <option value="0">Sin margen</option>
                                     <option value="5">5 minutos</option>
                                     <option value="10" selected>10 minutos</option>
@@ -616,7 +616,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Antelación mínima para agendar</label>
-                                <select id="appointment-advance">
+                                <select id="appointment-advance" title="Antelación mínima">
                                     <option value="1">1 hora</option>
                                     <option value="2">2 horas</option>
                                     <option value="4" selected>4 horas</option>
@@ -626,7 +626,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Días máximos a futuro</label>
-                                <select id="appointment-max-days">
+                                <select id="appointment-max-days" title="Días máximos a futuro">
                                     <option value="7">1 semana</option>
                                     <option value="14" selected>2 semanas</option>
                                     <option value="30">1 mes</option>
@@ -937,14 +937,14 @@
                                         </div>
                                         <div class="color-selector">
                                             <div class="color-presets">
-                                                <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
-                                                <button class="color-dot" data-color="#8B5CF6" style="background:#8B5CF6" title="Púrpura"></button>
-                                                <button class="color-dot" data-color="#3B82F6" style="background:#3B82F6" title="Azul"></button>
-                                                <button class="color-dot" data-color="#10B981" style="background:#10B981" title="Verde"></button>
-                                                <button class="color-dot" data-color="#F59E0B" style="background:#F59E0B" title="Ámbar"></button>
-                                                <button class="color-dot" data-color="#EF4444" style="background:#EF4444" title="Rojo"></button>
-                                                <button class="color-dot" data-color="#EC4899" style="background:#EC4899" title="Rosa"></button>
-                                                <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
+                                                <button class="color-dot" data-color="#6366F1" title="Índigo"></button>
+                                                <button class="color-dot" data-color="#8B5CF6" title="Púrpura"></button>
+                                                <button class="color-dot" data-color="#3B82F6" title="Azul"></button>
+                                                <button class="color-dot" data-color="#10B981" title="Verde"></button>
+                                                <button class="color-dot" data-color="#F59E0B" title="Ámbar"></button>
+                                                <button class="color-dot" data-color="#EF4444" title="Rojo"></button>
+                                                <button class="color-dot" data-color="#EC4899" title="Rosa"></button>
+                                                <button class="color-dot" data-color="#000000" title="Negro"></button>
                                             </div>
                                             <input type="color" id="primary-color-picker" class="color-input-modern" value="#6366F1" title="Color principal" aria-label="Seleccionar color principal">
                                         </div>
@@ -957,10 +957,10 @@
                                         </div>
                                         <div class="color-selector">
                                             <div class="color-presets">
-                                                <button class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ddd" title="Blanco"></button>
-                                                <button class="color-dot" data-color="#F3F4F6" style="background:#F3F4F6" title="Gris claro"></button>
-                                                <button class="color-dot" data-color="#1F2937" style="background:#1F2937" title="Oscuro"></button>
-                                                <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
+                                                <button class="color-dot active" data-color="#FFFFFF" title="Blanco"></button>
+                                                <button class="color-dot" data-color="#F3F4F6" title="Gris claro"></button>
+                                                <button class="color-dot" data-color="#1F2937" title="Oscuro"></button>
+                                                <button class="color-dot" data-color="#6366F1" title="Índigo"></button>
                                             </div>
                                             <input type="color" id="header-bg-picker" class="color-input-modern" value="#FFFFFF" title="Fondo del header" aria-label="Seleccionar fondo del header">
                                         </div>
@@ -973,9 +973,9 @@
                                         </div>
                                         <div class="color-selector">
                                             <div class="color-presets">
-                                                <button class="color-dot active" data-color="#111827" style="background:#111827" title="Negro"></button>
-                                                <button class="color-dot" data-color="#6B7280" style="background:#6B7280" title="Gris"></button>
-                                                <button class="color-dot" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ddd" title="Blanco"></button>
+                                                <button class="color-dot active" data-color="#111827" title="Negro"></button>
+                                                <button class="color-dot" data-color="#6B7280" title="Gris"></button>
+                                                <button class="color-dot" data-color="#FFFFFF" title="Blanco"></button>
                                             </div>
                                             <input type="color" id="header-font-picker" class="color-input-modern" value="#111827" title="Texto del header" aria-label="Seleccionar color de texto del header">
                                         </div>
@@ -994,10 +994,10 @@
                                         </div>
                                         <div class="color-selector">
                                             <div class="color-presets">
-                                                <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
-                                                <button class="color-dot active" data-color="#10B981" style="background:#10B981" title="Verde"></button>
-                                                <button class="color-dot" data-color="#3B82F6" style="background:#3B82F6" title="Azul"></button>
-                                                <button class="color-dot" data-color="#8B5CF6" style="background:#8B5CF6" title="Púrpura"></button>
+                                                <button class="color-dot" data-color="#6366F1" title="Índigo"></button>
+                                                <button class="color-dot active" data-color="#10B981" title="Verde"></button>
+                                                <button class="color-dot" data-color="#3B82F6" title="Azul"></button>
+                                                <button class="color-dot" data-color="#8B5CF6" title="Púrpura"></button>
                                             </div>
                                             <input type="color" id="user-bubble-picker" class="color-input-modern" value="#10B981" title="Burbuja del usuario" aria-label="Seleccionar color de burbuja del usuario">
                                         </div>
@@ -1125,12 +1125,12 @@
                                         </div>
                                         <div class="color-selector">
                                             <div class="color-presets">
-                                                <button class="color-dot active" data-color="#8B5CF6" style="background:#8B5CF6" title="Púrpura"></button>
-                                                <button class="color-dot" data-color="#6366F1" style="background:#6366F1" title="Índigo"></button>
-                                                <button class="color-dot" data-color="#3B82F6" style="background:#3B82F6" title="Azul"></button>
-                                                <button class="color-dot" data-color="#10B981" style="background:#10B981" title="Verde"></button>
-                                                <button class="color-dot" data-color="#EF4444" style="background:#EF4444" title="Rojo"></button>
-                                                <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
+                                                <button class="color-dot active" data-color="#8B5CF6" title="Púrpura"></button>
+                                                <button class="color-dot" data-color="#6366F1" title="Índigo"></button>
+                                                <button class="color-dot" data-color="#3B82F6" title="Azul"></button>
+                                                <button class="color-dot" data-color="#10B981" title="Verde"></button>
+                                                <button class="color-dot" data-color="#EF4444" title="Rojo"></button>
+                                                <button class="color-dot" data-color="#000000" title="Negro"></button>
                                             </div>
                                             <input type="color" id="bubble-bg-picker" class="color-input-modern" value="#8B5CF6" title="Fondo de burbuja" aria-label="Seleccionar color de fondo de burbuja">
                                         </div>
@@ -1141,8 +1141,8 @@
                                         </div>
                                         <div class="color-selector">
                                             <div class="color-presets">
-                                                <button class="color-dot active" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ddd" title="Blanco"></button>
-                                                <button class="color-dot" data-color="#000000" style="background:#000000" title="Negro"></button>
+                                                <button class="color-dot active" data-color="#FFFFFF" title="Blanco"></button>
+                                                <button class="color-dot" data-color="#000000" title="Negro"></button>
                                             </div>
                                             <input type="color" id="bubble-icon-picker" class="color-input-modern" value="#FFFFFF" title="Color de icono de burbuja" aria-label="Seleccionar color de icono de burbuja">
                                         </div>
@@ -1540,6 +1540,7 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/utils.js"></script>
     <script src="/js/dashboard.js"></script>
     <script src="/js/training.js"></script>
     <script src="/js/test-chatbot.js"></script>

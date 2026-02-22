@@ -82,7 +82,7 @@
                 </div>
             `;
 
-            const response = await fetch(
+            const response = await authFetch(
                 `${API_URL}/dashboard/conversations?chatbotId=${currentChatbotId}&page=${currentPage}&limit=${pageSize}`
             );
             const data = await response.json();
@@ -180,7 +180,7 @@
                 </div>
             `;
 
-            const response = await fetch(`${API_URL}/dashboard/conversations/${sessionId}`);
+            const response = await authFetch(`${API_URL}/dashboard/conversations/${sessionId}`);
             const data = await response.json();
 
             if (data.success && data.conversation) {
@@ -281,7 +281,7 @@
         }
 
         try {
-            const response = await fetch(`${API_URL}/dashboard/conversations/${currentSessionId}`);
+            const response = await authFetch(`${API_URL}/dashboard/conversations/${currentSessionId}`);
             const data = await response.json();
 
             if (data.success && data.conversation) {
@@ -326,7 +326,7 @@
         }
 
         try {
-            const response = await fetch(`${API_URL}/dashboard/conversations/${currentSessionId}`, {
+            const response = await authFetch(`${API_URL}/dashboard/conversations/${currentSessionId}`, {
                 method: 'DELETE'
             });
             const data = await response.json();
@@ -352,12 +352,7 @@
         }
     }
 
-    // Utility functions
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    // Utility functions (escapeHtml, showSuccess, showError → utils.js)
 
     function truncateText(text, maxLength) {
         if (text.length <= maxLength) return text;
@@ -398,18 +393,6 @@
         formatted = formatted.replace(/`(.*?)`/g, '<code>$1</code>');
         formatted = formatted.replace(/\n/g, '<br>');
         return formatted;
-    }
-
-    function showSuccess(message) {
-        if (window.dashboardApp && window.dashboardApp.showSuccess) {
-            window.dashboardApp.showSuccess(message);
-        }
-    }
-
-    function showError(message) {
-        if (window.dashboardApp && window.dashboardApp.showError) {
-            window.dashboardApp.showError(message);
-        }
     }
 
     // Expose function for global access

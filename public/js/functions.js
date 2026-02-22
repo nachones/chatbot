@@ -66,7 +66,7 @@
         if (!container) return;
 
         try {
-            const response = await fetch(`${API_URL}/functions?chatbotId=${currentChatbotId}`);
+            const response = await authFetch(`${API_URL}/functions?chatbotId=${currentChatbotId}`);
             const data = await response.json();
 
             if (data.success && data.functions && data.functions.length > 0) {
@@ -165,7 +165,7 @@
 
     async function loadFunctionData(functionId) {
         try {
-            const response = await fetch(`${API_URL}/functions/${functionId}`);
+            const response = await authFetch(`${API_URL}/functions/${functionId}`);
             const data = await response.json();
 
             if (data.success && data.function) {
@@ -311,7 +311,7 @@
                 ? `${API_URL}/functions/${editingFunctionId}`
                 : `${API_URL}/functions`;
             
-            const response = await fetch(url, {
+            const response = await authFetch(url, {
                 method: editingFunctionId ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(functionData)
@@ -340,7 +340,7 @@
 
     window.toggleFunction = async function(id, enabled) {
         try {
-            const response = await fetch(`${API_URL}/functions/${id}`, {
+            const response = await authFetch(`${API_URL}/functions/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ enabled })
@@ -366,7 +366,7 @@
         }
 
         try {
-            const response = await fetch(`${API_URL}/functions/${id}`, {
+            const response = await authFetch(`${API_URL}/functions/${id}`, {
                 method: 'DELETE'
             });
 
@@ -384,25 +384,7 @@
         }
     };
 
-    // Utility functions
-    function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    function showSuccess(message) {
-        if (window.dashboardApp && window.dashboardApp.showSuccess) {
-            window.dashboardApp.showSuccess(message);
-        }
-    }
-
-    function showError(message) {
-        if (window.dashboardApp && window.dashboardApp.showError) {
-            window.dashboardApp.showError(message);
-        }
-    }
+    // Utility functions (escapeHtml, showSuccess, showError → utils.js)
 
     function showLoading(message) {
         let loading = document.getElementById('functions-loading');

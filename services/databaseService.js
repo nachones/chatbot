@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const { getPlanLimits } = require('./planConfig');
 
 class DatabaseService {
   constructor() {
@@ -675,7 +676,7 @@ class DatabaseService {
   // Chatbot Management Methods
   async createChatbot(chatbotData) {
     return new Promise((resolve, reject) => {
-      const id = 'chatbot_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const id = 'chatbot_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
       const nextResetDate = new Date();
       nextResetDate.setMonth(nextResetDate.getMonth() + 1);
 
@@ -698,7 +699,7 @@ class DatabaseService {
           chatbotData.widget_title || 'Chat Assistant',
           chatbotData.welcome_message || '¡Hola! ¿En qué puedo ayudarte?',
           chatbotData.plan || 'starter',
-          chatbotData.plan === 'custom' ? 999999999 : (chatbotData.plan === 'pro' ? 500000 : 100000),
+          getPlanLimits(chatbotData.plan || 'starter').tokensLimit,
           nextResetDate.toISOString(),
           chatbotData.user_id || null
         ],
@@ -958,11 +959,9 @@ class DatabaseService {
           if (err) reject(err);
           else {
             if (row) {
-              // Planes: starter (9,95€/mes, 100K tokens), pro (25€/mes, 500K tokens), custom (150€/año, API propia)
-              const tokenLimits = { 'starter': 100000, 'pro': 500000, 'custom': 999999999 };
-              const messageLimits = { 'starter': 1000, 'pro': 5000, 'custom': 999999999 };
-              row.tokens_limit = tokenLimits[row.plan] || 100000;
-              row.messages_limit = messageLimits[row.plan] || 1000;
+              const limits = getPlanLimits(row.plan);
+              row.tokens_limit = limits.tokensLimit;
+              row.messages_limit = limits.messagesLimit || 1000;
             }
             resolve(row);
           }
@@ -987,8 +986,7 @@ class DatabaseService {
   }
 
   async updatePlan(chatbotId, plan) {
-    const tokenLimits = { 'starter': 100000, 'pro': 500000, 'custom': 999999999 };
-    const tokensLimit = tokenLimits[plan] || 100000;
+    const { tokensLimit } = getPlanLimits(plan);
     return new Promise((resolve, reject) => {
       this.db.run(
         'UPDATE chatbots SET plan = ?, tokens_limit = ? WHERE id = ?',
@@ -1030,7 +1028,7 @@ class DatabaseService {
 
   async createQuickPrompt(data) {
     return new Promise((resolve, reject) => {
-      const id = 'qp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const id = 'qp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
       this.db.run(
         `INSERT INTO quick_prompts (id, chatbot_id, button_title, link, prompt, order_index, enabled) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [id, data.chatbotId, data.buttonTitle, data.link || null, data.prompt || null, data.orderIndex || 0, data.enabled !== undefined ? (data.enabled ? 1 : 0) : 1],
@@ -1078,7 +1076,7 @@ class DatabaseService {
   }
   async addTrainingData(chatbotId, content, type, source) {
     return new Promise((resolve, reject) => {
-      const trainingId = 'train_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const trainingId = 'train_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
       const metadata = JSON.stringify({ type, source });
 
       this.db.run(
@@ -1359,4 +1357,4 @@ class DatabaseService {
   }
 }
 
-module.exports = DatabaseService;
+module.exports = new DatabaseService();

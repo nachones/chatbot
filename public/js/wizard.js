@@ -282,7 +282,7 @@
 
         try {
             // Create chatbot
-            const response = await fetch('/api/chatbots', {
+            const response = await authFetch('/api/chatbots', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -336,7 +336,7 @@
         });
         formData.append('chatbotId', chatbotId);
 
-        const response = await fetch('/api/training/upload', {
+        const response = await authFetch('/api/training/upload', {
             method: 'POST',
             body: formData
         });
@@ -345,7 +345,7 @@
     }
 
     async function trainFromUrl(chatbotId, url) {
-        const response = await fetch('/api/training/url', {
+        const response = await authFetch('/api/training/url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url, chatbotId })

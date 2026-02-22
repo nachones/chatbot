@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
-
-const db = new DatabaseService();
+const { verifyOwnership } = require('../services/planConfig');
 
 // All function routes require authentication
 router.use(authMiddleware);
@@ -16,6 +15,9 @@ router.get('/', async (req, res) => {
     if (!chatbotId) {
       return res.status(400).json({ error: 'chatbotId es requerido' });
     }
+
+    const owns = await verifyOwnership(db, chatbotId, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
     
     const functions = await db.getFunctions(chatbotId);
     
@@ -38,6 +40,9 @@ router.get('/:id', async (req, res) => {
     if (!func) {
       return res.status(404).json({ error: 'Función no encontrada' });
     }
+
+    const owns = await verifyOwnership(db, func.chatbot_id, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a esta función' });
     
     res.json({
       success: true,
@@ -57,6 +62,9 @@ router.post('/', async (req, res) => {
     if (!functionData.name || !functionData.description || !functionData.endpoint || !functionData.chatbotId) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
+
+    const owns = await verifyOwnership(db, functionData.chatbotId, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
     
     // Validate function name format
     if (!/^[a-zA-Z0-9_]+$/.test(functionData.name)) {
@@ -81,6 +89,11 @@ router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const functionData = req.body;
+
+    const func = await db.getFunction(id);
+    if (!func) return res.status(404).json({ error: 'Función no encontrada' });
+    const owns = await verifyOwnership(db, func.chatbot_id, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a esta función' });
     
     // Validate function name format if name is being updated
     if (functionData.name && !/^[a-zA-Z0-9_]+$/.test(functionData.name)) {
@@ -104,6 +117,11 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+
+    const func = await db.getFunction(id);
+    if (!func) return res.status(404).json({ error: 'Función no encontrada' });
+    const owns = await verifyOwnership(db, func.chatbot_id, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a esta función' });
     
     await db.deleteFunction(id);
     

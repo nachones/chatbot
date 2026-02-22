@@ -1,17 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
-
-const db = new DatabaseService();
+const { verifyOwnership } = require('../services/planConfig');
 
 // All dashboard routes require authentication
 router.use(authMiddleware);
 
+// Helper: validate chatbotId belongs to user
+async function requireOwnership(req, res) {
+  const chatbotId = req.query.chatbotId || req.params.chatbotId || null;
+  if (chatbotId) {
+    const owns = await verifyOwnership(db, chatbotId, req.user.id);
+    if (!owns) {
+      res.status(403).json({ error: 'No tienes acceso a este chatbot' });
+      return null;
+    }
+  }
+  return chatbotId;
+}
+
 // Get dashboard statistics
 router.get('/stats', async (req, res) => {
   try {
-    const chatbotId = req.query.chatbotId || null;
+    const chatbotId = await requireOwnership(req, res);
+    if (chatbotId === null && req.query.chatbotId) return;
     
     // Get total messages
     const messages = await db.getStats('messages', chatbotId);
@@ -44,7 +57,8 @@ router.get('/stats', async (req, res) => {
 router.get('/chat-history', async (req, res) => {
   try {
     const period = req.query.period || '1w';
-    const chatbotId = req.query.chatbotId || null;
+    const chatbotId = await requireOwnership(req, res);
+    if (chatbotId === null && req.query.chatbotId) return;
     const history = await db.getChatHistory(period, chatbotId);
     
     res.json({
@@ -61,7 +75,8 @@ router.get('/chat-history', async (req, res) => {
 router.get('/recent-conversations', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 5;
-    const chatbotId = req.query.chatbotId || null;
+    const chatbotId = await requireOwnership(req, res);
+    if (chatbotId === null && req.query.chatbotId) return;
     const conversations = await db.getRecentConversations(limit, chatbotId);
     
     res.json({
@@ -78,7 +93,8 @@ router.get('/recent-conversations', async (req, res) => {
 router.get('/token-usage', async (req, res) => {
   try {
     const period = req.query.period || 'month';
-    const chatbotId = req.query.chatbotId || null;
+    const chatbotId = await requireOwnership(req, res);
+    if (chatbotId === null && req.query.chatbotId) return;
     const usage = await db.getTokenUsage(period, chatbotId);
     
     // Calculate costs (example rates for GPT-3.5-turbo)
@@ -102,7 +118,7 @@ router.get('/token-usage', async (req, res) => {
   } catch (error) {
     console.error('Error getting token usage:', error);
     res.status(500).json({ 
-      success: true,
+      success: false,
       usage: {
         total: 0,
         input: 0,
@@ -119,7 +135,8 @@ router.get('/conversations', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const search = req.query.search || '';
-    const chatbotId = req.query.chatbotId || null;
+    const chatbotId = await requireOwnership(req, res);
+    if (chatbotId === null && req.query.chatbotId) return;
     
     const conversations = await db.getAllConversations(page, limit, search, chatbotId);
     
@@ -171,7 +188,8 @@ router.delete('/conversations/:sessionId', async (req, res) => {
 // Get leads
 router.get('/leads', async (req, res) => {
   try {
-    const chatbotId = req.query.chatbotId || null;
+    const chatbotId = await requireOwnership(req, res);
+    if (chatbotId === null && req.query.chatbotId) return;
     const leads = await db.getLeads(chatbotId);
     
     res.json({
@@ -187,18 +205,15 @@ router.get('/leads', async (req, res) => {
 // Export leads as CSV
 router.get('/leads/export', async (req, res) => {
   try {
-    const chatbotId = req.query.chatbotId || null;
+    const chatbotId = await requireOwnership(req, res);
+    if (chatbotId === null && req.query.chatbotId) return;
     const leads = await db.getLeads(chatbotId);
     
-    // Create CSV
+    // Create CSV - escape values to prevent CSV injection
+    const escCsv = (val) => '"' + String(val || 'N/A').replace(/"/g, '""') + '"';
     let csv = 'Nombre,Email,Teléfono,Fecha,Origen\n';
     leads.forEach(lead => {
-      const name = lead.name || 'N/A';
-      const email = lead.email || 'N/A';
-      const phone = lead.phone || 'N/A';
-      const date = lead.created_at || lead.date || '';
-      const source = lead.source || 'Chat';
-      csv += `"${name}","${email}","${phone}","${date}","${source}"\n`;
+      csv += `${escCsv(lead.name)},${escCsv(lead.email)},${escCsv(lead.phone)},${escCsv(lead.created_at || lead.date)},${escCsv(lead.source || 'Chat')}\n`;
     });
     
     const filename = chatbotId ? `leads-${chatbotId}-${Date.now()}.csv` : `leads-${Date.now()}.csv`;

@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const ChatbotService = require('../services/chatbotService');
-const DocumentProcessor = require('../services/documentProcessor');
 const llmService = require('../services/llmService');
 const { authMiddleware } = require('./auth');
 
 // Instanciar servicios
 const chatbotService = new ChatbotService();
-const documentProcessor = new DocumentProcessor();
 
 // Endpoint para enviar mensajes al chatbot
 router.post('/chat', async (req, res) => {

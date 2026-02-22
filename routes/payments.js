@@ -2,11 +2,9 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const emailService = require('../services/emailService');
 const { authMiddleware } = require('./auth');
-
-const db = new DatabaseService();
 
 // Initialize Stripe only if key is configured
 let stripe = null;
@@ -284,12 +282,11 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 
           // Send upgrade confirmation email
           await emailService.sendPlanUpgradeEmail(customerEmail, customerName || user.name, planId, billing);
-          console.log(`✓ Plan actualizado para usuario existente ${customerEmail}: ${planId} (${billing})`);
         } else {
           // NEW USER: create account automatically
           const rawPassword = crypto.randomBytes(6).toString('base64url'); // ~8 chars, URL-safe
           const hashedPassword = await bcrypt.hash(rawPassword, 10);
-          const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
 
           await db.createUser(userId, customerEmail.toLowerCase(), hashedPassword, customerName, '');
 
@@ -312,8 +309,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
             planId,
             billing
           );
-
-          console.log(`✓ Nueva cuenta creada para ${customerEmail}: plan ${planId} (${billing})`);
         }
         break;
       }
@@ -340,7 +335,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
             }
 
             await emailService.sendSubscriptionCancelledEmail(email, user.name);
-            console.log(`⚠ Suscripción cancelada para ${email}, cuenta desactivada`);
           }
         }
         break;
@@ -352,7 +346,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         if (customerEmail) {
           const user = await db.getUserByEmail(customerEmail.toLowerCase());
           await emailService.sendPaymentFailedEmail(customerEmail, user?.name || '');
-          console.log(`⚠ Pago fallido para ${customerEmail}`);
         }
         break;
       }

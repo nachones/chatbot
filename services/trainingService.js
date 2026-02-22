@@ -1,9 +1,9 @@
-const DatabaseService = require('./databaseService');
+const db = require('./databaseService');
 const llmService = require('./llmService');
 
 class TrainingService {
   constructor() {
-    this.db = new DatabaseService();
+    this.db = db;
   }
 
   async generateEmbedding(text) {

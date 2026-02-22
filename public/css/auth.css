@@ -283,3 +283,137 @@
 .auth-password-copy:hover {
   background: #e5e7eb;
 }
+
+/* ========================================
+   UTILITY CLASSES (replacing inline styles)
+   ======================================== */
+
+/* Generic hidden state for JS toggling */
+.initially-hidden {
+  display: none;
+}
+
+/* Text helpers */
+.text-center { text-align: center; }
+.text-muted { color: #555; }
+.text-muted-light { color: #888; }
+.text-muted-lighter { color: #aaa; }
+.text-muted-subtle { color: #9ca3af; }
+
+/* Spacing helpers */
+.mt-12 { margin-top: 12px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-15 { margin-bottom: 15px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-30 { margin-bottom: 30px; }
+.mr-6 { margin-right: 6px; }
+
+/* ========================================
+   PRICING SECTION
+   ======================================== */
+.billing-toggle-wrapper {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.billing-toggle-pill {
+  display: inline-flex;
+  background: #f1f1f1;
+  border-radius: 30px;
+  padding: 4px;
+}
+
+.billing-discount-badge {
+  background: #6C63FF;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.pricing-feature-highlight .fas.fa-check {
+  color: #16a34a;
+}
+
+.pricing-badge-empresas {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.pricing-footnote {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+/* ========================================
+   CHECKOUT MODAL
+   ======================================== */
+.checkout-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.checkout-title {
+  color: #6C63FF;
+  margin: 0;
+  font-size: 24px;
+}
+
+.checkout-plan-label {
+  color: #888;
+  margin-top: 5px;
+}
+
+.checkout-submit {
+  background: #6C63FF;
+}
+
+.checkout-footer {
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+  margin-top: 12px;
+}
+
+/* ========================================
+   AUTH FORMS
+   ======================================== */
+.auth-link-accent {
+  color: #6C63FF;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.auth-form-desc {
+  color: #555;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* ========================================
+   VERIFY MESSAGE
+   ======================================== */
+.verify-message-box {
+  display: none;
+  padding: 30px;
+  text-align: center;
+}
+
+.verify-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.verify-title {
+  margin-bottom: 10px;
+}
+
+.verify-text {
+  color: #555;
+}
+
+.verify-login-btn {
+  margin-top: 20px;
+}

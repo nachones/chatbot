@@ -4,11 +4,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const DocumentProcessor = require('../services/documentProcessor');
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const TrainingService = require('../services/trainingService');
 const { authMiddleware } = require('./auth');
-
-const db = new DatabaseService();
+const { verifyOwnership } = require('../services/planConfig');
 const documentProcessor = new DocumentProcessor();
 const trainingService = new TrainingService();
 
@@ -60,6 +59,9 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
       return res.status(400).json({ error: 'ID del chatbot requerido' });
     }
 
+    const owns = await verifyOwnership(db, chatbotId, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
+
     const results = await documentProcessor.processMultipleFiles(files);
 
     let totalChunks = 0;
@@ -108,6 +110,9 @@ router.post('/url', async (req, res) => {
       return res.status(400).json({ error: 'ID del chatbot requerido' });
     }
 
+    const owns = await verifyOwnership(db, chatbotId, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
+
     const chunks = await documentProcessor.processWebPage(url);
 
     // Save using trainingService (generates embeddings)
@@ -142,6 +147,9 @@ router.post('/text', async (req, res) => {
       return res.status(400).json({ error: 'ID del chatbot requerido' });
     }
 
+    const owns = await verifyOwnership(db, chatbotId, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
+
     // Process text into chunks
     const chunks = await documentProcessor.processText(textContent);
 
@@ -167,6 +175,8 @@ router.post('/text', async (req, res) => {
 router.get('/data/:chatbotId', async (req, res) => {
   try {
     const { chatbotId } = req.params;
+    const owns = await verifyOwnership(db, chatbotId, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
 
     const trainingData = await db.getTrainingDataByChatbot(chatbotId);
 
@@ -201,6 +211,8 @@ router.delete('/data/:id', async (req, res) => {
 router.get('/stats/:chatbotId', async (req, res) => {
   try {
     const { chatbotId } = req.params;
+    const owns = await verifyOwnership(db, chatbotId, req.user.id);
+    if (!owns) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
 
     const stats = await db.getTrainingStats(chatbotId);
 

@@ -1,22 +1,15 @@
-const OpenAI = require('openai');
-const DatabaseService = require('./databaseService');
+const db = require('./databaseService');
 const TrainingService = require('./trainingService');
 const llmService = require('./llmService');
 const CalendarService = require('./calendarService');
+const { getPlanLimits } = require('./planConfig');
 
 class ChatbotService {
   constructor() {
-    this.openai = null;
-    this.db = new DatabaseService();
+    this.db = db;
     this.trainingService = new TrainingService();
     this.calendarService = new CalendarService();
     this.systemPrompt = 'Eres un asistente inteligente y útil. Responde de manera clara y concisa.';
-  }
-
-  async initialize(apiKey) {
-    this.openai = new OpenAI({
-      apiKey: apiKey || process.env.OPENAI_API_KEY
-    });
   }
 
   async processMessage(message, sessionId = null, context = {}, chatbotId = null) {
@@ -65,7 +58,6 @@ class ChatbotService {
               apiKey = providerKeyMap[p];
               provider = p;
               model = defaultModels[p];
-              console.log(`Fallback: usando ${p} (${model}) porque no hay key para el proveedor original`);
               break;
             }
           }
@@ -79,8 +71,7 @@ class ChatbotService {
       // === VERIFICAR CUOTA DE TOKENS ===
       if (chatbotId && chatbotConfig) {
         const plan = chatbotConfig.plan || 'starter';
-        const tokenLimits = { 'starter': 100000, 'pro': 500000, 'custom': 999999999 };
-        const limit = tokenLimits[plan] || 100000;
+        const { tokensLimit } = getPlanLimits(plan);
         const used = chatbotConfig.tokens_used || 0;
 
         // Verificar si necesita reset mensual
@@ -88,12 +79,11 @@ class ChatbotService {
           const resetDate = new Date(chatbotConfig.reset_date);
           if (new Date() >= resetDate) {
             await this.db.resetMonthlyUsage(chatbotId);
-            console.log(`Reset mensual aplicado para ${chatbotId}`);
           }
         }
 
-        if (plan !== 'custom' && used >= limit) {
-          throw new Error(`Has alcanzado el límite de tokens de tu plan ${plan === 'starter' ? 'Starter (100.000)' : 'Pro (500.000)'}. Actualiza tu plan para seguir usando el chatbot.`);
+        if (tokensLimit < 999999999 && used >= tokensLimit) {
+          throw new Error(`Has alcanzado el límite de tokens de tu plan. Actualiza tu plan para seguir usando el chatbot.`);
         }
       }
 

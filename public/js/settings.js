@@ -55,7 +55,7 @@
 
     async function loadModels() {
         try {
-            const response = await fetch(`${API_URL}/models`);
+            const response = await authFetch(`${API_URL}/models`);
             const data = await response.json();
             
             if (data.success) {
@@ -199,7 +199,7 @@
         if (!currentChatbotId) return;
 
         try {
-            const response = await fetch(`${API_URL}/chatbots/${currentChatbotId}`);
+            const response = await authFetch(`${API_URL}/chatbots/${currentChatbotId}`);
             const data = await response.json();
 
             if (data.success && data.chatbot) {
@@ -253,7 +253,7 @@
         try {
             showLoading('Guardando configuración...');
 
-            const response = await fetch(`${API_URL}/chatbots/${currentChatbotId}`, {
+            const response = await authFetch(`${API_URL}/chatbots/${currentChatbotId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -297,7 +297,7 @@
         try {
             showLoading('Guardando configuración...');
 
-            const response = await fetch(`${API_URL}/chatbots/${currentChatbotId}`, {
+            const response = await authFetch(`${API_URL}/chatbots/${currentChatbotId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -345,7 +345,7 @@
         testBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Probando...';
 
         try {
-            const response = await fetch(`${API_URL}/test-connection`, {
+            const response = await authFetch(`${API_URL}/test-connection`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ apiKey, provider })
@@ -372,7 +372,7 @@
         }
     }
 
-    // Utility functions
+    // Utility functions (showSuccess, showError → utils.js)
     function setInputValue(id, value) {
         const el = document.getElementById(id);
         if (el) el.value = value;
@@ -381,22 +381,6 @@
     function setSelectValue(id, value) {
         const el = document.getElementById(id);
         if (el) el.value = value;
-    }
-
-    function showSuccess(message) {
-        if (window.dashboardApp && window.dashboardApp.showSuccess) {
-            window.dashboardApp.showSuccess(message);
-        } else {
-            alert(message);
-        }
-    }
-
-    function showError(message) {
-        if (window.dashboardApp && window.dashboardApp.showError) {
-            window.dashboardApp.showError(message);
-        } else {
-            alert('Error: ' + message);
-        }
     }
 
     function showLoading(message) {

@@ -80,7 +80,7 @@
         try {
             showLoading('Subiendo archivos...');
 
-            const response = await fetch(`${API_URL}/training/upload`, {
+            const response = await authFetch(`${API_URL}/training/upload`, {
                 method: 'POST',
                 body: formData
             });
@@ -197,7 +197,7 @@
         try {
             showLoading('Procesando URL...');
 
-            const response = await fetch(`${API_URL}/training/url`, {
+            const response = await authFetch(`${API_URL}/training/url`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -316,7 +316,7 @@ Por ejemplo:
         try {
             showLoading('Procesando texto...');
 
-            const response = await fetch(`${API_URL}/training/text`, {
+            const response = await authFetch(`${API_URL}/training/text`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -350,7 +350,7 @@ Por ejemplo:
         if (!container) return;
 
         try {
-            const response = await fetch(`${API_URL}/training/data/${currentChatbotId}`);
+            const response = await authFetch(`${API_URL}/training/data/${currentChatbotId}`);
             const data = await response.json();
 
             if (data.success && data.trainingData && data.trainingData.length > 0) {
@@ -416,7 +416,7 @@ Por ejemplo:
         }
 
         try {
-            const response = await fetch(`${API_URL}/training/data/${id}`, {
+            const response = await authFetch(`${API_URL}/training/data/${id}`, {
                 method: 'DELETE'
             });
 
@@ -453,35 +453,10 @@ Por ejemplo:
         return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     }
 
+    // escapeHtml, formatDate, showSuccess, showError → utils.js
+    // Use formatAbsoluteDate for training dates
     function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    function showSuccess(message) {
-        if (window.dashboardApp && window.dashboardApp.showSuccess) {
-            window.dashboardApp.showSuccess(message);
-        } else {
-            alert(message);
-        }
-    }
-
-    function showError(message) {
-        if (window.dashboardApp && window.dashboardApp.showError) {
-            window.dashboardApp.showError(message);
-        } else {
-            alert(message);
-        }
+        return formatAbsoluteDate(dateString);
     }
 
     function showLoading(message) {

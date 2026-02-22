@@ -835,11 +835,11 @@
       </div>
 
       <!-- Billing Toggle -->
-      <div style="text-align:center; margin-bottom:30px;">
-        <div style="display:inline-flex; background:#f1f1f1; border-radius:30px; padding:4px;">
+      <div class="billing-toggle-wrapper">
+        <div class="billing-toggle-pill">
           <button id="billing-monthly" class="billing-toggle active" onclick="switchBilling('monthly')">Mensual</button>
           <button id="billing-annual" class="billing-toggle" onclick="switchBilling('annual')">
-            Anual <span style="background:#6C63FF; color:white; padding:2px 8px; border-radius:10px; font-size:11px; margin-left:4px;">-17%</span>
+            Anual <span class="billing-discount-badge">-17%</span>
           </button>
         </div>
       </div>
@@ -877,7 +877,7 @@
             <li><i class="fas fa-check"></i> Acceso API completo</li>
             <li><i class="fas fa-check"></i> Sin marca de agua</li>
             <li><i class="fas fa-check"></i> Soporte prioritario</li>
-            <li><i class="fas fa-check" style="color:#16a34a;"></i> <strong>Agendar citas con Google Calendar</strong></li>
+            <li class="pricing-feature-highlight"><i class="fas fa-check"></i> <strong>Agendar citas con Google Calendar</strong></li>
           </ul>
           <button class="pricing-button btn-checkout-plan" data-plan="pro">
             Empezar con Pro
@@ -885,7 +885,7 @@
         </div>
         
         <div class="pricing-card featured">
-          <div class="pricing-badge" style="background:linear-gradient(135deg, #f59e0b, #d97706);">Crea Tu Negocio</div>
+          <div class="pricing-badge pricing-badge-empresas">Crea Tu Negocio</div>
           <h3>Empresas</h3>
           <div class="pricing-price" id="price-empresas">850€<span>/año</span></div>
           <ul class="pricing-features">
@@ -898,25 +898,25 @@
             <li><i class="fas fa-check"></i> API empresarial</li>
             <li><i class="fas fa-check"></i> Entrenamiento ilimitado</li>
             <li><i class="fas fa-check"></i> Soporte dedicado</li>
-            <li><i class="fas fa-check" style="color:#16a34a;"></i> <strong>Agendar citas con Google Calendar</strong></li>
-            <li><i class="fas fa-check" style="color:#16a34a;"></i> <strong>Revende chatbots a tus clientes</strong></li>
+            <li class="pricing-feature-highlight"><i class="fas fa-check"></i> <strong>Agendar citas con Google Calendar</strong></li>
+            <li class="pricing-feature-highlight"><i class="fas fa-check"></i> <strong>Revende chatbots a tus clientes</strong></li>
           </ul>
           <button class="pricing-button btn-checkout-plan" data-plan="empresas">
             Empezar con Empresas
           </button>
         </div>
       </div>
-      <p style="text-align:center; color:#9ca3af; font-size:13px; margin-top:12px;">Precios en EUR (€). Si pagas en otra moneda, tu banco aplicará el tipo de cambio del día.</p>
+      <p class="pricing-footnote">Precios en EUR (€). Si pagas en otra moneda, tu banco aplicará el tipo de cambio del día.</p>
     </div>
   </section>
 
   <!-- Checkout Modal -->
-  <div id="checkout-modal" class="auth-modal-overlay" style="display:none;">
+  <div id="checkout-modal" class="auth-modal-overlay initially-hidden">
     <div class="auth-modal-container">
       <button id="close-checkout-modal" class="auth-modal-close">&times;</button>
-      <div style="text-align:center; margin-bottom:20px;">
-        <h1 style="color:#6C63FF; margin:0; font-size:24px;">🤖 MIABOT</h1>
-        <p id="checkout-plan-label" style="color:#888; margin-top:5px;">Plan Starter — 9,95€/mes</p>
+      <div class="checkout-header">
+        <h1 class="checkout-title">🤖 MIABOT</h1>
+        <p id="checkout-plan-label" class="checkout-plan-label">Plan Starter — 9,95€/mes</p>
       </div>
       <form id="checkout-form">
         <div class="auth-field">
@@ -928,10 +928,10 @@
           <input type="email" id="checkout-email" required placeholder="tu@email.com" class="auth-input">
         </div>
         <div id="checkout-error" class="auth-error"></div>
-        <button type="submit" class="auth-submit" style="background:#6C63FF;">
-          <i class="fas fa-lock" style="margin-right:6px;"></i> Continuar al pago seguro
+        <button type="submit" class="auth-submit checkout-submit">
+          <i class="fas fa-lock mr-6"></i> Continuar al pago seguro
         </button>
-        <p style="text-align:center; color:#aaa; font-size:12px; margin-top:12px;">
+        <p class="checkout-footer">
           <i class="fas fa-shield-alt"></i> Pago seguro con Stripe. Tu cuenta se creará automáticamente.
         </p>
       </form>
@@ -1022,17 +1022,17 @@
           <small class="auth-password-hint">Mín. 8 caracteres. Evita símbolos: <strong>$ % & # { } | \ ` ~</strong></small>
         </div>
         <div id="login-error" class="auth-error"></div>
-        <div id="login-verification" style="display:none;" class="auth-info">
+        <div id="login-verification" class="auth-info initially-hidden">
           <p>Debes verificar tu email. <a href="#" id="resend-verification-login">Reenviar email de verificación</a></p>
         </div>
         <button type="submit" class="auth-submit">Iniciar Sesión</button>
-        <div style="text-align:center; margin-top:12px;">
-          <a href="#" id="forgot-password-link" style="color:#6C63FF; font-size:14px; text-decoration:none;">¿Olvidaste tu contraseña?</a>
+        <div class="text-center mt-12">
+          <a href="#" id="forgot-password-link" class="auth-link-accent">¿Olvidaste tu contraseña?</a>
         </div>
       </form>
 
       <!-- Register Form -->
-      <form id="register-form" style="display:none">
+      <form id="register-form" class="initially-hidden">
         <div class="auth-field">
           <label class="auth-label">Nombre</label>
           <input type="text" id="register-name" placeholder="Tu nombre" class="auth-input">
@@ -1056,28 +1056,28 @@
           <small class="auth-password-hint">Usa letras, números y caracteres simples. Evita: <strong>$ % & # { } | \\ ` ~</strong></small>
         </div>
         <div id="register-error" class="auth-error"></div>
-        <div id="register-success" class="auth-success" style="display:none;"></div>
+        <div id="register-success" class="auth-success initially-hidden"></div>
         <button type="submit" class="auth-submit">Crear Cuenta</button>
       </form>
 
       <!-- Forgot Password Form -->
-      <form id="forgot-form" style="display:none">
-        <p style="color:#555; margin-bottom:20px; font-size:14px;">Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
+      <form id="forgot-form" class="initially-hidden">
+        <p class="auth-form-desc">Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
         <div class="auth-field-last">
           <label class="auth-label">Email</label>
           <input type="email" id="forgot-email" required placeholder="tu@email.com" class="auth-input">
         </div>
         <div id="forgot-error" class="auth-error"></div>
-        <div id="forgot-success" class="auth-success" style="display:none;"></div>
+        <div id="forgot-success" class="auth-success initially-hidden"></div>
         <button type="submit" class="auth-submit">Enviar enlace</button>
-        <div style="text-align:center; margin-top:12px;">
-          <a href="#" id="back-to-login" style="color:#6C63FF; font-size:14px; text-decoration:none;">Volver a iniciar sesión</a>
+        <div class="text-center mt-12">
+          <a href="#" id="back-to-login" class="auth-link-accent">Volver a iniciar sesión</a>
         </div>
       </form>
 
       <!-- Reset Password Form -->
-      <form id="reset-form" style="display:none">
-        <p style="color:#555; margin-bottom:20px; font-size:14px;">Introduce tu nueva contraseña.</p>
+      <form id="reset-form" class="initially-hidden">
+        <p class="auth-form-desc">Introduce tu nueva contraseña.</p>
         <div class="auth-field-last">
           <label class="auth-label">Nueva contraseña (mín. 8 caracteres)</label>
           <div class="auth-password-row">
@@ -1089,16 +1089,16 @@
           <small class="auth-password-hint">Usa letras, números y caracteres simples. Evita: <strong>$ % & # { } | \\ ` ~</strong></small>
         </div>
         <div id="reset-error" class="auth-error"></div>
-        <div id="reset-success" class="auth-success" style="display:none;"></div>
+        <div id="reset-success" class="auth-success initially-hidden"></div>
         <button type="submit" class="auth-submit">Restablecer contraseña</button>
       </form>
 
       <!-- Verification message -->
-      <div id="verify-message" style="display:none; padding:30px; text-align:center;">
-        <div id="verify-icon" style="font-size:48px; margin-bottom:15px;"></div>
-        <h3 id="verify-title" style="margin-bottom:10px;"></h3>
-        <p id="verify-text" style="color:#555;"></p>
-        <button onclick="document.getElementById('verify-message').style.display='none'; document.getElementById('login-form').style.display='block'; document.querySelector('.auth-tabs').style.display='flex';" class="auth-submit" style="margin-top:20px;">Iniciar Sesión</button>
+      <div id="verify-message" class="verify-message-box">
+        <div id="verify-icon" class="verify-icon"></div>
+        <h3 id="verify-title" class="verify-title"></h3>
+        <p id="verify-text" class="verify-text"></p>
+        <button id="verify-back-to-login" class="auth-submit verify-login-btn">Iniciar Sesión</button>
       </div>
     </div>
   </div>
@@ -1420,6 +1420,16 @@
         loginForm.style.display = 'block';
         document.querySelector('.auth-tabs').style.display = 'flex';
         switchTab('login');
+      });
+    }
+
+    // Verify message → back to login
+    const verifyBackBtn = document.getElementById('verify-back-to-login');
+    if (verifyBackBtn) {
+      verifyBackBtn.addEventListener('click', () => {
+        document.getElementById('verify-message').style.display = 'none';
+        loginForm.style.display = 'block';
+        document.querySelector('.auth-tabs').style.display = 'flex';
       });
     }
 

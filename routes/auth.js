@@ -2,14 +2,11 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const emailService = require('../services/emailService');
 
-const db = new DatabaseService();
-
 if (!process.env.JWT_SECRET) {
-  console.error('FATAL: JWT_SECRET no configurado en .env');
-  process.exit(1);
+  throw new Error('FATAL: JWT_SECRET no configurado en .env');
 }
 const JWT_SECRET = process.env.JWT_SECRET;
 const SESSION_EXPIRY = process.env.SESSION_EXPIRY || '7d';

@@ -5,10 +5,9 @@ const express = require('express');
 const router = express.Router();
 const CalendarService = require('../services/calendarService');
 const { authMiddleware } = require('./auth');
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 
 const calendarService = new CalendarService();
-const db = new DatabaseService();
 
 // ---- OAuth: Get authorization URL ----
 router.get('/auth-url', authMiddleware, async (req, res) => {

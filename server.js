@@ -48,7 +48,12 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
-      callback(null, true); // Widget can be embedded anywhere
+      // In production, reject unknown origins. In dev, allow all for widget embedding.
+      if (process.env.NODE_ENV === 'production') {
+        callback(new Error('CORS no permitido para este origen'));
+      } else {
+        callback(null, true);
+      }
     }
   },
   credentials: true

@@ -1,17 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
-
-const db = new DatabaseService();
+const { verifyOwnership, PLANS, getPlan } = require('../services/planConfig');
 
 // All usage routes require authentication
 router.use(authMiddleware);
+
+// Helper: verify ownership
+async function checkOwnership(req, res) {
+  const { chatbotId } = req.params;
+  const owns = await verifyOwnership(db, chatbotId, req.user.id);
+  if (!owns) {
+    res.status(403).json({ success: false, error: 'No tienes acceso a este chatbot' });
+    return false;
+  }
+  return true;
+}
 
 // Obtener estadísticas de uso de un chatbot
 router.get('/:chatbotId', async (req, res) => {
   try {
     const { chatbotId } = req.params;
+    if (!(await checkOwnership(req, res))) return;
     
     const stats = await db.getUsageStats(chatbotId);
     
@@ -22,15 +33,8 @@ router.get('/:chatbotId', async (req, res) => {
       });
     }
 
-    // Info de planes
-    const planInfo = {
-      starter: { name: 'Starter', price: '9,95€/mes', tokensLimit: 100000 },
-      pro: { name: 'Pro', price: '25€/mes', tokensLimit: 500000 },
-      custom: { name: 'Custom', price: '150€/año', tokensLimit: null }
-    };
-
-    const currentPlan = planInfo[stats.plan] || planInfo.starter;
-    const tokensLimit = stats.plan === 'custom' ? null : (currentPlan.tokensLimit || 100000);
+    const currentPlan = getPlan(stats.plan);
+    const tokensLimit = currentPlan.tokensLimit >= 999999999 ? null : currentPlan.tokensLimit;
     const tokensPercentage = tokensLimit ? Math.min(100, Math.round((stats.tokens_used / tokensLimit) * 100)) : 0;
     const messagesPercentage = stats.messages_limit ? Math.min(100, Math.round((stats.messages_used / stats.messages_limit) * 100)) : 0;
 
@@ -39,8 +43,7 @@ router.get('/:chatbotId', async (req, res) => {
       usage: {
         plan: stats.plan,
         planName: currentPlan.name,
-        planPrice: currentPlan.price,
-        isCustomApi: stats.plan === 'custom',
+        isCustomApi: stats.plan === 'empresas' || stats.plan === 'custom',
         messagesUsed: stats.messages_used,
         messagesLimit: stats.messages_limit,
         messagesRemaining: Math.max(0, stats.messages_limit - stats.messages_used),
@@ -65,6 +68,7 @@ router.get('/:chatbotId', async (req, res) => {
 router.post('/:chatbotId/reset', async (req, res) => {
   try {
     const { chatbotId } = req.params;
+    if (!(await checkOwnership(req, res))) return;
     
     await db.resetMonthlyUsage(chatbotId);
     
@@ -85,13 +89,15 @@ router.post('/:chatbotId/reset', async (req, res) => {
 router.put('/:chatbotId/plan', async (req, res) => {
   try {
     const { chatbotId } = req.params;
+    if (!(await checkOwnership(req, res))) return;
+
     const { plan } = req.body;
     
-    const validPlans = ['starter', 'pro', 'custom'];
+    const validPlans = ['starter', 'pro', 'empresas'];
     if (!validPlans.includes(plan)) {
       return res.status(400).json({
         success: false,
-        error: 'Plan inválido. Debe ser: starter, pro o custom'
+        error: 'Plan inválido. Debe ser: starter, pro o empresas'
       });
     }
     

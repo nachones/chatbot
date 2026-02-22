@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
-
-const db = new DatabaseService();
+const { verifyOwnership } = require('../services/planConfig');
 
 // Get all quick prompts for a chatbot
 router.get('/', async (req, res) => {
@@ -23,7 +22,7 @@ router.get('/', async (req, res) => {
         console.error('Error fetching quick prompts:', error);
         res.status(500).json({ 
             success: false, 
-            error: error.message 
+            error: 'Error obteniendo quick prompts' 
         });
     }
 });
@@ -45,7 +44,7 @@ router.get('/:id', async (req, res) => {
         console.error('Error fetching quick prompt:', error);
         res.status(500).json({ 
             success: false, 
-            error: error.message 
+            error: 'Error obteniendo quick prompt' 
         });
     }
 });
@@ -63,6 +62,9 @@ router.post('/', authMiddleware, async (req, res) => {
                 error: 'chatbotId and buttonTitle are required' 
             });
         }
+
+        const owns = await verifyOwnership(db, chatbotId, req.user.id);
+        if (!owns) return res.status(403).json({ success: false, error: 'No tienes acceso a este chatbot' });
 
         // Validate: must have either link or prompt
         if (!link && !finalPrompt) {
@@ -89,14 +91,21 @@ router.post('/', authMiddleware, async (req, res) => {
         console.error('Error creating quick prompt:', error);
         res.status(500).json({ 
             success: false, 
-            error: error.message 
+            error: 'Error creando quick prompt' 
         });
     }
 });
 
-// Update a quick prompt (requires auth)
+// Update a quick prompt (requires auth + ownership)
 router.put('/:id', authMiddleware, async (req, res) => {
     try {
+        const existing = await db.getQuickPrompt(req.params.id);
+        if (!existing) return res.status(404).json({ success: false, error: 'Quick prompt no encontrado' });
+        if (existing.chatbot_id) {
+            const owns = await verifyOwnership(db, existing.chatbot_id, req.user.id);
+            if (!owns) return res.status(403).json({ success: false, error: 'No tienes acceso' });
+        }
+
         const { buttonTitle, link, prompt } = req.body;
 
         // Validate: if updating, must have either link or prompt
@@ -116,14 +125,21 @@ router.put('/:id', authMiddleware, async (req, res) => {
         console.error('Error updating quick prompt:', error);
         res.status(500).json({ 
             success: false, 
-            error: error.message 
+            error: 'Error actualizando quick prompt' 
         });
     }
 });
 
-// Delete a quick prompt (requires auth)
+// Delete a quick prompt (requires auth + ownership)
 router.delete('/:id', authMiddleware, async (req, res) => {
     try {
+        const existing = await db.getQuickPrompt(req.params.id);
+        if (!existing) return res.status(404).json({ success: false, error: 'Quick prompt no encontrado' });
+        if (existing.chatbot_id) {
+            const owns = await verifyOwnership(db, existing.chatbot_id, req.user.id);
+            if (!owns) return res.status(403).json({ success: false, error: 'No tienes acceso' });
+        }
+
         await db.deleteQuickPrompt(req.params.id);
         res.json({ 
             success: true, 
@@ -133,7 +149,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         console.error('Error deleting quick prompt:', error);
         res.status(500).json({ 
             success: false, 
-            error: error.message 
+            error: 'Error eliminando quick prompt' 
         });
     }
 });

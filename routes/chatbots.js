@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const DatabaseService = require('../services/databaseService');
+const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
-
-const db = new DatabaseService();
+const { getPlanLimits } = require('../services/planConfig');
 
 // All chatbot routes require authentication
 router.use(authMiddleware);
@@ -69,8 +68,8 @@ router.post('/', async (req, res) => {
       // Check chatbot limit by plan
       const user = await db.getUserById(req.user.id);
       const plan = user?.plan || 'starter';
-      const planLimits = { starter: 1, pro: 3, empresas: 999 };
-      const maxChatbots = planLimits[plan] || 1;
+      const { chatbotsLimit } = getPlanLimits(plan);
+      const maxChatbots = chatbotsLimit;
 
       const existingChatbots = await db.getChatbotsByUser(req.user.id);
       if (existingChatbots.length >= maxChatbots) {
@@ -141,6 +140,9 @@ router.delete('/:id', async (req, res) => {
 router.get('/:id/stats', async (req, res) => {
   try {
     const { id } = req.params;
+    const ownership = await verifyOwnership(id, req.user.id);
+    if (ownership === null) return res.status(404).json({ error: 'Chatbot no encontrado' });
+    if (ownership === false) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
     
     const messages = await db.getStats('messages', id);
     const conversations = await db.getStats('conversations', id);
@@ -166,6 +168,10 @@ router.get('/:id/stats', async (req, res) => {
 router.get('/:id/appearance', async (req, res) => {
   try {
     const { id } = req.params;
+    const ownership = await verifyOwnership(id, req.user.id);
+    if (ownership === null) return res.status(404).json({ error: 'Chatbot no encontrado' });
+    if (ownership === false) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
+
     const appearance = await db.getAppearanceSettings(id);
     
     res.json({
@@ -182,6 +188,10 @@ router.get('/:id/appearance', async (req, res) => {
 router.put('/:id/appearance', async (req, res) => {
   try {
     const { id } = req.params;
+    const ownership = await verifyOwnership(id, req.user.id);
+    if (ownership === null) return res.status(404).json({ error: 'Chatbot no encontrado' });
+    if (ownership === false) return res.status(403).json({ error: 'No tienes acceso a este chatbot' });
+
     const settings = req.body;
     
     await db.saveAppearanceSettings(id, settings);

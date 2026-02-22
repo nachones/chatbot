@@ -2,11 +2,11 @@
 // GOOGLE CALENDAR SERVICE
 // ==========================================
 const { google } = require('googleapis');
-const DatabaseService = require('./databaseService');
+const db = require('./databaseService');
 
 class CalendarService {
   constructor() {
-    this.db = new DatabaseService();
+    this.db = db;
     this.clientId = process.env.GOOGLE_CLIENT_ID;
     this.clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     this.redirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/calendar/callback';

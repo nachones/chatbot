@@ -94,6 +94,16 @@
     }
 
     function initColorDots() {
+        // Apply background color from data-color attribute (replacing inline styles)
+        document.querySelectorAll('.color-dot[data-color]').forEach(dot => {
+            const color = dot.getAttribute('data-color');
+            dot.style.backgroundColor = color;
+            // Add border for light colors
+            if (color === '#FFFFFF' || color === '#F3F4F6') {
+                dot.style.border = '1px solid #ddd';
+            }
+        });
+
         document.querySelectorAll('.color-presets').forEach(presetGroup => {
             const dots = presetGroup.querySelectorAll('.color-dot');
             const colorInput = presetGroup.nextElementSibling;
@@ -305,7 +315,7 @@
 
         try {
             // Load stats from API
-            const response = await fetch(`${API_URL}/chatbots/${currentChatbotId}/stats`);
+            const response = await authFetch(`${API_URL}/chatbots/${currentChatbotId}/stats`);
             const data = await response.json();
 
             if (data.success) {
@@ -320,7 +330,7 @@
 
             // Load usage from usage endpoint
             try {
-                const usageRes = await fetch(`${API_URL}/usage/${currentChatbotId}`);
+                const usageRes = await authFetch(`${API_URL}/usage/${currentChatbotId}`);
                 const usageData = await usageRes.json();
                 if (usageData.success && usageData.usage) {
                     const u = usageData.usage;
@@ -594,7 +604,7 @@ console.log(data.text);`;
                 </div>
             `;
 
-            const response = await fetch(`${API_URL}/dashboard/conversations?chatbotId=${currentChatbotId}&limit=20`);
+            const response = await authFetch(`${API_URL}/dashboard/conversations?chatbotId=${currentChatbotId}&limit=20`);
             const data = await response.json();
 
             if (data.success && data.conversations && data.conversations.length > 0) {
@@ -647,7 +657,7 @@ console.log(data.text);`;
         if (!currentChatbotId) return;
 
         try {
-            const response = await fetch(`${API_URL}/leads?chatbotId=${currentChatbotId}`);
+            const response = await authFetch(`${API_URL}/leads?chatbotId=${currentChatbotId}`);
             const data = await response.json();
 
             const container = document.getElementById('leads-list');
@@ -684,69 +694,8 @@ console.log(data.text);`;
         }
     }
 
-    // --- Utilities ---
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now - date;
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMs / 3600000);
-        const diffDays = Math.floor(diffMs / 86400000);
-
-        if (diffMins < 1) return 'Hace un momento';
-        if (diffMins < 60) return `Hace ${diffMins} minutos`;
-        if (diffHours < 24) return `Hace ${diffHours} horas`;
-        if (diffDays < 7) return `Hace ${diffDays} días`;
-
-        return date.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-    }
-
-    function showSuccess(message) {
-        showNotification(message, 'success');
-    }
-
-    function showError(message) {
-        showNotification(message, 'error');
-    }
-
-    function showNotification(message, type = 'info') {
-        // Simple notification system
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 24px;
-            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            font-weight: 500;
-        `;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }
+    // --- Utilities (delegated to utils.js) ---
+    // escapeHtml, formatDate, showSuccess, showError, showNotification → utils.js
 
     // Expose functions globally for inline event handlers
     window.dashboardApp = {
@@ -759,30 +708,3 @@ console.log(data.text);`;
     };
 
 })();
-
-// CSS for notifications (inject into page)
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
