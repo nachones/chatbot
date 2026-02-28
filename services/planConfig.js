@@ -7,32 +7,44 @@ const PLANS = {
   starter: {
     name: 'Starter',
     displayName: 'Starter',
-    monthlyPrice: 0,
-    yearlyPrice: 0,
+    monthlyPrice: 995,     // céntimos (9,95€)
+    yearlyPrice: 9900,     // céntimos (99€/año = 8,25€/mes)
     tokensLimit: 100000,
-    messagesLimit: 500,
+    messagesLimit: 1000,
     chatbotsLimit: 1,
-    features: ['1 chatbot', '500 mensajes/mes', 'Modelo básico']
+    features: ['1 chatbot', '1.000 mensajes/mes', '100.000 tokens', 'Gemini 2.0 Flash', 'Entrenamiento con archivos y URLs', 'Captura de leads', 'Widget personalizable'],
+    calendarEnabled: false,
+    functionCallingEnabled: false,
+    removeBranding: false,
+    customApiKey: false
   },
   pro: {
     name: 'Pro',
     displayName: 'Profesional',
-    monthlyPrice: 3995, // céntimos (39,95€)
-    yearlyPrice: 39950, // céntimos (399,50€)
+    monthlyPrice: 3995,    // céntimos (39,95€)
+    yearlyPrice: 39950,    // céntimos (399,50€/año = 33,29€/mes)
     tokensLimit: 500000,
-    messagesLimit: 5000,
-    chatbotsLimit: 5,
-    features: ['5 chatbots', '5.000 mensajes/mes', 'Todos los modelos', 'Funciones personalizadas']
+    messagesLimit: 10000,
+    chatbotsLimit: 3,
+    features: ['3 chatbots', '10.000 mensajes/mes', '500.000 tokens', 'Todos los modelos IA', 'Entrenamiento ilimitado', 'Function calling', 'API completo', 'Sin marca de agua', 'Soporte prioritario', 'Google Calendar'],
+    calendarEnabled: true,
+    functionCallingEnabled: true,
+    removeBranding: true,
+    customApiKey: false
   },
   empresas: {
     name: 'Empresas',
     displayName: 'Empresas',
-    monthlyPrice: 9900, // céntimos (99€)
-    yearlyPrice: 85000, // céntimos (850€)
+    monthlyPrice: null,     // Solo anual
+    yearlyPrice: 85000,     // céntimos (850€/año)
     tokensLimit: 999999999,
     messagesLimit: 999999999,
     chatbotsLimit: 999,
-    features: ['Chatbots ilimitados', 'Mensajes ilimitados', 'Todos los modelos', 'API access', 'Soporte prioritario']
+    features: ['Chatbots ilimitados', 'Mensajes ilimitados', 'Tokens ilimitados', 'Tu propia API key', 'Todos los modelos (GPT-4, Gemini, etc.)', 'Function calling avanzado', 'API empresarial', 'Entrenamiento ilimitado', 'Soporte dedicado', 'Google Calendar', 'Revende chatbots a tus clientes'],
+    calendarEnabled: true,
+    functionCallingEnabled: true,
+    removeBranding: true,
+    customApiKey: true
   }
 };
 
