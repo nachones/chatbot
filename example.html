@@ -64,12 +64,14 @@
         <div class="demo-section">
             <h3>Código de integración:</h3>
             <div class="code">
-                <!-- Agrega este código justo antes del </body> -->
-                <script src="http://localhost:3000/chat-widget.js" data-api-url="http://localhost:3000/api"
-                    data-api-key="TU_CHATBOT_ID" data-title="Asistente Virtual"
-                    data-welcome="¡Hola! ¿En qué puedo ayudarte hoy?"
-                    data-primary-color="#6366F1">
-                    </script>
+                &lt;!-- Agrega este código justo antes del &lt;/body&gt; --&gt;<br>
+                &lt;script src="https://app.micopiloto.es/chat-widget.js"<br>
+                &nbsp;&nbsp;data-api-url="https://app.micopiloto.es/api"<br>
+                &nbsp;&nbsp;data-api-key="TU_CHATBOT_ID"<br>
+                &nbsp;&nbsp;data-title="Asistente Virtual"<br>
+                &nbsp;&nbsp;data-welcome="¡Hola! ¿En qué puedo ayudarte hoy?"<br>
+                &nbsp;&nbsp;data-primary-color="#6366F1"&gt;<br>
+                &lt;/script&gt;
             </div>
         </div>
 
@@ -89,7 +91,7 @@
         <div class="demo-section">
             <h3>Instrucciones de uso:</h3>
             <ol>
-                <li>Asegúrate de que el servidor esté ejecutándose en http://localhost:3000</li>
+                <li>Asegúrate de que el servidor esté ejecutándose en https://app.micopiloto.es</li>
                 <li>Configura tu API key de OpenAI en el archivo .env</li>
                 <li>Entrena el modelo con tus documentos usando los endpoints de entrenamiento</li>
                 <li>Copia el código de integración arriba en tu sitio web</li>
@@ -100,12 +102,16 @@
 
     <!-- Chatbot Widget Demo -->
     <!-- Para usar: reemplaza TU_CHATBOT_ID con el ID real de tu chatbot -->
-    <script src="http://localhost:3000/chat-widget.js" 
-        data-api-url="http://localhost:3000/api"
-        data-api-key="demo" 
-        data-title="Asistente Demo"
-        data-primary-color="#6366F1"
-        data-welcome="¡Hola! Soy tu asistente virtual de demostración. ¿En qué puedo ayudarte hoy?">
+    <script>
+        const baseUrl = window.location.origin;
+        const script = document.createElement('script');
+        script.src = baseUrl + '/chat-widget.js';
+        script.setAttribute('data-api-url', baseUrl + '/api');
+        script.setAttribute('data-api-key', 'demo');
+        script.setAttribute('data-title', 'Asistente Demo');
+        script.setAttribute('data-primary-color', '#6366F1');
+        script.setAttribute('data-welcome', '¡Hola! Soy tu asistente virtual de demostración. ¿En qué puedo ayudarte hoy?');
+        document.body.appendChild(script);
     </script>
 </body>
 

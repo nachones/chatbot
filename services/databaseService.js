@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const { getPlanLimits } = require('./planConfig');
+const logger = require('./logger');
 
 class DatabaseService {
   constructor() {
@@ -46,9 +47,9 @@ class DatabaseService {
       if (!exists) {
         this.db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`, (err) => {
           if (err && !err.message.includes('duplicate column')) {
-            console.error(`Error adding column ${columnName} to ${tableName}:`, err);
+            logger.error(`Error adding column ${columnName} to ${tableName}:`, err);
           } else if (!err) {
-            console.log(`✓ Columna ${columnName} agregada a ${tableName}`);
+            logger.info(`✓ Columna ${columnName} agregada a ${tableName}`);
           }
         });
       }
@@ -216,7 +217,7 @@ class DatabaseService {
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
           )
         `);
-        console.log('✓ Tabla users creada');
+        logger.info('✓ Tabla users creada');
       }
       this.safeAddColumn('users', 'stripe_customer_id', 'TEXT');
       this.safeAddColumn('users', 'stripe_subscription_id', 'TEXT');
@@ -241,7 +242,7 @@ class DatabaseService {
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
           )
         `);
-        console.log('✓ Tabla calendar_connections creada');
+        logger.info('✓ Tabla calendar_connections creada');
       }
 
       // ---- Create indexes for performance ----
@@ -255,9 +256,9 @@ class DatabaseService {
       this.db.run('CREATE INDEX IF NOT EXISTS idx_training_jobs_chatbot ON training_jobs(chatbot_id)');
       this.db.run('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)');
 
-      console.log('✓ Base de datos inicializada correctamente');
+      logger.info('✓ Base de datos inicializada correctamente');
     } catch (error) {
-      console.error('Error initializing tables:', error);
+      logger.error('Error initializing tables:', error);
     }
   }
 

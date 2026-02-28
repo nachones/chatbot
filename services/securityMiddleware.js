@@ -2,6 +2,7 @@
  * Middleware de seguridad para MIABOT
  * Incluye validación de inputs, sanitización y protección básica
  */
+const logger = require('./logger');
 
 // Sanitizar strings para prevenir XSS
 function sanitizeString(str) {
@@ -94,7 +95,7 @@ function requestLogger(req, res, next) {
         
         // Solo loguear en producción
         if (process.env.NODE_ENV === 'production' || process.env.LOG_LEVEL === 'debug') {
-            console.log(
+            logger.info(
                 `[${logLevel}] ${new Date().toISOString()} | ${req.method} ${req.originalUrl} | ${res.statusCode} | ${duration}ms | ${req.ip}`
             );
         }

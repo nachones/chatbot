@@ -3,6 +3,7 @@ const router = express.Router();
 const ChatbotService = require('../services/chatbotService');
 const llmService = require('../services/llmService');
 const { authMiddleware } = require('./auth');
+const logger = require('../services/logger');
 
 // Instanciar servicios
 const chatbotService = new ChatbotService();
@@ -33,7 +34,7 @@ router.post('/chat', async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error en el chat:', error);
+    logger.error('Error en el chat:', error);
     res.status(500).json({ error: 'Error procesando el mensaje' });
   }
 });
@@ -49,7 +50,7 @@ router.get('/history/:sessionId', authMiddleware, async (req, res) => {
       history: history || []
     });
   } catch (error) {
-    console.error('Error obteniendo historial:', error);
+    logger.error('Error obteniendo historial:', error);
     res.status(500).json({ error: 'Error obteniendo historial' });
   }
 });
@@ -67,7 +68,7 @@ router.post('/config', authMiddleware, async (req, res) => {
 
     res.json({ success: true, message: 'Configuración actualizada' });
   } catch (error) {
-    console.error('Error actualizando configuración:', error);
+    logger.error('Error actualizando configuración:', error);
     res.status(500).json({ error: 'Error actualizando configuración' });
   }
 });
@@ -78,7 +79,7 @@ router.get('/config', authMiddleware, async (req, res) => {
     const config = await chatbotService.getConfig();
     res.json({ success: true, config });
   } catch (error) {
-    console.error('Error obteniendo configuración:', error);
+    logger.error('Error obteniendo configuración:', error);
     res.status(500).json({ error: 'Error obteniendo configuración' });
   }
 });
@@ -107,7 +108,7 @@ router.post('/test-connection', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: result.error });
     }
   } catch (error) {
-    console.error('Error testing connection:', error);
+    logger.error('Error testing connection:', error);
     res.status(400).json({ 
       error: 'Error de conexión. Verifica tu API key e inténtalo de nuevo.'
     });
@@ -126,7 +127,7 @@ router.get('/models', async (req, res) => {
       pricing
     });
   } catch (error) {
-    console.error('Error getting models:', error);
+    logger.error('Error getting models:', error);
     res.status(500).json({ error: 'Error obteniendo modelos' });
   }
 });

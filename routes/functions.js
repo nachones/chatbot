@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
 const { verifyOwnership } = require('../services/planConfig');
+const logger = require('../services/logger');
 
 // All function routes require authentication
 router.use(authMiddleware);
@@ -26,7 +27,7 @@ router.get('/', async (req, res) => {
       functions: functions
     });
   } catch (error) {
-    console.error('Error getting functions:', error);
+    logger.error('Error getting functions:', error);
     res.status(500).json({ error: 'Error obteniendo funciones' });
   }
 });
@@ -49,7 +50,7 @@ router.get('/:id', async (req, res) => {
       function: func
     });
   } catch (error) {
-    console.error('Error getting function:', error);
+    logger.error('Error getting function:', error);
     res.status(500).json({ error: 'Error obteniendo función' });
   }
 });
@@ -79,7 +80,7 @@ router.post('/', async (req, res) => {
       message: 'Función creada exitosamente'
     });
   } catch (error) {
-    console.error('Error creating function:', error);
+    logger.error('Error creating function:', error);
     res.status(500).json({ error: 'Error creando función' });
   }
 });
@@ -108,7 +109,7 @@ router.put('/:id', async (req, res) => {
       message: 'Función actualizada exitosamente'
     });
   } catch (error) {
-    console.error('Error updating function:', error);
+    logger.error('Error updating function:', error);
     res.status(500).json({ error: 'Error actualizando función' });
   }
 });
@@ -130,7 +131,7 @@ router.delete('/:id', async (req, res) => {
       message: 'Función eliminada exitosamente'
     });
   } catch (error) {
-    console.error('Error deleting function:', error);
+    logger.error('Error deleting function:', error);
     res.status(500).json({ error: 'Error eliminando función' });
   }
 });

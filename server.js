@@ -43,7 +43,7 @@ try {
 // Middleware básico
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-  : ['http://localhost:3000'];
+  : ['https://app.micopiloto.es'];
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile, curl, etc.) and allowed origins
@@ -242,7 +242,7 @@ try {
 
 // Manejo de errores
 app.use((err, req, res, next) => {
-  console.error('Error en request:', err);
+  logger.error('Error en request:', err.message || err);
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
@@ -295,17 +295,11 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // ---- Unhandled errors ----
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('UNHANDLED REJECTION:', reason);
-  if (logger && logger.error) {
-    logger.error('unhandledRejection', { reason: String(reason) });
-  }
+  logger.error('UNHANDLED REJECTION:', String(reason));
 });
 
 process.on('uncaughtException', (error) => {
-  console.error('UNCAUGHT EXCEPTION:', error);
-  if (logger && logger.error) {
-    logger.error('uncaughtException', { error: error.message, stack: error.stack });
-  }
+  logger.error('UNCAUGHT EXCEPTION:', error.message, error.stack);
   setTimeout(() => process.exit(1), 1000);
 });
 

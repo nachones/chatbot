@@ -1,5 +1,6 @@
 const db = require('./databaseService');
 const llmService = require('./llmService');
+const logger = require('./logger');
 
 class TrainingService {
   constructor() {
@@ -11,7 +12,7 @@ class TrainingService {
       const embedding = await llmService.generateEmbedding(text);
       return embedding; // Can be null if no API key available
     } catch (error) {
-      console.warn('Embeddings no disponibles (sin API key configurada):', error.message);
+      logger.warn('Embeddings no disponibles (sin API key configurada):', error.message);
       return null;
     }
   }
@@ -21,7 +22,7 @@ class TrainingService {
 
     try {
       // Generar embeddings para cada chunk
-      console.log(`Generando embeddings para ${chunks.length} chunks...`);
+      logger.info(`Generando embeddings para ${chunks.length} chunks...`);
 
       // Procesar en paralelo pero con límite si fueran muchos (aquí simple Promise.all)
       const chunksWithEmbeddings = await Promise.all(chunks.map(async (chunk) => {
@@ -29,7 +30,7 @@ class TrainingService {
           const embedding = await this.generateEmbedding(chunk.content);
           return { ...chunk, embedding };
         } catch (error) {
-          console.error(`Error generando embedding para chunk: ${chunk.content.substring(0, 50)}...`, error);
+          logger.error(`Error generando embedding para chunk: ${chunk.content.substring(0, 50)}...`, error);
           return { ...chunk, embedding: null }; // Guardar sin embedding si falla
         }
       }));
@@ -37,7 +38,7 @@ class TrainingService {
       await this.db.storeTrainingData(trainingId, chunksWithEmbeddings, chatbotId);
       return trainingId;
     } catch (error) {
-      console.error('Error almacenando datos de entrenamiento:', error);
+      logger.error('Error almacenando datos de entrenamiento:', error);
       throw error;
     }
   }
@@ -57,18 +58,11 @@ class TrainingService {
         throw new Error('No hay datos de entrenamiento disponibles');
       }
 
-      // Simular proceso de entrenamiento (en producción usaría OpenAI fine-tuning)
-      setTimeout(async () => {
-        try {
-          // Aquí iría el código real de fine-tuning con OpenAI
-          // Por ahora simulamos éxito
-          await this.db.updateTrainingJob(jobId, 'completed');
-          console.log(`Entrenamiento ${jobId} completado exitosamente`);
-        } catch (error) {
-          await this.db.updateTrainingJob(jobId, 'failed', error.message);
-          console.error(`Error en entrenamiento ${jobId}:`, error);
-        }
-      }, 5000); // Simular 5 segundos de entrenamiento
+      // Procesar embeddings para datos de entrenamiento (RAG)
+      // Esto se ejecuta de forma asíncrona para no bloquear la respuesta
+      this._processTrainingJob(jobId, trainingData).catch(error => {
+        logger.error(`Error en entrenamiento ${jobId}:`, error);
+      });
 
       return {
         id: jobId,
@@ -77,7 +71,7 @@ class TrainingService {
         modelType: modelType
       };
     } catch (error) {
-      console.error('Error iniciando entrenamiento:', error);
+      logger.error('Error iniciando entrenamiento:', error);
       throw error;
     }
   }
@@ -86,7 +80,7 @@ class TrainingService {
     try {
       return await this.db.getTrainingStatus(jobId);
     } catch (error) {
-      console.error('Error obteniendo estado del entrenamiento:', error);
+      logger.error('Error obteniendo estado del entrenamiento:', error);
       throw error;
     }
   }
@@ -95,7 +89,45 @@ class TrainingService {
     try {
       return await this.db.getAvailableTrainingData(chatbotId);
     } catch (error) {
-      console.error('Error obteniendo datos de entrenamiento disponibles:', error);
+      logger.error('Error obteniendo datos de entrenamiento disponibles:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Procesa un job de entrenamiento: genera embeddings para chunks que no los tengan
+   */
+  async _processTrainingJob(jobId, trainingData) {
+    try {
+      let processed = 0;
+      let failed = 0;
+
+      for (const chunk of trainingData) {
+        if (!chunk.embedding && chunk.content) {
+          try {
+            const embedding = await this.generateEmbedding(chunk.content);
+            if (embedding) {
+              // Update the chunk with its embedding in the database
+              await new Promise((resolve, reject) => {
+                this.db.db.run(
+                  'UPDATE training_data SET embedding = ? WHERE id = ?',
+                  [JSON.stringify(embedding), chunk.id],
+                  (err) => err ? reject(err) : resolve()
+                );
+              });
+              processed++;
+            }
+          } catch (error) {
+            logger.warn(`Error generando embedding para chunk ${chunk.id}:`, error.message);
+            failed++;
+          }
+        }
+      }
+
+      await this.db.updateTrainingJob(jobId, 'completed');
+      logger.info(`Entrenamiento ${jobId} completado: ${processed} embeddings generados, ${failed} fallidos de ${trainingData.length} chunks`);
+    } catch (error) {
+      await this.db.updateTrainingJob(jobId, 'failed', error.message);
       throw error;
     }
   }
@@ -121,7 +153,7 @@ class TrainingService {
       // 1. Generar embedding de la consulta
       const queryEmbedding = await this.generateEmbedding(query);
       if (!queryEmbedding) {
-        console.log('Embeddings no disponibles, usando búsqueda por palabras clave');
+        logger.info('Embeddings no disponibles, usando búsqueda por palabras clave');
         return this.searchRelevantContentSimple(query, limit, chatbotId);
       }
 
@@ -154,13 +186,13 @@ class TrainingService {
         return this.searchRelevantContentSimple(query, limit, chatbotId);
       }
 
-      console.log(`Búsqueda semántica: "${query}" - Encontrados ${scoredChunks.length} chunks. Top score: ${scoredChunks[0]?.similarity.toFixed(4)}`);
+      logger.info(`Búsqueda semántica: "${query}" - Encontrados ${scoredChunks.length} chunks. Top score: ${scoredChunks[0]?.similarity.toFixed(4)}`);
 
       // Filtrar por un umbral mínimo de relevancia (ej. 0.3)
       return scoredChunks.filter(chunk => chunk.similarity > 0.3);
 
     } catch (error) {
-      console.error('Error buscando contenido relevante:', error);
+      logger.error('Error buscando contenido relevante:', error);
       return [];
     }
   }

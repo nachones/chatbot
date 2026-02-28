@@ -35,10 +35,15 @@
     </div>
 
     <!-- Load the chatbot widget -->
-    <script src="/widget.js" 
-            data-api-url="http://localhost:3000/api"
-            data-title="Mi Asistente"
-            data-welcome="¡Hola! ¿En qué puedo ayudarte?">
+    <script>
+        // Auto-detect API URL from current host
+        const apiUrl = window.location.origin + '/api';
+        const script = document.createElement('script');
+        script.src = '/widget.js';
+        script.setAttribute('data-api-url', apiUrl);
+        script.setAttribute('data-title', 'Mi Asistente');
+        script.setAttribute('data-welcome', '¡Hola! ¿En qué puedo ayudarte?');
+        document.body.appendChild(script);
     </script>
 </body>
 </html>

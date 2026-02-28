@@ -5,6 +5,7 @@
 
 const OpenAI = require('openai');
 const axios = require('axios');
+const logger = require('./logger');
 
 class LLMService {
   constructor() {
@@ -33,7 +34,7 @@ class LLMService {
           const { GoogleGenerativeAI } = require('@google/generative-ai');
           this.providers.gemini = new GoogleGenerativeAI(apiKey);
         } catch (error) {
-          console.error('Error initializing Gemini:', error.message);
+          logger.error('Error initializing Gemini:', error.message);
           throw new Error('No se pudo inicializar Gemini. Verifica que @google/generative-ai esté instalado.');
         }
         break;
@@ -188,7 +189,7 @@ class LLMService {
         responseTime
       };
     } catch (error) {
-      console.error(`Error with ${detectedProvider}:`, error.message);
+      logger.error(`Error with ${detectedProvider}:`, error.message);
       throw error;
     }
   }
@@ -251,7 +252,7 @@ class LLMService {
         responseTime
       };
     } catch (error) {
-      console.error('Error with Gemini:', error.message);
+      logger.error('Error with Gemini:', error.message);
       throw error;
     }
   }
@@ -280,7 +281,7 @@ class LLMService {
         }
         throw new Error('No embedding values in Gemini response');
       } catch (error) {
-        console.warn('Gemini embeddings failed, trying OpenAI fallback:', error.message);
+        logger.warn('Gemini embeddings failed, trying OpenAI fallback:', error.message);
       }
     }
 

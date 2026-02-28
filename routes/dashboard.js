@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
 const { verifyOwnership } = require('../services/planConfig');
+const logger = require('../services/logger');
 
 // All dashboard routes require authentication
 router.use(authMiddleware);
@@ -48,7 +49,7 @@ router.get('/stats', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting stats:', error);
+    logger.error('Error getting stats:', error);
     res.status(500).json({ error: 'Error obteniendo estadísticas' });
   }
 });
@@ -66,7 +67,7 @@ router.get('/chat-history', async (req, res) => {
       history: history || []
     });
   } catch (error) {
-    console.error('Error getting chat history:', error);
+    logger.error('Error getting chat history:', error);
     res.status(500).json({ error: 'Error obteniendo historial' });
   }
 });
@@ -84,7 +85,7 @@ router.get('/recent-conversations', async (req, res) => {
       conversations: conversations || []
     });
   } catch (error) {
-    console.error('Error getting recent conversations:', error);
+    logger.error('Error getting recent conversations:', error);
     res.status(500).json({ error: 'Error obteniendo conversaciones' });
   }
 });
@@ -116,7 +117,7 @@ router.get('/token-usage', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting token usage:', error);
+    logger.error('Error getting token usage:', error);
     res.status(500).json({ 
       success: false,
       usage: {
@@ -148,7 +149,7 @@ router.get('/conversations', async (req, res) => {
       pages: Math.ceil((conversations.total || 0) / limit)
     });
   } catch (error) {
-    console.error('Error getting conversations:', error);
+    logger.error('Error getting conversations:', error);
     res.status(500).json({ error: 'Error obteniendo conversaciones' });
   }
 });
@@ -171,7 +172,7 @@ router.get('/conversations/:sessionId', async (req, res) => {
       conversation: conversation || []
     });
   } catch (error) {
-    console.error('Error getting conversation:', error);
+    logger.error('Error getting conversation:', error);
     res.status(500).json({ error: 'Error obteniendo conversación' });
   }
 });
@@ -194,7 +195,7 @@ router.delete('/conversations/:sessionId', async (req, res) => {
       message: 'Conversación eliminada'
     });
   } catch (error) {
-    console.error('Error deleting conversation:', error);
+    logger.error('Error deleting conversation:', error);
     res.status(500).json({ error: 'Error eliminando conversación' });
   }
 });
@@ -211,7 +212,7 @@ router.get('/leads', async (req, res) => {
       leads: leads || []
     });
   } catch (error) {
-    console.error('Error getting leads:', error);
+    logger.error('Error getting leads:', error);
     res.status(500).json({ error: 'Error obteniendo leads' });
   }
 });
@@ -235,7 +236,7 @@ router.get('/leads/export', async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
     res.send('\uFEFF' + csv); // Add BOM for Excel UTF-8 support
   } catch (error) {
-    console.error('Error exporting leads:', error);
+    logger.error('Error exporting leads:', error);
     res.status(500).json({ error: 'Error exportando leads' });
   }
 });

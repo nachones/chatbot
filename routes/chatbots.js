@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
 const { getPlanLimits } = require('../services/planConfig');
+const logger = require('../services/logger');
 
 // All chatbot routes require authentication
 router.use(authMiddleware);
@@ -24,7 +25,7 @@ router.get('/', async (req, res) => {
       chatbots: chatbots
     });
   } catch (error) {
-    console.error('Error getting chatbots:', error);
+    logger.error('Error getting chatbots:', error);
     res.status(500).json({ error: 'Error obteniendo chatbots' });
   }
 });
@@ -47,7 +48,7 @@ router.get('/:id', async (req, res) => {
       chatbot: chatbot
     });
   } catch (error) {
-    console.error('Error getting chatbot:', error);
+    logger.error('Error getting chatbot:', error);
     res.status(500).json({ error: 'Error obteniendo chatbot' });
   }
 });
@@ -89,7 +90,7 @@ router.post('/', async (req, res) => {
       message: 'Chatbot creado exitosamente'
     });
   } catch (error) {
-    console.error('Error creating chatbot:', error);
+    logger.error('Error creating chatbot:', error);
     res.status(500).json({ error: 'Error creando chatbot' });
   }
 });
@@ -111,7 +112,7 @@ router.put('/:id', async (req, res) => {
       message: 'Chatbot actualizado exitosamente'
     });
   } catch (error) {
-    console.error('Error updating chatbot:', error);
+    logger.error('Error updating chatbot:', error);
     res.status(500).json({ error: 'Error actualizando chatbot' });
   }
 });
@@ -131,7 +132,7 @@ router.delete('/:id', async (req, res) => {
       message: 'Chatbot eliminado exitosamente'
     });
   } catch (error) {
-    console.error('Error deleting chatbot:', error);
+    logger.error('Error deleting chatbot:', error);
     res.status(500).json({ error: 'Error eliminando chatbot' });
   }
 });
@@ -159,7 +160,7 @@ router.get('/:id/stats', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting chatbot stats:', error);
+    logger.error('Error getting chatbot stats:', error);
     res.status(500).json({ error: 'Error obteniendo estadísticas' });
   }
 });
@@ -179,7 +180,7 @@ router.get('/:id/appearance', async (req, res) => {
       appearance: appearance || {}
     });
   } catch (error) {
-    console.error('Error getting appearance:', error);
+    logger.error('Error getting appearance:', error);
     res.status(500).json({ error: 'Error obteniendo configuración de apariencia' });
   }
 });
@@ -201,7 +202,7 @@ router.put('/:id/appearance', async (req, res) => {
       message: 'Configuración de apariencia guardada exitosamente'
     });
   } catch (error) {
-    console.error('Error saving appearance:', error);
+    logger.error('Error saving appearance:', error);
     res.status(500).json({ error: 'Error guardando configuración de apariencia' });
   }
 });

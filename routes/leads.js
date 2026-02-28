@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
 const { verifyOwnership } = require('../services/planConfig');
+const logger = require('../services/logger');
 
 // POST /api/leads - Guardar nuevo lead (público - desde el widget)
 router.post('/', async (req, res) => {
@@ -50,7 +51,7 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error guardando lead:', error);
+    logger.error('Error guardando lead:', error);
     res.status(500).json({
       success: false,
       error: 'Error al guardar el lead'
@@ -77,7 +78,7 @@ router.get('/', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error obteniendo leads:', error);
+    logger.error('Error obteniendo leads:', error);
     res.status(500).json({
       success: false,
       error: 'Error al obtener leads'
@@ -111,7 +112,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error obteniendo lead:', error);
+    logger.error('Error obteniendo lead:', error);
     res.status(500).json({
       success: false,
       error: 'Error al obtener el lead'
@@ -140,7 +141,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error eliminando lead:', error);
+    logger.error('Error eliminando lead:', error);
     res.status(500).json({
       success: false,
       error: 'Error al eliminar el lead'

@@ -8,6 +8,7 @@ const db = require('../services/databaseService');
 const TrainingService = require('../services/trainingService');
 const { authMiddleware } = require('./auth');
 const { verifyOwnership } = require('../services/planConfig');
+const logger = require('../services/logger');
 const documentProcessor = new DocumentProcessor();
 const trainingService = new TrainingService();
 
@@ -86,7 +87,7 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
     // Clean up uploaded files
     for (const file of files) {
       fs.unlink(file.path, (err) => {
-        if (err) console.error('Error deleting file:', err);
+        if (err) logger.error('Error deleting file:', err);
       });
     }
 
@@ -97,7 +98,7 @@ router.post('/upload', upload.array('files', 5), async (req, res) => {
       totalChunks
     });
   } catch (error) {
-    console.error('Error uploading files:', error);
+    logger.error('Error uploading files:', error);
     res.status(500).json({ error: 'Error procesando archivos' });
   }
 });
@@ -133,7 +134,7 @@ router.post('/url', async (req, res) => {
       chunks: chunks.length
     });
   } catch (error) {
-    console.error('Error processing URL:', error);
+    logger.error('Error processing URL:', error);
     res.status(500).json({ error: 'Error procesando URL' });
   }
 });
@@ -171,7 +172,7 @@ router.post('/text', async (req, res) => {
       chunks: chunks.length
     });
   } catch (error) {
-    console.error('Error processing text:', error);
+    logger.error('Error processing text:', error);
     res.status(500).json({ error: 'Error procesando texto' });
   }
 });
@@ -190,15 +191,32 @@ router.get('/data/:chatbotId', async (req, res) => {
       trainingData: trainingData || []
     });
   } catch (error) {
-    console.error('Error getting training data:', error);
+    logger.error('Error getting training data:', error);
     res.status(500).json({ error: 'Error obteniendo datos de entrenamiento' });
   }
 });
 
-// Delete training data item
+// Delete training data item (with ownership verification)
 router.delete('/data/:id', async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Verify ownership: get the chatbot_id from the training data, then check ownership
+    const trainingItem = await new Promise((resolve, reject) => {
+      db.db.get('SELECT chatbot_id FROM training_data WHERE id = ?', [id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    if (!trainingItem) {
+      return res.status(404).json({ error: 'Dato de entrenamiento no encontrado' });
+    }
+
+    if (trainingItem.chatbot_id) {
+      const owns = await verifyOwnership(db, trainingItem.chatbot_id, req.user.id);
+      if (!owns) return res.status(403).json({ error: 'No tienes acceso a este dato de entrenamiento' });
+    }
 
     await db.deleteTrainingData(id);
 
@@ -207,7 +225,7 @@ router.delete('/data/:id', async (req, res) => {
       message: 'Dato de entrenamiento eliminado'
     });
   } catch (error) {
-    console.error('Error deleting training data:', error);
+    logger.error('Error deleting training data:', error);
     res.status(500).json({ error: 'Error eliminando dato de entrenamiento' });
   }
 });
@@ -226,7 +244,7 @@ router.get('/stats/:chatbotId', async (req, res) => {
       stats: stats
     });
   } catch (error) {
-    console.error('Error getting training stats:', error);
+    logger.error('Error getting training stats:', error);
     res.status(500).json({ error: 'Error obteniendo estadísticas' });
   }
 });

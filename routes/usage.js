@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
 const { verifyOwnership, PLANS, getPlan } = require('../services/planConfig');
+const logger = require('../services/logger');
 
 // All usage routes require authentication
 router.use(authMiddleware);
@@ -56,7 +57,7 @@ router.get('/:chatbotId', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error obteniendo estadísticas de uso:', error);
+    logger.error('Error obteniendo estadísticas de uso:', error);
     res.status(500).json({
       success: false,
       error: 'Error obteniendo estadísticas'
@@ -77,7 +78,7 @@ router.post('/:chatbotId/reset', async (req, res) => {
       message: 'Uso reseteado correctamente'
     });
   } catch (error) {
-    console.error('Error reseteando uso:', error);
+    logger.error('Error reseteando uso:', error);
     res.status(500).json({
       success: false,
       error: 'Error reseteando uso'
@@ -109,7 +110,7 @@ router.put('/:chatbotId/plan', async (req, res) => {
       plan: plan
     });
   } catch (error) {
-    console.error('Error actualizando plan:', error);
+    logger.error('Error actualizando plan:', error);
     res.status(500).json({
       success: false,
       error: 'Error actualizando plan'

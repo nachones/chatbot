@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../services/databaseService');
 const { authMiddleware } = require('./auth');
 const { verifyOwnership } = require('../services/planConfig');
+const logger = require('../services/logger');
 
 // Get all quick prompts for a chatbot
 router.get('/', async (req, res) => {
@@ -19,7 +20,7 @@ router.get('/', async (req, res) => {
         const prompts = await db.getQuickPrompts(chatbotId);
         res.json({ success: true, prompts });
     } catch (error) {
-        console.error('Error fetching quick prompts:', error);
+        logger.error('Error fetching quick prompts:', error);
         res.status(500).json({ 
             success: false, 
             error: 'Error obteniendo quick prompts' 
@@ -41,7 +42,7 @@ router.get('/:id', async (req, res) => {
 
         res.json({ success: true, prompt });
     } catch (error) {
-        console.error('Error fetching quick prompt:', error);
+        logger.error('Error fetching quick prompt:', error);
         res.status(500).json({ 
             success: false, 
             error: 'Error obteniendo quick prompt' 
@@ -88,7 +89,7 @@ router.post('/', authMiddleware, async (req, res) => {
             prompt: newPrompt 
         });
     } catch (error) {
-        console.error('Error creating quick prompt:', error);
+        logger.error('Error creating quick prompt:', error);
         res.status(500).json({ 
             success: false, 
             error: 'Error creando quick prompt' 
@@ -122,7 +123,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
             prompt: updatedPrompt 
         });
     } catch (error) {
-        console.error('Error updating quick prompt:', error);
+        logger.error('Error updating quick prompt:', error);
         res.status(500).json({ 
             success: false, 
             error: 'Error actualizando quick prompt' 
@@ -146,7 +147,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
             message: 'Quick prompt deleted successfully' 
         });
     } catch (error) {
-        console.error('Error deleting quick prompt:', error);
+        logger.error('Error deleting quick prompt:', error);
         res.status(500).json({ 
             success: false, 
             error: 'Error eliminando quick prompt' 

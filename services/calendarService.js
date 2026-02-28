@@ -3,13 +3,14 @@
 // ==========================================
 const { google } = require('googleapis');
 const db = require('./databaseService');
+const logger = require('./logger');
 
 class CalendarService {
   constructor() {
     this.db = db;
     this.clientId = process.env.GOOGLE_CLIENT_ID;
     this.clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    this.redirectUri = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/api/calendar/callback';
+    this.redirectUri = process.env.GOOGLE_REDIRECT_URI || `${process.env.APP_URL || 'https://app.micopiloto.es'}/api/calendar/callback`;
   }
 
   // Create OAuth2 client instance
@@ -27,7 +28,7 @@ class CalendarService {
 
     // Auto-refresh token
     oauth2Client.on('tokens', async (newTokens) => {
-      console.log('Tokens de Google Calendar refrescados para chatbot:', chatbotId);
+      logger.info('Tokens de Google Calendar refrescados para chatbot:', chatbotId);
       await this.saveTokens(chatbotId, {
         ...tokens,
         ...newTokens

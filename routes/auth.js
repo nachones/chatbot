@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../services/databaseService');
 const emailService = require('../services/emailService');
+const logger = require('../services/logger');
 
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL: JWT_SECRET no configurado en .env');
@@ -96,7 +97,7 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error en registro:', error);
+    logger.error('Error en registro:', error);
     res.status(500).json({ error: 'Error al crear la cuenta' });
   }
 });
@@ -119,7 +120,7 @@ router.get('/verify-email', async (req, res) => {
 
     return res.redirect('/?verify=success');
   } catch (error) {
-    console.error('Error verificando email:', error);
+    logger.error('Error verificando email:', error);
     return res.redirect('/?verify=error');
   }
 });
@@ -148,7 +149,7 @@ router.post('/resend-verification', async (req, res) => {
 
     res.json({ success: true, message: 'Si el email existe, se ha reenviado el enlace de verificacion' });
   } catch (error) {
-    console.error('Error reenviando verificacion:', error);
+    logger.error('Error reenviando verificacion:', error);
     res.status(500).json({ error: 'Error al reenviar verificacion' });
   }
 });
@@ -172,7 +173,7 @@ router.post('/forgot-password', async (req, res) => {
     // Siempre responder igual (no revelar si el email existe)
     res.json({ success: true, message: 'Si el email esta registrado, recibiras un enlace para restablecer tu contrasena' });
   } catch (error) {
-    console.error('Error en forgot password:', error);
+    logger.error('Error en forgot password:', error);
     res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
 });
@@ -199,7 +200,7 @@ router.post('/reset-password', async (req, res) => {
 
     res.json({ success: true, message: 'Contrasena actualizada correctamente. Ya puedes iniciar sesion.' });
   } catch (error) {
-    console.error('Error en reset password:', error);
+    logger.error('Error en reset password:', error);
     res.status(500).json({ error: 'Error al restablecer la contrasena' });
   }
 });
@@ -257,7 +258,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error en login:', error);
+    logger.error('Error en login:', error);
     res.status(500).json({ error: 'Error al iniciar sesion' });
   }
 });
@@ -282,7 +283,7 @@ router.get('/me', authMiddleware, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error obteniendo perfil:', error);
+    logger.error('Error obteniendo perfil:', error);
     res.status(500).json({ error: 'Error al obtener perfil' });
   }
 });
@@ -290,6 +291,82 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Verify token (used by dashboard to check if logged in)
 router.get('/verify', authMiddleware, (req, res) => {
   res.json({ success: true, user: req.user });
+});
+
+// =============================================
+// SMTP Diagnostics (requiere autenticación)
+// =============================================
+
+// GET /api/auth/smtp-status — Estado SMTP actual
+router.get('/smtp-status', authMiddleware, async (req, res) => {
+  try {
+    const diagnosis = await emailService.diagnose();
+    res.json({ success: true, smtp: diagnosis });
+  } catch (error) {
+    logger.error('Error en diagnóstico SMTP:', error);
+    res.status(500).json({ error: 'Error ejecutando diagnóstico SMTP' });
+  }
+});
+
+// POST /api/auth/smtp-test — Enviar email de prueba
+router.post('/smtp-test', authMiddleware, async (req, res) => {
+  try {
+    const { email } = req.body;
+    const targetEmail = email || req.user.email;
+
+    if (!targetEmail) {
+      return res.status(400).json({ error: 'Email de destino requerido' });
+    }
+
+    // Primero diagnosticar
+    const diagnosis = await emailService.diagnose();
+
+    if (!diagnosis.connectionTest?.success) {
+      return res.json({
+        success: false,
+        message: 'No se pudo conectar al servidor SMTP',
+        smtp: diagnosis
+      });
+    }
+
+    // Enviar email de prueba
+    const sendResult = await emailService.sendTestEmail(targetEmail);
+
+    res.json({
+      success: sendResult.success,
+      message: sendResult.success
+        ? `Email de prueba enviado a ${targetEmail}. Revisa tu bandeja de entrada (y spam).`
+        : `Error enviando email: ${sendResult.error}`,
+      sendResult,
+      smtp: diagnosis
+    });
+  } catch (error) {
+    logger.error('Error en test SMTP:', error);
+    res.status(500).json({ error: 'Error ejecutando test SMTP' });
+  }
+});
+
+// POST /api/auth/smtp-reinit — Reinicializar conexión SMTP
+router.post('/smtp-reinit', authMiddleware, async (req, res) => {
+  try {
+    emailService.reinitialize();
+    
+    // Esperar un momento para que la verificación se complete
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    const diagnosis = await emailService.diagnose();
+    
+    res.json({
+      success: diagnosis.connectionTest?.success || false,
+      message: diagnosis.connectionTest?.success
+        ? 'SMTP reinicializado y conectado correctamente'
+        : `SMTP reinicializado pero no conecta: ${diagnosis.connectionTest?.error}`,
+      smtp: diagnosis
+    });
+  } catch (error) {
+    logger.error('Error reinicializando SMTP:', error);
+    res.status(500).json({ error: 'Error reinicializando SMTP' });
+  }
 });
 
 module.exports = router;

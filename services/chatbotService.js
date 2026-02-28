@@ -3,6 +3,7 @@ const TrainingService = require('./trainingService');
 const llmService = require('./llmService');
 const CalendarService = require('./calendarService');
 const { getPlanLimits } = require('./planConfig');
+const logger = require('./logger');
 
 class ChatbotService {
   constructor() {
@@ -122,10 +123,10 @@ ${contextText}
 
 Usa esta información para responder de manera precisa y detallada. Si la pregunta del usuario está relacionada con este contexto, úsalo en tu respuesta. Si no está relacionado, responde normalmente basándote en tu conocimiento general.`;
             
-            console.log(`✓ Encontrados ${relevantChunks.length} chunks relevantes para la consulta`);
+            logger.info(`✓ Encontrados ${relevantChunks.length} chunks relevantes para la consulta`);
           }
         } catch (error) {
-          console.error('Error buscando contenido relevante:', error);
+          logger.error('Error buscando contenido relevante:', error);
           // Continuar sin contexto si hay error
         }
       }
@@ -176,7 +177,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
             tools = tools ? [...tools, ...calendarTools] : calendarTools;
           }
         } catch (e) {
-          console.warn('Error checking calendar connection:', e.message);
+          logger.warn('Error checking calendar connection:', e.message);
         }
       }
 
@@ -208,7 +209,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
           try {
             functionArgs = JSON.parse(toolCall.function.arguments);
           } catch (parseErr) {
-            console.error(`Error parsing arguments for ${functionName}:`, parseErr.message);
+            logger.error(`Error parsing arguments for ${functionName}:`, parseErr.message);
             messages.push({
               role: 'tool',
               tool_call_id: toolCall.id,
@@ -229,7 +230,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
                 content: JSON.stringify(calendarResult)
               });
             } catch (error) {
-              console.error(`Error ejecutando función calendario ${functionName}:`, error);
+              logger.error(`Error ejecutando función calendario ${functionName}:`, error);
               messages.push({
                 role: 'tool',
                 tool_call_id: toolCall.id,
@@ -252,7 +253,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
                   content: JSON.stringify(functionResult)
                 });
               } catch (error) {
-                console.error(`Error ejecutando función ${functionName}:`, error);
+                logger.error(`Error ejecutando función ${functionName}:`, error);
                 messages.push({
                   role: 'tool',
                   tool_call_id: toolCall.id,
@@ -300,7 +301,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
         responseTime: result.responseTime
       };
     } catch (error) {
-      console.error('Error procesando mensaje:', error);
+      logger.error('Error procesando mensaje:', error);
       throw new Error(error.message || 'Error al procesar el mensaje');
     }
   }
@@ -358,7 +359,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
             : functionDef.headers;
           headers = { ...headers, ...customHeaders };
         } catch (e) {
-          console.warn('Headers inválidos para función:', functionDef.name);
+          logger.warn('Headers inválidos para función:', functionDef.name);
         }
       }
 
@@ -404,7 +405,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
 
       return response.data;
     } catch (error) {
-      console.error('Error ejecutando función externa:', error);
+      logger.error('Error ejecutando función externa:', error);
       return {
         error: true,
         message: error.message || 'Error ejecutando la función',
@@ -417,7 +418,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
     try {
       return await this.db.getConversationHistory(sessionId);
     } catch (error) {
-      console.error('Error obteniendo historial:', error);
+      logger.error('Error obteniendo historial:', error);
       return [];
     }
   }
@@ -431,7 +432,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
       await this.db.saveConfig(config);
       return true;
     } catch (error) {
-      console.error('Error actualizando configuración:', error);
+      logger.error('Error actualizando configuración:', error);
       throw error;
     }
   }
@@ -440,7 +441,7 @@ Usa esta información para responder de manera precisa y detallada. Si la pregun
     try {
       return await this.db.getConfig();
     } catch (error) {
-      console.error('Error obteniendo configuración:', error);
+      logger.error('Error obteniendo configuración:', error);
       return {
         model: 'gemini-2.0-flash',
         systemPrompt: this.systemPrompt

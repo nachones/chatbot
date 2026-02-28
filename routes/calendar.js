@@ -6,6 +6,7 @@ const router = express.Router();
 const CalendarService = require('../services/calendarService');
 const { authMiddleware } = require('./auth');
 const db = require('../services/databaseService');
+const logger = require('../services/logger');
 
 const calendarService = new CalendarService();
 
@@ -35,7 +36,7 @@ router.get('/auth-url', authMiddleware, async (req, res) => {
     }
     res.json({ url });
   } catch (error) {
-    console.error('Error getting auth URL:', error);
+    logger.error('Error getting auth URL:', error);
     res.status(500).json({ error: 'Error al obtener URL de autorización' });
   }
 });
@@ -89,7 +90,7 @@ router.get('/callback', async (req, res) => {
     // Redirect to dashboard calendar page
     res.redirect('/dashboard.html?calendar=connected#calendar');
   } catch (error) {
-    console.error('Error in OAuth callback:', error);
+    logger.error('Error in OAuth callback:', error);
     res.redirect('/dashboard.html#calendar?error=oauth_failed');
   }
 });
@@ -118,7 +119,7 @@ router.get('/status', authMiddleware, async (req, res) => {
     const status = await calendarService.getCalendarStatus(chatbotId);
     res.json(status);
   } catch (error) {
-    console.error('Error getting status:', error);
+    logger.error('Error getting status:', error);
     res.status(500).json({ error: 'Error al obtener estado del calendario' });
   }
 });
@@ -143,7 +144,7 @@ router.post('/config', authMiddleware, async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error('Error saving config:', error);
+    logger.error('Error saving config:', error);
     res.status(500).json({ error: 'Error al guardar configuración' });
   }
 });
@@ -159,7 +160,7 @@ router.get('/config', authMiddleware, async (req, res) => {
     const config = await calendarService.getConfig(chatbotId);
     res.json({ config });
   } catch (error) {
-    console.error('Error getting config:', error);
+    logger.error('Error getting config:', error);
     res.status(500).json({ error: 'Error al obtener configuración' });
   }
 });
@@ -175,7 +176,7 @@ router.get('/availability', async (req, res) => {
     const availability = await calendarService.checkAvailability(chatbotId, date);
     res.json(availability);
   } catch (error) {
-    console.error('Error checking availability:', error);
+    logger.error('Error checking availability:', error);
     res.status(500).json({ error: 'Error al comprobar disponibilidad' });
   }
 });
@@ -193,7 +194,7 @@ router.post('/book', async (req, res) => {
     });
     res.json(result);
   } catch (error) {
-    console.error('Error booking appointment:', error);
+    logger.error('Error booking appointment:', error);
     res.status(500).json({ error: 'Error al reservar cita' });
   }
 });
@@ -215,7 +216,7 @@ router.get('/appointments', authMiddleware, async (req, res) => {
     const appointments = await calendarService.getUpcomingAppointments(chatbotId);
     res.json({ appointments });
   } catch (error) {
-    console.error('Error getting appointments:', error);
+    logger.error('Error getting appointments:', error);
     res.status(500).json({ error: 'Error al obtener citas', appointments: [] });
   }
 });
@@ -237,7 +238,7 @@ router.post('/disconnect', authMiddleware, async (req, res) => {
     await calendarService.disconnect(chatbotId);
     res.json({ success: true });
   } catch (error) {
-    console.error('Disconnect error:', error);
+    logger.error('Disconnect error:', error);
     res.status(500).json({ error: 'Error al desconectar calendario' });
   }
 });

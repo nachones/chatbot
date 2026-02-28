@@ -5,14 +5,15 @@ const crypto = require('crypto');
 const db = require('../services/databaseService');
 const emailService = require('../services/emailService');
 const { authMiddleware } = require('./auth');
+const logger = require('../services/logger');
 
 // Initialize Stripe only if key is configured
 let stripe = null;
 if (process.env.STRIPE_SECRET_KEY) {
   stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-  console.log('✓ Stripe configurado');
+  logger.info('✓ Stripe configurado');
 } else {
-  console.log('⚠ Stripe no configurado (STRIPE_SECRET_KEY no encontrada)');
+  logger.info('⚠ Stripe no configurado (STRIPE_SECRET_KEY no encontrada)');
 }
 
 // ==========================================
@@ -187,7 +188,7 @@ router.post('/checkout', async (req, res) => {
 
     res.json({ success: true, url: session.url, sessionId: session.id });
   } catch (error) {
-    console.error('Error creando sesión de Stripe:', error);
+    logger.error('Error creando sesión de Stripe:', error);
     res.status(500).json({ error: 'Error al crear sesión de pago' });
   }
 });
@@ -212,7 +213,7 @@ router.post('/portal', authMiddleware, async (req, res) => {
 
     res.json({ success: true, url: session.url });
   } catch (error) {
-    console.error('Error creando portal de Stripe:', error);
+    logger.error('Error creando portal de Stripe:', error);
     res.status(500).json({ error: 'Error al acceder al portal de pagos' });
   }
 });
@@ -229,11 +230,11 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     if (webhookSecret) {
       event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } else {
-      console.warn('⚠ STRIPE_WEBHOOK_SECRET no configurado - webhook rechazado');
+      logger.warn('⚠ STRIPE_WEBHOOK_SECRET no configurado - webhook rechazado');
       return res.status(503).json({ error: 'Webhook no configurado' });
     }
   } catch (err) {
-    console.error('Error verificando webhook:', err.message);
+    logger.error('Error verificando webhook:', err.message);
     return res.status(400).send('Webhook signature verification failed');
   }
 
@@ -249,13 +250,13 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         const customerId = session.customer;
 
         if (!customerEmail || !planId) {
-          console.error('⚠ Webhook: falta email o planId en metadata');
+          logger.error('⚠ Webhook: falta email o planId en metadata');
           break;
         }
 
         const plan = PLANS[planId];
         if (!plan) {
-          console.error(`⚠ Webhook: plan desconocido "${planId}"`);
+          logger.error(`⚠ Webhook: plan desconocido "${planId}"`);
           break;
         }
 
@@ -353,7 +354,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 
     res.json({ received: true });
   } catch (error) {
-    console.error('Error procesando webhook:', error);
+    logger.error('Error procesando webhook:', error);
     res.status(500).json({ error: 'Error procesando webhook' });
   }
 });
@@ -384,7 +385,7 @@ router.get('/subscription', authMiddleware, async (req, res) => {
       } : null
     });
   } catch (error) {
-    console.error('Error obteniendo suscripción:', error);
+    logger.error('Error obteniendo suscripción:', error);
     res.status(500).json({ error: 'Error obteniendo información de suscripción' });
   }
 });

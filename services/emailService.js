@@ -4,13 +4,16 @@
  */
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const logger = require('./logger');
 
 class EmailService {
   constructor() {
     this.transporter = null;
     this.configured = false;
+    this.lastError = null;
+    this.smtpConfig = null;
     this.from = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@micopiloto.es';
-    this.appUrl = process.env.APP_URL || 'http://localhost:3000';
+    this.appUrl = process.env.APP_URL || 'https://app.micopiloto.es';
     this.initialize();
   }
 
@@ -20,11 +23,20 @@ class EmailService {
     const pass = process.env.SMTP_PASS;
 
     if (!host || !user || !pass) {
-      console.log('⚠ SMTP no configurado — emails deshabilitados');
+      this.lastError = 'Variables SMTP_HOST, SMTP_USER o SMTP_PASS no definidas en .env';
+      logger.info('⚠ SMTP no configurado — emails deshabilitados');
       return;
     }
 
     const port = parseInt(process.env.SMTP_PORT) || 587;
+
+    this.smtpConfig = {
+      host,
+      port,
+      secure: port === 465,
+      user,
+      from: this.from
+    };
 
     this.transporter = nodemailer.createTransport({
       host,
@@ -32,20 +44,141 @@ class EmailService {
       secure: port === 465, // true para 465, false para 587
       auth: { user, pass },
       tls: {
-        rejectUnauthorized: process.env.NODE_ENV === 'production'
-      }
+        rejectUnauthorized: false // Plesk local mail - cert puede no coincidir
+      },
+      connectionTimeout: 10000, // 10s timeout de conexión
+      greetingTimeout: 10000,   // 10s timeout saludo SMTP
+      socketTimeout: 15000      // 15s timeout de socket
     });
 
     // Verificar conexión
     this.transporter.verify()
       .then(() => {
-        console.log('✓ SMTP conectado correctamente');
+        logger.info('✓ SMTP conectado correctamente');
+        logger.info(`  Host: ${host}:${port} | User: ${user}`);
         this.configured = true;
+        this.lastError = null;
       })
       .catch(err => {
-        console.error('✗ Error SMTP:', err.message);
+        this.lastError = err.message;
+        logger.error('✗ Error SMTP:', err.message);
+        logger.error(`  Config: ${host}:${port} | User: ${user}`);
         this.configured = false;
       });
+  }
+
+  /**
+   * Reinicializa la conexión SMTP (útil para cambios en caliente)
+   */
+  reinitialize() {
+    if (this.transporter) {
+      this.transporter.close();
+    }
+    this.transporter = null;
+    this.configured = false;
+    this.lastError = null;
+    this.smtpConfig = null;
+    this.from = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@micopiloto.es';
+    this.appUrl = process.env.APP_URL || 'https://app.micopiloto.es';
+    this.initialize();
+  }
+
+  /**
+   * Diagnóstico completo de SMTP - devuelve info detallada
+   */
+  async diagnose() {
+    const result = {
+      timestamp: new Date().toISOString(),
+      configured: this.configured,
+      lastError: this.lastError,
+      config: this.smtpConfig ? {
+        host: this.smtpConfig.host,
+        port: this.smtpConfig.port,
+        secure: this.smtpConfig.secure,
+        user: this.smtpConfig.user,
+        from: this.smtpConfig.from
+      } : null,
+      envVars: {
+        SMTP_HOST: process.env.SMTP_HOST ? '✓ definido' : '✗ no definido',
+        SMTP_PORT: process.env.SMTP_PORT || '(default 587)',
+        SMTP_USER: process.env.SMTP_USER ? '✓ definido' : '✗ no definido',
+        SMTP_PASS: process.env.SMTP_PASS ? '✓ definido (' + process.env.SMTP_PASS.length + ' chars)' : '✗ no definido',
+        SMTP_FROM: process.env.SMTP_FROM || '(no definido, usando SMTP_USER)',
+        APP_URL: process.env.APP_URL || '(default https://app.micopiloto.es)'
+      },
+      connectionTest: null,
+      sendTest: null
+    };
+
+    // Test de conexión
+    if (this.transporter) {
+      try {
+        await this.transporter.verify();
+        result.connectionTest = { success: true, message: 'Conexión SMTP verificada correctamente' };
+        this.configured = true;
+        this.lastError = null;
+      } catch (err) {
+        result.connectionTest = {
+          success: false,
+          error: err.message,
+          code: err.code || 'UNKNOWN',
+          command: err.command || null
+        };
+        this.lastError = err.message;
+      }
+    } else {
+      result.connectionTest = { success: false, error: 'Transporter no inicializado - faltan variables SMTP' };
+    }
+
+    return result;
+  }
+
+  /**
+   * Envía un email de prueba para verificar que todo funciona end-to-end
+   */
+  async sendTestEmail(to) {
+    if (!this.transporter) {
+      return { success: false, error: 'SMTP no inicializado' };
+    }
+
+    try {
+      // Primero verificar conexión
+      await this.transporter.verify();
+      this.configured = true;
+
+      // Enviar email de prueba
+      const info = await this.transporter.sendMail({
+        from: this.from,
+        to,
+        subject: '✓ Test SMTP MIABOT - ' + new Date().toLocaleString('es-ES'),
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: 0 auto;">
+            <h2 style="color: #6C63FF;">🤖 MIABOT - Test SMTP</h2>
+            <p>Este es un email de prueba para confirmar que la configuración SMTP funciona correctamente.</p>
+            <div style="background: #f0f8f0; border-left: 4px solid #4CAF50; padding: 15px; margin: 20px 0; border-radius: 4px;">
+              <strong style="color: #2E7D32;">✓ SMTP funciona correctamente</strong><br>
+              <small style="color: #666;">Host: ${this.smtpConfig?.host}:${this.smtpConfig?.port}</small><br>
+              <small style="color: #666;">Fecha: ${new Date().toLocaleString('es-ES')}</small>
+            </div>
+            <p style="color: #888; font-size: 12px;">Si recibes este email, la recuperación de contraseña y el registro funcionarán correctamente.</p>
+          </div>
+        `
+      });
+
+      return {
+        success: true,
+        messageId: info.messageId,
+        accepted: info.accepted,
+        response: info.response
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: err.message,
+        code: err.code || 'UNKNOWN',
+        command: err.command || null
+      };
+    }
   }
 
   /**
@@ -59,21 +192,41 @@ class EmailService {
    * Envía un email genérico
    */
   async sendMail(to, subject, html) {
-    if (!this.configured || !this.transporter) {
-      console.warn('⚠ SMTP no disponible — email no enviado a', to);
+    if (!this.transporter) {
+      logger.warn('⚠ SMTP no inicializado — email no enviado a', to);
       return false;
     }
 
+    // Si no está configurado, intentar reconectar una vez
+    if (!this.configured) {
+      try {
+        await this.transporter.verify();
+        this.configured = true;
+        this.lastError = null;
+        logger.info('✓ SMTP reconectado automáticamente');
+      } catch (err) {
+        logger.warn('⚠ SMTP no disponible (reintento fallido) — email no enviado a', to);
+        this.lastError = err.message;
+        return false;
+      }
+    }
+
     try {
-      await this.transporter.sendMail({
+      const info = await this.transporter.sendMail({
         from: this.from,
         to,
         subject,
         html
       });
+      logger.info(`✓ Email enviado a ${to} (${info.messageId})`);
       return true;
     } catch (error) {
-      console.error('Error enviando email a', to, ':', error.message);
+      logger.error('Error enviando email a', to, ':', error.message);
+      // Marcar como no configurado para reintentar en el siguiente envío
+      if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') {
+        this.configured = false;
+        this.lastError = error.message;
+      }
       return false;
     }
   }
@@ -234,11 +387,11 @@ class EmailService {
         </p>
 
         <div style="background: #f0f0ff; border-radius: 10px; padding: 25px; margin: 25px 0; border-left: 4px solid #6C63FF;">
-          <h3 style="color: #333; margin: 0 0 15px 0; font-size: 16px;">🔐 Tus credenciales de acceso</h3>
+          <h3 style="color: #333; margin: 0 0 15px 0; font-size: 16px;">🔐 Acceso a tu cuenta</h3>
           <p style="color: #555; margin: 5px 0;"><strong>Email:</strong> ${email}</p>
-          <p style="color: #555; margin: 5px 0;"><strong>Contraseña:</strong> <code style="background:#e8e8ff; padding:3px 8px; border-radius:4px; font-size:15px;">${password}</code></p>
-          <p style="color: #FF6B6B; font-size: 13px; margin-top: 12px;">
-            ⚠️ Te recomendamos cambiar tu contraseña una vez dentro del dashboard.
+          <p style="color: #555; margin: 5px 0;"><strong>Contraseña:</strong> La que estableciste durante el registro</p>
+          <p style="color: #6C63FF; font-size: 13px; margin-top: 12px;">
+            Si no recuerdas tu contraseña, puedes restablecerla desde la pantalla de inicio de sesión.
           </p>
         </div>
 

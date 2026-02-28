@@ -4,6 +4,7 @@ const pdf = require('pdf-parse');
 const mammoth = require('mammoth');
 const cheerio = require('cheerio');
 const axios = require('axios');
+const logger = require('./logger');
 
 class DocumentProcessor {
   constructor() {
@@ -35,7 +36,7 @@ class DocumentProcessor {
       const content = await processor(filePath);
       return this.chunkContent(content);
     } catch (error) {
-      console.error('Error procesando archivo:', error);
+      logger.error('Error procesando archivo:', error);
       throw error;
     }
   }
@@ -79,7 +80,7 @@ class DocumentProcessor {
       
       return this.chunkContent(text);
     } catch (error) {
-      console.error('Error procesando página web:', error.message);
+      logger.error('Error procesando página web:', error.message);
       throw error;
     }
   }
@@ -92,7 +93,7 @@ class DocumentProcessor {
       
       return this.chunkContent(text);
     } catch (error) {
-      console.error('Error procesando texto:', error);
+      logger.error('Error procesando texto:', error);
       throw error;
     }
   }
@@ -118,7 +119,7 @@ class DocumentProcessor {
     const maxContentLength = 100000;
     if (content.length > maxContentLength) {
       content = content.substring(0, maxContentLength);
-      console.warn(`Contenido truncado a ${maxContentLength} caracteres para evitar problemas de memoria`);
+      logger.warn(`Contenido truncado a ${maxContentLength} caracteres para evitar problemas de memoria`);
     }
     
     const words = content.split(/\s+/).filter(w => w.length > 0);
@@ -180,7 +181,7 @@ class DocumentProcessor {
           data: chunks
         });
       } catch (error) {
-        console.error(`Error procesando ${file.originalname}:`, error);
+        logger.error(`Error procesando ${file.originalname}:`, error);
         results.push({
           filename: file.originalname,
           error: error.message
