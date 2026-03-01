@@ -4027,6 +4027,131 @@ textarea.form-control {
     margin-top: var(--space-md);
 }
 
+/* WordPress Plugin Integration Card */
+.integration-card-wordpress {
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    background: linear-gradient(135deg, rgba(30,41,59,0.6) 0%, rgba(30,41,59,0.3) 100%);
+}
+
+.integration-card-wordpress::before {
+    background: linear-gradient(90deg, #f59e0b, #d97706) !important;
+    opacity: 1 !important;
+}
+
+.integration-card-wordpress .integration-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.integration-card-wordpress .integration-header h3 i {
+    background: linear-gradient(135deg, #21759b, #0073aa);
+}
+
+.integration-badge {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+    50% { box-shadow: 0 0 12px 4px rgba(245,158,11,0.15); }
+}
+
+.wp-plugin-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin: 16px 0 20px;
+}
+
+.wp-feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(148,163,184,0.9);
+}
+
+.wp-feature i {
+    color: #10b981;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.wp-plugin-steps {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin: 16px 0 20px;
+}
+
+.wp-plugin-steps h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin: 0 0 12px;
+}
+
+.wp-plugin-steps ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.wp-plugin-steps ol li {
+    font-size: 13px;
+    color: rgba(148,163,184,0.8);
+    padding: 4px 0;
+    line-height: 1.5;
+}
+
+.wp-plugin-steps ol li strong {
+    color: #e2e8f0;
+}
+
+.wp-plugin-steps ol li code {
+    background: rgba(245,158,11,0.1);
+    color: #f59e0b;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    user-select: all;
+}
+
+.wp-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #21759b, #0073aa) !important;
+    color: white !important;
+    border: none;
+    padding: 12px 28px;
+    border-radius: var(--radius-lg);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wp-download-btn:hover {
+    background: linear-gradient(135deg, #2b8ab5, #0085c3) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(33,117,155,0.3);
+}
+
+.wp-download-btn i {
+    font-size: 18px;
+}
+
 /* Settings Page Modern */
 .settings-container {
     max-width: 800px;

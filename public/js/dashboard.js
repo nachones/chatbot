@@ -457,6 +457,12 @@ console.log(data.text);`;
         if (directLink) {
             directLink.textContent = `${origin}/widget-preview.html?id=${currentChatbotId}`;
         }
+
+        // WordPress plugin info
+        const wpServerUrl = document.getElementById('wp-server-url');
+        if (wpServerUrl) wpServerUrl.textContent = origin;
+        const wpChatbotId = document.getElementById('wp-chatbot-id');
+        if (wpChatbotId) wpChatbotId.textContent = currentChatbotId;
     }
 
     // --- Modals ---

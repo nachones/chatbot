@@ -1,0 +1,245 @@
+/* MIABOT Admin Panel Styles */
+.miabot-settings-wrap {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.miabot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f59e0b;
+}
+
+.miabot-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.miabot-logo-icon {
+    font-size: 32px;
+}
+
+.miabot-logo h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+    color: #1d2327;
+}
+
+.miabot-version {
+    background: #f59e0b;
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Cards */
+.miabot-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s;
+}
+
+.miabot-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.miabot-card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1d2327;
+}
+
+.miabot-card h2 .dashicons {
+    color: #f59e0b;
+    font-size: 20px;
+}
+
+.miabot-card-desc {
+    color: #6b7280;
+    margin: 0 0 16px;
+    font-size: 13px;
+}
+
+/* Status Card */
+.miabot-status-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-left: 4px solid #dc2626;
+}
+
+.miabot-status-card.active {
+    border-left-color: #10b981;
+}
+
+.miabot-status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #dc2626;
+    flex-shrink: 0;
+}
+
+.miabot-status-card.active .miabot-status-dot {
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16,185,129,0.4);
+    animation: miabot-pulse 2s infinite;
+}
+
+@keyframes miabot-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.miabot-status-text {
+    flex: 1;
+}
+
+.miabot-status-text strong {
+    display: block;
+    font-size: 15px;
+    color: #1d2327;
+}
+
+.miabot-status-text span {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Toggle Switch */
+.miabot-toggle {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.miabot-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.miabot-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d1d5db;
+    transition: 0.3s;
+    border-radius: 28px;
+}
+
+.miabot-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.miabot-toggle input:checked + .miabot-toggle-slider {
+    background-color: #f59e0b;
+}
+
+.miabot-toggle input:checked + .miabot-toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* Form Table */
+.miabot-card .form-table th {
+    padding: 12px 0;
+    font-weight: 600;
+    font-size: 13px;
+    color: #374151;
+    width: 200px;
+}
+
+.miabot-card .form-table td {
+    padding: 12px 0;
+}
+
+.miabot-card .form-table input[type="text"],
+.miabot-card .form-table input[type="url"],
+.miabot-card .form-table select {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.miabot-card .form-table input:focus,
+.miabot-card .form-table select:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+    outline: none;
+}
+
+.miabot-card .description {
+    color: #9ca3af;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Info Card */
+.miabot-info-card {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border-color: #fcd34d;
+}
+
+.miabot-shortcode {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: monospace;
+    margin: 8px 0;
+    user-select: all;
+}
+
+/* Save Button */
+.miabot-save-btn {
+    background: #f59e0b !important;
+    border-color: #d97706 !important;
+    color: #000 !important;
+    font-weight: 600 !important;
+    padding: 8px 24px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    transition: all 0.2s !important;
+}
+
+.miabot-save-btn:hover {
+    background: #d97706 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245,158,11,0.3) !important;
+}

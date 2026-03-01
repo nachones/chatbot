@@ -240,6 +240,14 @@ try {
   console.error('✗ Error cargando Calendar routes:', error.message);
 }
 
+try {
+  const integrationsRoutes = require('./routes/integrations');
+  app.use('/api/integrations', integrationsRoutes);
+  console.log('✓ Integrations routes cargadas');
+} catch (error) {
+  console.error('✗ Error cargando Integrations routes:', error.message);
+}
+
 // Manejo de errores
 app.use((err, req, res, next) => {
   logger.error('Error en request:', err.message || err);
