@@ -17,18 +17,18 @@
 
 .calendar-setup-icon {
     font-size: 4rem;
-    color: var(--primary);
+    color: #f59e0b;
     margin-bottom: var(--space-lg);
 }
 
 .calendar-setup h2 {
     font-size: 1.75rem;
-    color: var(--gray-800);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
 .calendar-setup > p {
-    color: var(--gray-500);
+    color: rgba(148,163,184,0.6);
     font-size: 1rem;
     max-width: 500px;
     margin: 0 auto var(--space-xl);
@@ -44,8 +44,8 @@
 }
 
 .calendar-feature {
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     text-align: center;
@@ -53,19 +53,19 @@
 
 .calendar-feature i {
     font-size: 2rem;
-    color: var(--primary);
+    color: #f59e0b;
     margin-bottom: var(--space-sm);
 }
 
 .calendar-feature h4 {
     font-size: 0.95rem;
-    color: var(--gray-800);
+    color: #e2e8f0;
     margin-bottom: 0.5rem;
 }
 
 .calendar-feature p {
     font-size: 0.8rem;
-    color: var(--gray-500);
+    color: rgba(148,163,184,0.6);
     line-height: 1.4;
     margin: 0;
 }
@@ -85,8 +85,8 @@
 
 /* Upgrade notice */
 .calendar-upgrade-notice {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border: 1px solid #f59e0b;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.25);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     margin-bottom: var(--space-lg);
@@ -104,7 +104,7 @@
 
 .calendar-upgrade-notice p {
     margin: 0;
-    color: #92400e;
+    color: #f59e0b;
     font-size: 0.95rem;
 }
 
@@ -113,8 +113,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.25);
     border-radius: var(--radius-lg);
     padding: var(--space-md) var(--space-lg);
     margin-bottom: var(--space-xl);
@@ -139,15 +139,15 @@
 }
 
 .calendar-email {
-    color: var(--gray-500);
+    color: rgba(148,163,184,0.6);
     font-size: 0.85rem;
     margin-left: var(--space-sm);
 }
 
 /* Config section */
 .calendar-config-section {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     margin-bottom: var(--space-xl);
@@ -155,17 +155,17 @@
 
 .calendar-config-section h3 {
     font-size: 1.15rem;
-    color: var(--gray-800);
+    color: #e2e8f0;
     margin-bottom: 0.25rem;
 }
 
 .calendar-config-section h3 i {
-    color: var(--primary);
+    color: #f59e0b;
     margin-right: 0.5rem;
 }
 
 .section-desc {
-    color: var(--gray-500);
+    color: rgba(148,163,184,0.6);
     font-size: 0.85rem;
     margin-bottom: var(--space-lg);
 }
@@ -183,7 +183,7 @@
     align-items: center;
     gap: var(--space-lg);
     padding: var(--space-sm) var(--space-md);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     border-radius: var(--radius-md);
 }
 
@@ -194,28 +194,28 @@
     min-width: 130px;
     cursor: pointer;
     font-weight: 500;
-    color: var(--gray-700);
+    color: #cbd5e1;
 }
 
 .schedule-toggle input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: var(--primary);
+    accent-color: #f59e0b;
 }
 
 .schedule-hours {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    color: var(--gray-500);
+    color: rgba(148,163,184,0.6);
 }
 
 .schedule-hours input[type="time"] {
     padding: 0.4rem 0.6rem;
-    border: 1px solid var(--gray-300);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
-    color: var(--gray-700);
+    color: #cbd5e1;
 }
 
 .schedule-hours input[type="time"]:disabled {
@@ -234,31 +234,31 @@
     display: block;
     font-weight: 500;
     font-size: 0.85rem;
-    color: var(--gray-700);
+    color: #cbd5e1;
     margin-bottom: 0.4rem;
 }
 
 .calendar-options select {
     width: 100%;
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--gray-300);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-md);
     font-size: 0.875rem;
-    color: var(--gray-700);
-    background: white;
+    color: #cbd5e1;
+    background: rgba(30,41,59,0.5);
 }
 
 /* Upcoming appointments */
 .calendar-upcoming-section {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
 }
 
 .calendar-upcoming-section h3 {
     font-size: 1.15rem;
-    color: var(--gray-800);
+    color: #e2e8f0;
     margin-bottom: var(--space-lg);
 }
 
@@ -283,7 +283,7 @@
     align-items: center;
     gap: var(--space-md);
     padding: var(--space-md);
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
 .appointment-item:last-child {
@@ -291,7 +291,7 @@
 }
 
 .appointment-date {
-    background: var(--primary);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border-radius: var(--radius-md);
     padding: var(--space-sm) var(--space-md);
@@ -317,12 +317,12 @@
 
 .appointment-info .time {
     font-weight: 600;
-    color: var(--gray-800);
+    color: #e2e8f0;
 }
 
 .appointment-info .visitor {
     font-size: 0.85rem;
-    color: var(--gray-500);
+    color: rgba(148,163,184,0.6);
 }
 
 .appointment-actions .btn-sm {

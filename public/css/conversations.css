@@ -8,7 +8,7 @@
     grid-template-columns: 380px 1fr;
     height: calc(100vh - 128px);
     gap: 0;
-    background: white;
+    background: rgba(30,41,59,0.5);
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -16,15 +16,15 @@
 
 /* Conversations Sidebar */
 .conversations-sidebar {
-    border-right: 1px solid var(--gray-200);
+    border-right: 1px solid rgba(255,255,255,0.06);
     display: flex;
     flex-direction: column;
-    background: white;
+    background: rgba(30,41,59,0.5);
 }
 
 .conversations-header {
     padding: var(--space-lg);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -33,7 +33,7 @@
 .conversations-header h3 {
     font-size: 18px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0;
 }
 
@@ -45,11 +45,11 @@
 /* Search */
 .conversations-search {
     padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
 }
 
 .conversations-search i {
@@ -71,7 +71,7 @@
     display: flex;
     gap: var(--space-sm);
     padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     overflow-x: auto;
 }
 
@@ -80,23 +80,23 @@
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: var(--gray-100);
+    background: rgba(255,255,255,0.05);
     border: none;
     border-radius: 20px;
     font-size: 13px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: #cbd5e1;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
 }
 
 .filter-chip:hover {
-    background: var(--gray-200);
+    background: rgba(255,255,255,0.08);
 }
 
 .filter-chip.active {
-    background: var(--primary);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
 }
 
@@ -128,25 +128,25 @@
     align-items: center;
     gap: var(--space-md);
     padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
     cursor: pointer;
     transition: background 0.2s ease;
 }
 
 .conversation-item:hover {
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
 }
 
 .conversation-item.active {
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), transparent);
-    border-left: 3px solid var(--primary);
+    background: rgba(245,158,11,0.08);
+    border-left: 3px solid #f59e0b;
 }
 
 .conversation-avatar {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     display: flex;
     align-items: center;
@@ -163,7 +163,7 @@
 
 .conversation-name {
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     font-size: 14px;
     margin-bottom: 4px;
 }
@@ -192,7 +192,7 @@
     min-width: 20px;
     height: 20px;
     padding: 0 6px;
-    background: var(--primary);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border-radius: 10px;
     font-size: 11px;
@@ -224,7 +224,7 @@
 .chat-view {
     display: flex;
     flex-direction: column;
-    background: #fafafa;
+    background: rgba(10,10,10,0.8);
 }
 
 .chat-empty-state {
@@ -240,7 +240,7 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    background: rgba(245,158,11,0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -249,13 +249,13 @@
 
 .empty-chat-icon i {
     font-size: 48px;
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .chat-empty-state h3 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
@@ -273,8 +273,8 @@
 
 .chat-header {
     padding: var(--space-md) var(--space-lg);
-    background: white;
-    border-bottom: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -290,7 +290,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     display: flex;
     align-items: center;
@@ -301,7 +301,7 @@
 .user-details h4 {
     font-size: 15px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0 0 2px 0;
 }
 
@@ -342,15 +342,15 @@
 
 .message-user {
     align-self: flex-start;
-    background: white;
-    color: var(--gray-900);
+    background: rgba(30,41,59,0.5);
+    color: #e2e8f0;
     border-bottom-left-radius: 4px;
     box-shadow: var(--shadow-sm);
 }
 
 .message-bot {
     align-self: flex-end;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border-bottom-right-radius: 4px;
 }
@@ -368,8 +368,8 @@
 
 /* Chat Input */
 .chat-input-area {
-    background: white;
-    border-top: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border-top: 1px solid rgba(255,255,255,0.06);
     padding: var(--space-md) var(--space-lg);
 }
 
@@ -377,8 +377,8 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 24px;
     padding: 8px 12px;
     margin-bottom: var(--space-sm);
@@ -397,7 +397,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border: none;
     display: flex;

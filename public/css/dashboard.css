@@ -3,23 +3,23 @@
    ======================================== */
 
 :root {
-    /* Primary Colors - Modern Blue/Purple Gradient */
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --primary-light: #818cf8;
-    --accent: #8b5cf6;
+    /* Primary Colors - Amber/Gold Premium */
+    --primary: #f59e0b;
+    --primary-dark: #d97706;
+    --primary-light: #fbbf24;
+    --accent: #f59e0b;
 
-    /* Neutral Colors */
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
+    /* Neutral Colors - Dark Theme */
+    --gray-50: rgba(255,255,255,0.03);
+    --gray-100: rgba(255,255,255,0.06);
+    --gray-200: rgba(255,255,255,0.1);
+    --gray-300: rgba(255,255,255,0.15);
+    --gray-400: rgba(148,163,184,0.5);
+    --gray-500: rgba(148,163,184,0.6);
+    --gray-600: rgba(148,163,184,0.7);
+    --gray-700: #cbd5e1;
+    --gray-800: #e2e8f0;
+    --gray-900: #f1f5f9;
 
     /* Semantic Colors */
     --success: #10b981;
@@ -27,10 +27,20 @@
     --danger: #ef4444;
     --info: #3b82f6;
 
+    /* Background */
+    --bg-base: #000000;
+    --bg-surface: rgba(255,255,255,0.03);
+    --bg-elevated: rgba(255,255,255,0.06);
+    --bg-card: rgba(30,41,59,0.5);
+    --bg-input: rgba(255,255,255,0.05);
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-default: rgba(255,255,255,0.1);
+    --border-accent: rgba(245,158,11,0.25);
+
     /* Sidebar */
-    --sidebar-bg: #ffffff;
-    --sidebar-text: var(--gray-600);
-    --sidebar-hover: var(--gray-50);
+    --sidebar-bg: rgba(0,0,0,0.6);
+    --sidebar-text: rgba(148,163,184,0.7);
+    --sidebar-hover: rgba(255,255,255,0.05);
     --sidebar-active: var(--primary);
 
     /* Spacing */
@@ -46,11 +56,12 @@
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    /* Shadows - Dark Theme */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 4px 20px rgba(245,158,11,0.3);
 }
 
 /* ========================================
@@ -64,11 +75,11 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: var(--gray-50);
-    color: var(--gray-900);
+    background: linear-gradient(180deg, #000 0%, #0a0a0a 50%, #111 100%);
+    color: #e2e8f0;
     font-size: 14px;
     line-height: 1.5;
     display: flex;
@@ -82,17 +93,19 @@ body {
 
 .sidebar {
     width: 280px;
-    background: var(--sidebar-bg);
-    border-right: 1px solid var(--gray-200);
+    background: rgba(0,0,0,0.6);
+    border-right: 1px solid rgba(255,255,255,0.06);
     display: flex;
     flex-direction: column;
     height: 100vh;
     flex-shrink: 0;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .sidebar-header {
     padding: var(--space-lg);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .logo {
@@ -101,8 +114,9 @@ body {
     gap: 12px;
     font-size: 20px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #f59e0b;
     margin-bottom: var(--space-lg);
+    letter-spacing: 2px;
 }
 
 .logo i {
@@ -111,8 +125,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
     border-radius: var(--radius-lg);
     font-size: 18px;
 }
@@ -127,21 +141,21 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .chatbot-current:hover {
-    background: var(--gray-100);
-    border-color: var(--gray-300);
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(245,158,11,0.3);
 }
 
 .chatbot-current span {
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     font-size: 14px;
 }
 
@@ -156,13 +170,15 @@ body {
     left: 0;
     right: 0;
     margin-top: var(--space-sm);
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(15,15,15,0.95);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
     z-index: 100;
     max-height: 300px;
     overflow-y: auto;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .chatbot-dropdown.hidden {
@@ -179,12 +195,12 @@ body {
     cursor: pointer;
     transition: all 0.15s ease;
     font-size: 14px;
-    color: var(--gray-700);
+    color: #cbd5e1;
 }
 
 .chatbot-item:hover {
-    background: var(--gray-50);
-    color: var(--gray-900);
+    background: rgba(255,255,255,0.05);
+    color: #f59e0b;
 }
 
 .btn-new-chatbot {
@@ -194,8 +210,8 @@ body {
     gap: 8px;
     width: 100%;
     padding: 10px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
     border: none;
     border-radius: var(--radius-sm);
     font-weight: 600;
@@ -207,7 +223,7 @@ body {
 
 .btn-new-chatbot:hover {
     transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 20px rgba(245,158,11,0.4);
 }
 
 /* Navigation */
@@ -239,13 +255,13 @@ body {
 }
 
 .nav-item:hover {
-    background: var(--sidebar-hover);
-    color: var(--gray-900);
+    background: rgba(255,255,255,0.05);
+    color: #e2e8f0;
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    color: var(--primary);
+    background: rgba(245,158,11,0.1);
+    color: #f59e0b;
     font-weight: 600;
 }
 
@@ -257,13 +273,13 @@ body {
     transform: translateY(-50%);
     width: 3px;
     height: 60%;
-    background: linear-gradient(180deg, var(--primary), var(--accent));
+    background: linear-gradient(180deg, #f59e0b, #d97706);
     border-radius: 0 2px 2px 0;
 }
 
 .sidebar-section {
     padding: var(--space-lg) var(--space-md);
-    border-top: 1px solid var(--gray-200);
+    border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .section-title {
@@ -279,8 +295,8 @@ body {
 .badge {
     display: inline-block;
     padding: 2px 8px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
     font-size: 10px;
     font-weight: 700;
     border-radius: 12px;
@@ -289,7 +305,7 @@ body {
 
 .sidebar-footer {
     padding: var(--space-md);
-    border-top: 1px solid var(--gray-200);
+    border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 /* ========================================
@@ -302,29 +318,32 @@ body {
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
-    background: var(--gray-50);
+    background: linear-gradient(180deg, #000 0%, #0a0a0a 50%, #111 100%);
 }
 
 /* Header */
 .header {
-    background: white;
-    border-bottom: 1px solid var(--gray-200);
+    background: rgba(0,0,0,0.5);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     padding: var(--space-lg) var(--space-xl);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: var(--shadow-sm);
+    box-shadow: none;
     z-index: 10;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .header-left h1 {
     font-size: 24px;
     font-weight: 700;
-    color: var(--gray-900);
-    background: linear-gradient(135deg, var(--gray-900), var(--gray-600));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #f59e0b;
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    background-clip: unset;
+    letter-spacing: 2px;
 }
 
 .header-right {
@@ -338,20 +357,21 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
     border: none;
     border-radius: var(--radius-md);
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: var(--shadow-sm);
+    box-shadow: none;
+    letter-spacing: 0.5px;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 20px rgba(245,158,11,0.4);
 }
 
 .btn-secondary {
@@ -359,9 +379,9 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: white;
-    color: var(--gray-700);
-    border: 1px solid var(--gray-300);
+    background: rgba(255,255,255,0.05);
+    color: #e2e8f0;
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-md);
     font-weight: 600;
     font-size: 14px;
@@ -370,8 +390,8 @@ body {
 }
 
 .btn-secondary:hover {
-    background: var(--gray-50);
-    border-color: var(--gray-400);
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(245,158,11,0.3);
 }
 
 /* Content Area */
@@ -418,8 +438,8 @@ body {
 }
 
 .stat-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     transition: all 0.3s ease;
@@ -434,15 +454,15 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--accent));
+    background: linear-gradient(90deg, #f59e0b, #d97706);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .stat-card:hover {
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 4px 20px rgba(245,158,11,0.15);
     transform: translateY(-4px);
-    border-color: var(--gray-300);
+    border-color: rgba(245,158,11,0.2);
 }
 
 .stat-card:hover::before {
@@ -492,7 +512,7 @@ body {
 .stat-value {
     font-size: 32px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     line-height: 1;
 }
 
@@ -514,8 +534,8 @@ body {
 
 /* Cards */
 .card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
@@ -523,7 +543,7 @@ body {
 }
 
 .card:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .card-header {
@@ -536,7 +556,7 @@ body {
 .card-title {
     font-size: 18px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
 }
 
 .card-body {
@@ -553,19 +573,19 @@ body {
     width: 80px;
     height: 80px;
     margin: 0 auto var(--space-lg);
-    background: var(--gray-100);
+    background: rgba(245,158,11,0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 32px;
-    color: var(--gray-400);
+    color: #f59e0b;
 }
 
 .empty-state-title {
     font-size: 18px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
@@ -599,14 +619,17 @@ body {
 }
 
 .modal-content {
-    background: white;
+    background: rgba(15,15,15,0.95);
     border-radius: var(--radius-xl);
     max-width: 600px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-xl);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
     animation: modalSlideIn 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.1);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
 }
 
 @keyframes modalSlideIn {
@@ -623,7 +646,7 @@ body {
 
 .modal-header {
     padding: var(--space-xl);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -632,7 +655,7 @@ body {
 .modal-header h2 {
     font-size: 20px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #f59e0b;
 }
 
 .close-modal {
@@ -640,8 +663,8 @@ body {
     height: 32px;
     border-radius: var(--radius-md);
     border: none;
-    background: var(--gray-100);
-    color: var(--gray-600);
+    background: rgba(255,255,255,0.05);
+    color: rgba(148,163,184,0.6);
     font-size: 20px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -651,8 +674,8 @@ body {
 }
 
 .close-modal:hover {
-    background: var(--gray-200);
-    color: var(--gray-900);
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
 }
 
 .modal-body {
@@ -661,7 +684,7 @@ body {
 
 .modal-footer {
     padding: var(--space-xl);
-    border-top: 1px solid var(--gray-200);
+    border-top: 1px solid rgba(255,255,255,0.06);
     display: flex;
     gap: var(--space-md);
     justify-content: flex-end;
@@ -678,7 +701,7 @@ body {
 .form-group label {
     display: block;
     font-weight: 600;
-    color: var(--gray-700);
+    color: #cbd5e1;
     margin-bottom: var(--space-sm);
     font-size: 14px;
 }
@@ -686,22 +709,23 @@ body {
 .form-control {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid var(--gray-300);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-md);
     font-size: 14px;
     font-family: inherit;
     transition: all 0.2s ease;
-    background: white;
+    background: rgba(255,255,255,0.05);
+    color: #e2e8f0;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: rgba(245,158,11,0.5);
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
 }
 
 .form-control::placeholder {
-    color: var(--gray-400);
+    color: rgba(148,163,184,0.4);
 }
 
 textarea.form-control {
@@ -772,16 +796,16 @@ textarea.form-control {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--gray-100);
+    background: rgba(0,0,0,0.3);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--gray-300);
+    background: rgba(255,255,255,0.1);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--gray-400);
+    background: rgba(255,255,255,0.2);
 }
 
 /* ========================================
@@ -806,14 +830,14 @@ textarea.form-control {
 
 .usage-bar {
     height: 6px;
-    background: var(--gray-200);
+    background: rgba(255,255,255,0.06);
     border-radius: 3px;
     overflow: hidden;
 }
 
 .usage-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--accent));
+    background: linear-gradient(90deg, #f59e0b, #d97706);
     border-radius: 3px;
     transition: width 0.3s ease;
 }
@@ -841,8 +865,8 @@ textarea.form-control {
 }
 
 .chart-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
@@ -858,7 +882,7 @@ textarea.form-control {
 .chart-header h3 {
     font-size: 16px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
 }
 
 .chart-tabs {
@@ -869,9 +893,9 @@ textarea.form-control {
 .chart-tab {
     padding: 6px 12px;
     background: transparent;
-    border: 1px solid var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-sm);
-    color: var(--gray-600);
+    color: rgba(148,163,184,0.6);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -879,20 +903,20 @@ textarea.form-control {
 }
 
 .chart-tab:hover {
-    background: var(--gray-50);
-    border-color: var(--gray-300);
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(245,158,11,0.3);
 }
 
 .chart-tab.active {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
     border-color: transparent;
 }
 
 /* Conversations Card */
 .conversations-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
@@ -908,12 +932,12 @@ textarea.form-control {
 .conversations-header h3 {
     font-size: 16px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
 }
 
 .view-all {
     font-size: 13px;
-    color: var(--primary);
+    color: #f59e0b;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.2s ease;
@@ -931,15 +955,15 @@ textarea.form-control {
 
 .conversation-item {
     padding: var(--space-md);
-    border: 1px solid var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-md);
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
 .conversation-item:hover {
-    background: var(--gray-50);
-    border-color: var(--gray-300);
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(245,158,11,0.2);
 }
 
 .conversation-header {
@@ -951,7 +975,7 @@ textarea.form-control {
 
 .conversation-user {
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     font-size: 14px;
 }
 
@@ -972,8 +996,8 @@ textarea.form-control {
 
 /* Token Usage Card */
 .token-usage-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
@@ -989,24 +1013,24 @@ textarea.form-control {
 .token-header h3 {
     font-size: 16px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     display: flex;
     align-items: center;
     gap: var(--space-sm);
 }
 
 .token-header i {
-    color: var(--warning);
+    color: #f59e0b;
 }
 
 .token-period select {
     padding: 6px 12px;
-    border: 1px solid var(--gray-300);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-sm);
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-700);
-    background: white;
+    color: #e2e8f0;
+    background: rgba(255,255,255,0.05);
     cursor: pointer;
 }
 
@@ -1019,7 +1043,7 @@ textarea.form-control {
 .token-stat {
     text-align: center;
     padding: var(--space-lg);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     border-radius: var(--radius-md);
 }
 
@@ -1034,7 +1058,7 @@ textarea.form-control {
 .token-value {
     font-size: 24px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
 }
 
 /* Content Container */
@@ -1084,7 +1108,7 @@ textarea.form-control {
 
 /* Hero Section */
 .integrations-hero {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     padding: var(--space-xl) 0;
     margin: calc(var(--space-xl) * -1);
     margin-bottom: var(--space-xl);
@@ -1110,7 +1134,7 @@ textarea.form-control {
     display: flex;
     gap: var(--space-md);
     margin-bottom: var(--space-xl);
-    border-bottom: 2px solid var(--gray-200);
+    border-bottom: 2px solid rgba(255,255,255,0.06);
 }
 
 .integration-tab {
@@ -1130,13 +1154,13 @@ textarea.form-control {
 }
 
 .integration-tab:hover {
-    color: var(--primary);
-    background: var(--gray-50);
+    color: #f59e0b;
+    background: rgba(255,255,255,0.03);
 }
 
 .integration-tab.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
+    color: #f59e0b;
+    border-bottom-color: #f59e0b;
 }
 
 .integration-tab i {
@@ -1164,7 +1188,7 @@ textarea.form-control {
 .integration-steps h3 {
     font-size: 20px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-lg);
 }
 
@@ -1179,7 +1203,7 @@ textarea.form-control {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     display: flex;
     align-items: center;
@@ -1191,7 +1215,7 @@ textarea.form-control {
 .step-content h4 {
     font-size: 16px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-xs);
 }
 
@@ -1202,26 +1226,26 @@ textarea.form-control {
 }
 
 .step-content code {
-    background: var(--gray-100);
+    background: rgba(255,255,255,0.05);
     padding: 2px 6px;
     border-radius: 4px;
     font-family: 'Menlo', monospace;
     font-size: 13px;
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 /* Platform Badges */
 .integration-platforms {
     margin-top: var(--space-xl);
     padding: var(--space-lg);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     border-radius: var(--radius-lg);
 }
 
 .integration-platforms h4 {
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: #cbd5e1;
     margin-bottom: var(--space-md);
 }
 
@@ -1236,18 +1260,18 @@ textarea.form-control {
     align-items: center;
     gap: var(--space-xs);
     padding: 6px 12px;
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-md);
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-700);
+    color: #cbd5e1;
 }
 
 /* Code Section */
 .integration-code-section {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(15,15,15,0.8);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-md);
@@ -1296,8 +1320,8 @@ textarea.form-control {
 
 .code-footer {
     padding: var(--space-md) var(--space-lg);
-    background: var(--gray-50);
-    border-top: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .code-note {
@@ -1314,8 +1338,8 @@ textarea.form-control {
 
 /* Integration Preview */
 .integration-preview {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
@@ -1329,14 +1353,14 @@ textarea.form-control {
 }
 
 .preview-header i {
-    color: var(--primary);
+    color: #f59e0b;
     font-size: 18px;
 }
 
 .preview-header h4 {
     font-size: 16px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0;
 }
 
@@ -1347,14 +1371,14 @@ textarea.form-control {
 
 /* Browser Mockup */
 .demo-browser {
-    border: 1px solid var(--gray-300);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
 }
 
 .browser-header {
-    background: var(--gray-200);
+    background: rgba(255,255,255,0.08);
     padding: var(--space-sm) var(--space-md);
     display: flex;
     align-items: center;
@@ -1387,16 +1411,16 @@ textarea.form-control {
 
 .browser-url {
     flex: 1;
-    background: white;
+    background: rgba(255,255,255,0.05);
     padding: 4px 12px;
     border-radius: 4px;
     font-size: 12px;
-    color: var(--gray-600);
+    color: rgba(148,163,184,0.6);
     text-align: center;
 }
 
 .browser-content {
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    background: linear-gradient(135deg, #0a0a0a, #111);
     height: 200px;
     position: relative;
 }
@@ -1411,8 +1435,8 @@ textarea.form-control {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1438,7 +1462,7 @@ textarea.form-control {
 .api-intro h3 {
     font-size: 24px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
@@ -1455,8 +1479,8 @@ textarea.form-control {
 }
 
 .api-endpoint-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-sm);
@@ -1479,29 +1503,29 @@ textarea.form-control {
 }
 
 .http-method.get {
-    background: #ecfdf5;
-    color: #059669;
+    background: rgba(16,185,129,0.12);
+    color: #10b981;
 }
 
 .http-method.post {
-    background: #eff6ff;
-    color: #2563eb;
+    background: rgba(59,130,246,0.12);
+    color: #60a5fa;
 }
 
 .http-method.put {
-    background: #fef3c7;
-    color: #d97706;
+    background: rgba(245,158,11,0.12);
+    color: #fbbf24;
 }
 
 .http-method.delete {
-    background: #fee2e2;
-    color: #dc2626;
+    background: rgba(239,68,68,0.12);
+    color: #ef4444;
 }
 
 .endpoint-url {
     font-family: 'Menlo', monospace;
     font-size: 15px;
-    color: var(--gray-900);
+    color: #e2e8f0;
     font-weight: 600;
 }
 
@@ -1513,13 +1537,13 @@ textarea.form-control {
 .endpoint-details h4 {
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: #cbd5e1;
     margin: var(--space-lg) 0 var(--space-md);
 }
 
 /* API Examples */
 .api-examples {
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     padding: var(--space-xl);
     border-radius: var(--radius-lg);
 }
@@ -1527,7 +1551,7 @@ textarea.form-control {
 .api-examples h4 {
     font-size: 18px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-lg);
 }
 
@@ -1539,10 +1563,10 @@ textarea.form-control {
 
 .example-tab {
     padding: 8px 16px;
-    background: white;
-    border: 1px solid var(--gray-300);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-sm);
-    color: var(--gray-700);
+    color: #cbd5e1;
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
@@ -1550,14 +1574,14 @@ textarea.form-control {
 }
 
 .example-tab:hover {
-    border-color: var(--primary);
-    color: var(--primary);
+    border-color: rgba(245,158,11,0.3);
+    color: #f59e0b;
 }
 
 .example-tab.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+    border-color: transparent;
 }
 
 .example-content {
@@ -1576,8 +1600,8 @@ textarea.form-control {
 }
 
 .platform-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     text-align: center;
@@ -1587,15 +1611,15 @@ textarea.form-control {
 
 .platform-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary);
+    box-shadow: 0 4px 20px rgba(245,158,11,0.15);
+    border-color: rgba(245,158,11,0.3);
 }
 
 .platform-icon {
     width: 80px;
     height: 80px;
     margin: 0 auto var(--space-lg);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    background: rgba(245,158,11,0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1604,7 +1628,7 @@ textarea.form-control {
 
 .platform-icon i {
     font-size: 36px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1613,7 +1637,7 @@ textarea.form-control {
 .platform-card h3 {
     font-size: 18px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
@@ -1668,7 +1692,7 @@ textarea.form-control {
     grid-template-columns: 380px 1fr;
     height: calc(100vh - 128px);
     gap: 0;
-    background: white;
+    background: rgba(30,41,59,0.5);
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -1676,15 +1700,15 @@ textarea.form-control {
 
 /* Conversations Sidebar */
 .conversations-sidebar {
-    border-right: 1px solid var(--gray-200);
+    border-right: 1px solid rgba(255,255,255,0.06);
     display: flex;
     flex-direction: column;
-    background: white;
+    background: rgba(30,41,59,0.5);
 }
 
 .conversations-header {
     padding: var(--space-lg);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1693,7 +1717,7 @@ textarea.form-control {
 .conversations-header h3 {
     font-size: 18px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0;
 }
 
@@ -1705,11 +1729,11 @@ textarea.form-control {
 /* Search */
 .conversations-search {
     padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
 }
 
 .conversations-search i {
@@ -1731,7 +1755,7 @@ textarea.form-control {
     display: flex;
     gap: var(--space-sm);
     padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     overflow-x: auto;
 }
 
@@ -1740,12 +1764,12 @@ textarea.form-control {
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: var(--gray-100);
+    background: rgba(255,255,255,0.05);
     border: none;
     border-radius: 20px;
     font-size: 13px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: #cbd5e1;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
@@ -1788,17 +1812,17 @@ textarea.form-control {
     align-items: center;
     gap: var(--space-md);
     padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
     cursor: pointer;
     transition: background 0.2s ease;
 }
 
 .conversation-item:hover {
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
 }
 
 .conversation-item.active {
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), transparent);
+    background: rgba(245,158,11,0.08);
     border-left: 3px solid var(--primary);
 }
 
@@ -1806,7 +1830,7 @@ textarea.form-control {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     display: flex;
     align-items: center;
@@ -1823,7 +1847,7 @@ textarea.form-control {
 
 .conversation-name {
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     font-size: 14px;
     margin-bottom: 4px;
 }
@@ -1884,7 +1908,7 @@ textarea.form-control {
 .chat-view {
     display: flex;
     flex-direction: column;
-    background: #fafafa;
+    background: rgba(10,10,10,0.8);
 }
 
 .chat-empty-state {
@@ -1900,7 +1924,7 @@ textarea.form-control {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    background: rgba(245,158,11,0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1909,13 +1933,13 @@ textarea.form-control {
 
 .empty-chat-icon i {
     font-size: 48px;
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .chat-empty-state h3 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
@@ -1933,8 +1957,8 @@ textarea.form-control {
 
 .chat-header {
     padding: var(--space-md) var(--space-lg);
-    background: white;
-    border-bottom: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1950,7 +1974,7 @@ textarea.form-control {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     display: flex;
     align-items: center;
@@ -1961,7 +1985,7 @@ textarea.form-control {
 .user-details h4 {
     font-size: 15px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0 0 2px 0;
 }
 
@@ -2004,15 +2028,15 @@ textarea.form-control {
 
 .message-user {
     align-self: flex-start;
-    background: white;
-    color: var(--gray-900);
+    background: rgba(30,41,59,0.5);
+    color: #e2e8f0;
     border-bottom-left-radius: 4px;
     box-shadow: var(--shadow-sm);
 }
 
 .message-bot {
     align-self: flex-end;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border-bottom-right-radius: 4px;
 }
@@ -2030,8 +2054,8 @@ textarea.form-control {
 
 /* Chat Input */
 .chat-input-area {
-    background: white;
-    border-top: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border-top: 1px solid rgba(255,255,255,0.06);
     padding: var(--space-md) var(--space-lg);
 }
 
@@ -2039,8 +2063,8 @@ textarea.form-control {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 24px;
     padding: 8px 12px;
     margin-bottom: var(--space-sm);
@@ -2059,7 +2083,7 @@ textarea.form-control {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border: none;
     display: flex;
@@ -2127,8 +2151,8 @@ textarea.form-control {
 
 /* Training Hero Section */
 .train-hero {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
-    border: 1px solid var(--gray-200);
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl) var(--space-xl);
     margin-bottom: var(--space-xl);
@@ -2138,7 +2162,7 @@ textarea.form-control {
 .train-hero-content h2 {
     font-size: 28px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-md);
     background: linear-gradient(135deg, var(--gray-900), var(--primary));
     -webkit-background-clip: text;
@@ -2163,8 +2187,8 @@ textarea.form-control {
 }
 
 .method-card-large {
-    background: white;
-    border: 2px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 2px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2187,7 +2211,7 @@ textarea.form-control {
 }
 
 .method-card-large:hover {
-    border-color: var(--primary);
+    border-color: #f59e0b;
     box-shadow: var(--shadow-xl);
     transform: translateY(-4px);
 }
@@ -2200,8 +2224,8 @@ textarea.form-control {
     width: 64px;
     height: 64px;
     border-radius: var(--radius-lg);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    color: var(--primary);
+    background: rgba(245,158,11,0.1);
+    color: #f59e0b;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2211,7 +2235,7 @@ textarea.form-control {
 }
 
 .method-card-large:hover .method-icon-large {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     transform: scale(1.1) rotate(5deg);
 }
@@ -2219,7 +2243,7 @@ textarea.form-control {
 .method-card-large h3 {
     font-size: 20px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
@@ -2243,8 +2267,8 @@ textarea.form-control {
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: var(--gray-100);
-    color: var(--gray-700);
+    background: rgba(255,255,255,0.05);
+    color: #cbd5e1;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
@@ -2253,7 +2277,7 @@ textarea.form-control {
 
 .method-card-large:hover .feature-badge {
     background: rgba(99, 102, 241, 0.1);
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .feature-badge i {
@@ -2268,7 +2292,7 @@ textarea.form-control {
     justify-content: center;
     gap: 8px;
     padding: 12px 20px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border: none;
     border-radius: var(--radius-md);
@@ -2290,8 +2314,8 @@ textarea.form-control {
 
 /* Training Data Container */
 .training-data-container {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
     margin-bottom: var(--space-xl);
@@ -2303,13 +2327,13 @@ textarea.form-control {
     justify-content: space-between;
     margin-bottom: var(--space-xl);
     padding-bottom: var(--space-lg);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .training-data-header .header-left h3 {
     font-size: 20px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -2317,7 +2341,7 @@ textarea.form-control {
 }
 
 .training-data-header .header-left h3 i {
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .header-subtitle {
@@ -2344,16 +2368,16 @@ textarea.form-control {
 }
 
 .training-item {
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     transition: all 0.2s ease;
 }
 
 .training-item:hover {
-    background: white;
-    border-color: var(--primary);
+    background: rgba(30,41,59,0.5);
+    border-color: #f59e0b;
     box-shadow: var(--shadow-md);
     transform: translateX(4px);
 }
@@ -2368,8 +2392,8 @@ textarea.form-control {
     width: 48px;
     height: 48px;
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    color: var(--primary);
+    background: rgba(245,158,11,0.1);
+    color: #f59e0b;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2385,7 +2409,7 @@ textarea.form-control {
 .training-item-title {
     font-size: 15px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2446,19 +2470,19 @@ textarea.form-control {
     width: 80px;
     height: 80px;
     margin: 0 auto var(--space-lg);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    background: rgba(245,158,11,0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 32px;
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .empty-training-state h4 {
     font-size: 18px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
@@ -2520,20 +2544,20 @@ textarea.form-control {
 
 /* Browser Mockup */
 .browser-mockup {
-    background: white;
+    background: rgba(30,41,59,0.5);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
     overflow: hidden;
-    border: 1px solid var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .browser-header {
-    background: var(--gray-100);
+    background: rgba(255,255,255,0.05);
     padding: 12px 16px;
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .browser-dots {
@@ -2561,7 +2585,7 @@ textarea.form-control {
 
 .browser-address-bar {
     flex: 1;
-    background: white;
+    background: rgba(30,41,59,0.5);
     padding: 6px 12px;
     border-radius: 6px;
     display: flex;
@@ -2585,7 +2609,7 @@ textarea.form-control {
 
 /* Website Mockup Background */
 .website-mockup {
-    background: white;
+    background: rgba(30,41,59,0.5);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     box-shadow: var(--shadow-sm);
@@ -2598,7 +2622,7 @@ textarea.form-control {
     align-items: center;
     margin-bottom: var(--space-lg);
     padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .mockup-logo {
@@ -2644,7 +2668,7 @@ textarea.form-control {
 .mockup-button {
     width: 120px;
     height: 36px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     border-radius: var(--radius-md);
     margin: 0 auto;
 }
@@ -2662,7 +2686,7 @@ textarea.form-control {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     border: none;
     color: white;
     font-size: 24px;
@@ -2690,7 +2714,7 @@ textarea.form-control {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     animation: pulse 2s infinite;
     z-index: -1;
 }
@@ -2716,7 +2740,7 @@ textarea.form-control {
     right: 0;
     width: 380px;
     height: 550px;
-    background: white;
+    background: rgba(30,41,59,0.5);
     border-radius: var(--radius-xl);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     display: none;
@@ -2742,7 +2766,7 @@ textarea.form-control {
 }
 
 .chat-window-header {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     padding: var(--space-lg);
     display: flex;
@@ -2801,7 +2825,7 @@ textarea.form-control {
     flex: 1;
     overflow-y: auto;
     padding: var(--space-lg);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
@@ -2833,8 +2857,8 @@ textarea.form-control {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    color: var(--primary);
+    background: rgba(245,158,11,0.1);
+    color: #f59e0b;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2847,17 +2871,17 @@ textarea.form-control {
 }
 
 .preview-message-bubble {
-    background: white;
+    background: rgba(30,41,59,0.5);
     padding: 12px 16px;
     border-radius: 16px;
     box-shadow: var(--shadow-sm);
     font-size: 14px;
     line-height: 1.5;
-    color: var(--gray-900);
+    color: #e2e8f0;
 }
 
 .preview-message.user .preview-message-bubble {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border-bottom-right-radius: 4px;
 }
@@ -2869,8 +2893,8 @@ textarea.form-control {
 /* Chat Input */
 .chat-window-input {
     padding: var(--space-md);
-    background: white;
-    border-top: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border-top: 1px solid rgba(255,255,255,0.06);
     display: flex;
     gap: var(--space-sm);
 }
@@ -2878,7 +2902,7 @@ textarea.form-control {
 .chat-preview-input {
     flex: 1;
     padding: 10px 14px;
-    border: 1px solid var(--gray-300);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 24px;
     font-size: 14px;
     outline: none;
@@ -2886,15 +2910,15 @@ textarea.form-control {
 }
 
 .chat-preview-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
 }
 
 .chat-send-btn {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     border: none;
     color: white;
     cursor: pointer;
@@ -2919,12 +2943,12 @@ textarea.form-control {
     text-align: center;
     font-size: 11px;
     color: var(--gray-500);
-    background: var(--gray-50);
-    border-top: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .chat-branding strong {
-    color: var(--primary);
+    color: #f59e0b;
     font-weight: 600;
 }
 
@@ -2947,8 +2971,8 @@ textarea.form-control {
 }
 
 .test-info-card {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
-    border: 1px solid var(--gray-200);
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
     text-align: center;
@@ -2958,7 +2982,7 @@ textarea.form-control {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     display: flex;
     align-items: center;
@@ -2970,7 +2994,7 @@ textarea.form-control {
 .test-info-card h3 {
     font-size: 18px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
 }
 
@@ -2981,8 +3005,8 @@ textarea.form-control {
 }
 
 .test-tips, .test-stats {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
 }
@@ -2990,7 +3014,7 @@ textarea.form-control {
 .test-tips h4, .test-stats h4 {
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-md);
     display: flex;
     align-items: center;
@@ -3002,7 +3026,7 @@ textarea.form-control {
 }
 
 .test-stats h4 i {
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .test-tips ul {
@@ -3017,7 +3041,7 @@ textarea.form-control {
     padding: 8px 0;
     padding-left: 20px;
     position: relative;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
 .test-tips li:last-child {
@@ -3028,7 +3052,7 @@ textarea.form-control {
     content: '→';
     position: absolute;
     left: 0;
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .stat-row {
@@ -3037,7 +3061,7 @@ textarea.form-control {
     align-items: center;
     padding: 10px 0;
     font-size: 13px;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
 .stat-row:last-child {
@@ -3050,13 +3074,13 @@ textarea.form-control {
 
 .stat-row span:last-child {
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
 }
 
 /* Test Chat Modern */
 .test-chat-modern {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     display: flex;
     flex-direction: column;
@@ -3065,7 +3089,7 @@ textarea.form-control {
 }
 
 .test-chat-header {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     padding: var(--space-lg);
     display: flex;
@@ -3124,7 +3148,7 @@ textarea.form-control {
     flex: 1;
     overflow-y: auto;
     padding: var(--space-lg);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
@@ -3144,8 +3168,8 @@ textarea.form-control {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    color: var(--primary);
+    background: rgba(245,158,11,0.1);
+    color: #f59e0b;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3176,13 +3200,13 @@ textarea.form-control {
 }
 
 .message-wrapper.bot .message-bubble {
-    background: white;
-    color: var(--gray-900);
+    background: rgba(30,41,59,0.5);
+    color: #e2e8f0;
     border-bottom-left-radius: 4px;
 }
 
 .message-wrapper.user .message-bubble {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border-bottom-right-radius: 4px;
 }
@@ -3203,7 +3227,7 @@ textarea.form-control {
     display: flex;
     gap: 4px;
     padding: 12px 16px;
-    background: white;
+    background: rgba(30,41,59,0.5);
     border-radius: 16px;
     border-bottom-left-radius: 4px;
     box-shadow: var(--shadow-sm);
@@ -3240,8 +3264,8 @@ textarea.form-control {
 /* Test Input Modern */
 .test-input-modern {
     padding: var(--space-lg);
-    background: white;
-    border-top: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .input-wrapper {
@@ -3253,7 +3277,7 @@ textarea.form-control {
 .test-input-modern .test-input {
     flex: 1;
     padding: 12px 18px;
-    border: 2px solid var(--gray-200);
+    border: 2px solid rgba(255,255,255,0.06);
     border-radius: 24px;
     font-size: 14px;
     outline: none;
@@ -3261,15 +3285,15 @@ textarea.form-control {
 }
 
 .test-input-modern .test-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
 }
 
 .btn-send-modern {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     border: none;
     color: white;
     font-size: 18px;
@@ -3305,8 +3329,8 @@ textarea.form-control {
 
 /* Train Hero */
 .train-hero {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
-    border: 1px solid var(--gray-200);
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-2xl);
     margin-bottom: var(--space-xl);
@@ -3316,7 +3340,7 @@ textarea.form-control {
 .train-hero-content h2 {
     font-size: 28px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-md);
     display: flex;
     align-items: center;
@@ -3325,7 +3349,7 @@ textarea.form-control {
 }
 
 .train-hero-content h2 i {
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 /* Responsive */
@@ -3382,8 +3406,8 @@ textarea.form-control {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: var(--space-xl);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
-    border: 1px solid var(--gray-200);
+    background: rgba(245,158,11,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
 }
@@ -3391,7 +3415,7 @@ textarea.form-control {
 .functions-header h2 {
     font-size: 24px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-sm);
     display: flex;
     align-items: center;
@@ -3404,7 +3428,7 @@ textarea.form-control {
     font-weight: 900;
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
     border-radius: var(--radius-lg);
     display: flex;
@@ -3425,7 +3449,7 @@ textarea.form-control {
 }
 
 .functions-list .empty-state {
-    background: white;
+    background: rgba(30,41,59,0.5);
     border: 2px dashed var(--gray-300);
     border-radius: var(--radius-xl);
     padding: var(--space-xl) * 2;
@@ -3443,7 +3467,7 @@ textarea.form-control {
 .functions-list .empty-state h3 {
     font-size: 18px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: #cbd5e1;
     margin-bottom: var(--space-sm);
 }
 
@@ -3455,8 +3479,8 @@ textarea.form-control {
 }
 
 .function-item {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     transition: all 0.3s ease;
@@ -3506,7 +3530,7 @@ textarea.form-control {
     padding: var(--space-xl);
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(234, 179, 8, 0.08));
     border-radius: var(--radius-xl);
-    border: 1px solid var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .prompts-icon {
@@ -3529,7 +3553,7 @@ textarea.form-control {
 .prompts-header-text h2 {
     font-size: 24px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0 0 4px 0;
 }
 
@@ -3567,8 +3591,8 @@ textarea.form-control {
     align-items: flex-start;
     gap: var(--space-lg);
     padding: var(--space-lg);
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     border-left: 4px solid #F59E0B;
 }
@@ -3589,7 +3613,7 @@ textarea.form-control {
 .info-card-content h4 {
     font-size: 15px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0 0 4px 0;
 }
 
@@ -3610,7 +3634,7 @@ textarea.form-control {
 /* Empty State */
 .prompt-card-empty {
     grid-column: 1 / -1;
-    background: white;
+    background: rgba(30,41,59,0.5);
     border: 2px dashed var(--gray-300);
     border-radius: var(--radius-xl);
     padding: 60px var(--space-xl);
@@ -3642,7 +3666,7 @@ textarea.form-control {
 .prompt-card-empty h3 {
     font-size: 18px;
     font-weight: 600;
-    color: var(--gray-800);
+    color: #cbd5e1;
     margin: 0 0 var(--space-sm) 0;
 }
 
@@ -3677,8 +3701,8 @@ textarea.form-control {
 
 /* Prompt Card */
 .prompt-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-lg);
     transition: all 0.3s ease;
@@ -3701,7 +3725,7 @@ textarea.form-control {
 .prompt-card-title {
     font-size: 16px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     display: flex;
     align-items: center;
     gap: var(--space-sm);
@@ -3722,8 +3746,8 @@ textarea.form-control {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-sm);
     color: var(--gray-500);
     cursor: pointer;
@@ -3731,8 +3755,8 @@ textarea.form-control {
 }
 
 .prompt-action-btn:hover {
-    background: var(--gray-100);
-    color: var(--gray-700);
+    background: rgba(255,255,255,0.05);
+    color: #cbd5e1;
 }
 
 .prompt-action-btn.delete:hover {
@@ -3744,7 +3768,7 @@ textarea.form-control {
 .prompt-card-text {
     font-size: 14px;
     color: var(--gray-600);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     padding: var(--space-md);
     border-radius: var(--radius-md);
     line-height: 1.5;
@@ -3752,8 +3776,8 @@ textarea.form-control {
 
 /* Preview Section */
 .prompts-preview-section {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
 }
@@ -3764,12 +3788,12 @@ textarea.form-control {
     gap: var(--space-sm);
     font-size: 16px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0 0 var(--space-lg) 0;
 }
 
 .prompts-preview-section h3 i {
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .prompts-preview-widget {
@@ -3783,7 +3807,7 @@ textarea.form-control {
 .preview-chat-input {
     width: 100%;
     max-width: 400px;
-    background: white;
+    background: rgba(30,41,59,0.5);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     overflow: hidden;
@@ -3794,16 +3818,16 @@ textarea.form-control {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-sm);
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
 .preview-prompt-btn {
     padding: 8px 14px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-700);
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    color: #cbd5e1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -3826,9 +3850,9 @@ textarea.form-control {
     flex: 1;
     padding: 10px 14px;
     font-size: 14px;
-    border: 1px solid var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-md);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
 }
 
 .preview-send {
@@ -3837,7 +3861,7 @@ textarea.form-control {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     border: none;
     border-radius: var(--radius-md);
     color: white;
@@ -3874,8 +3898,8 @@ textarea.form-control {
 }
 
 .integration-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
     transition: all 0.3s ease;
@@ -3911,7 +3935,7 @@ textarea.form-control {
 .integration-header h3 {
     font-size: 18px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     display: flex;
     align-items: center;
     gap: var(--space-sm);
@@ -3982,8 +4006,8 @@ textarea.form-control {
 }
 
 .api-endpoint {
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     margin-top: var(--space-md);
@@ -4009,8 +4033,8 @@ textarea.form-control {
 }
 
 .settings-section {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
     margin-bottom: var(--space-xl);
@@ -4024,10 +4048,10 @@ textarea.form-control {
 .settings-section h3 {
     font-size: 18px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin-bottom: var(--space-lg);
     padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     align-items: center;
     gap: var(--space-sm);
@@ -4035,8 +4059,8 @@ textarea.form-control {
 
 /* Leads Page Modern */
 .leads-container {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     overflow: hidden;
 }
@@ -4047,13 +4071,13 @@ textarea.form-control {
     align-items: center;
     padding: var(--space-xl);
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05));
-    border-bottom: 1px solid var(--gray-200);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .leads-header h3 {
     font-size: 20px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
 }
 
 .leads-table {
@@ -4103,13 +4127,13 @@ textarea.form-control {
     padding: var(--space-xl);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
     border-radius: var(--radius-xl);
-    border: 1px solid var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .appearance-icon {
     width: 56px;
     height: 56px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
@@ -4121,7 +4145,7 @@ textarea.form-control {
 .appearance-header-modern h2 {
     font-size: 24px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0;
 }
 
@@ -4135,7 +4159,7 @@ textarea.form-control {
 .appearance-tabs-modern {
     display: flex;
     gap: var(--space-sm);
-    background: var(--gray-100);
+    background: rgba(255,255,255,0.05);
     padding: 6px;
     border-radius: var(--radius-lg);
 }
@@ -4158,13 +4182,13 @@ textarea.form-control {
 }
 
 .tab-btn-modern:hover {
-    color: var(--gray-900);
+    color: #e2e8f0;
     background: rgba(255, 255, 255, 0.5);
 }
 
 .tab-btn-modern.active {
-    background: white;
-    color: var(--primary);
+    background: rgba(30,41,59,0.5);
+    color: #f59e0b;
     box-shadow: var(--shadow-sm);
 }
 
@@ -4191,8 +4215,8 @@ textarea.form-control {
 
 /* Settings Cards */
 .settings-card {
-    background: white;
-    border: 1px solid var(--gray-200);
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
 }
@@ -4203,12 +4227,12 @@ textarea.form-control {
     gap: var(--space-sm);
     font-size: 16px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0 0 var(--space-lg) 0;
 }
 
 .settings-card-title i {
-    color: var(--primary);
+    color: #f59e0b;
     font-size: 18px;
 }
 
@@ -4231,7 +4255,7 @@ textarea.form-control {
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-700);
+    color: #cbd5e1;
     margin-bottom: 6px;
 }
 
@@ -4239,17 +4263,17 @@ textarea.form-control {
     width: 100%;
     padding: 12px 16px;
     font-size: 14px;
-    border: 1px solid var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-md);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     transition: all 0.2s ease;
 }
 
 .input-modern:focus {
     outline: none;
-    border-color: var(--primary);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: #f59e0b;
+    background: rgba(30,41,59,0.5);
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
 }
 
 .input-modern::placeholder {
@@ -4272,17 +4296,17 @@ textarea.input-modern {
     width: 100%;
     padding: 12px 16px;
     font-size: 14px;
-    border: 1px solid var(--gray-200);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-md);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .select-modern:focus {
     outline: none;
-    border-color: var(--primary);
-    background: white;
+    border-color: #f59e0b;
+    background: rgba(30,41,59,0.5);
 }
 
 .input-with-unit {
@@ -4299,8 +4323,8 @@ textarea.input-modern {
     display: flex;
     align-items: center;
     padding: 0 12px;
-    background: var(--gray-100);
-    border: 1px solid var(--gray-200);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 0 var(--radius-md) var(--radius-md) 0;
     font-size: 13px;
     color: var(--gray-500);
@@ -4324,14 +4348,14 @@ textarea.input-modern {
     align-items: center;
     gap: var(--space-md);
     padding: var(--space-md);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     border: 1px dashed var(--gray-300);
     border-radius: var(--radius-lg);
     transition: all 0.2s ease;
 }
 
 .upload-item-modern:hover {
-    border-color: var(--primary);
+    border-color: #f59e0b;
     background: rgba(99, 102, 241, 0.03);
 }
 
@@ -4355,7 +4379,7 @@ textarea.input-modern {
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: var(--gray-700);
+    color: #cbd5e1;
     margin-bottom: 6px;
 }
 
@@ -4366,17 +4390,17 @@ textarea.input-modern {
     padding: 6px 12px;
     font-size: 12px;
     font-weight: 500;
-    color: var(--primary);
-    background: white;
-    border: 1px solid var(--gray-200);
+    color: #f59e0b;
+    background: rgba(30,41,59,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .btn-upload-modern:hover {
-    background: var(--gray-50);
-    border-color: var(--primary);
+    background: rgba(255,255,255,0.03);
+    border-color: #f59e0b;
 }
 
 .hidden-file-input {
@@ -4395,13 +4419,13 @@ textarea.input-modern {
     align-items: center;
     justify-content: space-between;
     padding: var(--space-md);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     border-radius: var(--radius-md);
     transition: all 0.2s ease;
 }
 
 .toggle-item-modern:hover {
-    background: var(--gray-100);
+    background: rgba(255,255,255,0.05);
 }
 
 .toggle-content {
@@ -4412,7 +4436,7 @@ textarea.input-modern {
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: var(--gray-800);
+    color: #cbd5e1;
 }
 
 .toggle-desc {
@@ -4455,14 +4479,14 @@ textarea.input-modern {
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: rgba(30,41,59,0.5);
     transition: 0.3s;
     border-radius: 50%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .switch-modern input:checked + .slider-modern {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
 .switch-modern input:checked + .slider-modern:before {
@@ -4481,7 +4505,7 @@ textarea.input-modern {
     align-items: center;
     justify-content: space-between;
     padding: var(--space-md);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     border-radius: var(--radius-md);
 }
 
@@ -4499,7 +4523,7 @@ textarea.input-modern {
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: var(--gray-800);
+    color: #cbd5e1;
 }
 
 .color-desc {
@@ -4535,18 +4559,18 @@ textarea.input-modern {
 }
 
 .color-dot.active {
-    border-color: var(--primary);
+    border-color: #f59e0b;
     box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary);
 }
 
 .color-input-modern {
     width: 36px;
     height: 36px;
-    border: 2px solid var(--gray-200);
+    border: 2px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-md);
     cursor: pointer;
     padding: 2px;
-    background: white;
+    background: rgba(30,41,59,0.5);
 }
 
 .color-input-modern::-webkit-color-swatch-wrapper {
@@ -4605,8 +4629,8 @@ textarea.input-modern {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gray-50);
-    border: 2px solid var(--gray-200);
+    background: rgba(255,255,255,0.03);
+    border: 2px solid rgba(255,255,255,0.06);
     border-radius: var(--radius-md);
     font-size: 20px;
     color: var(--gray-500);
@@ -4615,21 +4639,21 @@ textarea.input-modern {
 }
 
 .icon-option:hover {
-    background: white;
+    background: rgba(30,41,59,0.5);
     border-color: var(--gray-300);
-    color: var(--gray-700);
+    color: #cbd5e1;
 }
 
 .icon-option.active {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    border-color: var(--primary);
-    color: var(--primary);
+    background: rgba(245,158,11,0.1);
+    border-color: #f59e0b;
+    color: #f59e0b;
 }
 
 /* Save Bar */
 .appearance-save-bar {
     padding: var(--space-lg);
-    background: var(--gray-50);
+    background: rgba(255,255,255,0.03);
     border-radius: var(--radius-lg);
     display: flex;
     justify-content: flex-end;
@@ -4643,7 +4667,7 @@ textarea.input-modern {
     font-size: 15px;
     font-weight: 600;
     color: white;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
@@ -4687,12 +4711,12 @@ textarea.input-modern {
     gap: var(--space-sm);
     font-size: 16px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: #e2e8f0;
     margin: 0;
 }
 
 .preview-header h3 i {
-    color: var(--primary);
+    color: #f59e0b;
 }
 
 .preview-badge {

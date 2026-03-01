@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUCY — Panel de Administración</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #000 0%, #0a0a0a 50%, #111 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ─── LOGIN SCREEN ─── */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    #login-screen h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #f59e0b;
+    }
+
+    #login-screen p {
+      color: rgba(148,163,184,0.6);
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 320px;
+    }
+
+    .login-form input {
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .login-form input:focus {
+      border-color: rgba(245,158,11,0.5);
+    }
+
+    .login-form input::placeholder {
+      color: rgba(148,163,184,0.4);
+    }
+
+    .btn-primary {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 4px 20px rgba(245,158,11,0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .error-msg {
+      color: #ef4444;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ─── ADMIN PANEL ─── */
+    #admin-panel { display: none; }
+
+    .admin-header {
+      padding: 20px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.5);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .admin-header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #f59e0b;
+    }
+
+    .admin-header .subtitle {
+      font-size: 11px;
+      color: rgba(148,163,184,0.5);
+      letter-spacing: 1px;
+    }
+
+    .btn-logout {
+      padding: 8px 16px;
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 8px;
+      color: #ef4444;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239,68,68,0.25);
+    }
+
+    .btn-medical {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 8px;
+      color: #f59e0b;
+      font-size: 12px;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .btn-medical:hover {
+      background: rgba(245,158,11,0.2);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* ─── GENERATE SECTION ─── */
+    .generate-section {
+      background: rgba(245,158,11,0.06);
+      border: 1px solid rgba(245,158,11,0.15);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .generate-section h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f59e0b;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .generate-row {
+      display: flex;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .generate-row .field {
+      flex: 1;
+    }
+
+    .generate-row label {
+      display: block;
+      font-size: 11px;
+      color: rgba(148,163,184,0.6);
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .generate-row input {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .generate-row input:focus {
+      border-color: rgba(245,158,11,0.4);
+    }
+
+    .generate-row input::placeholder {
+      color: rgba(148,163,184,0.3);
+    }
+
+    .btn-generate {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.3s;
+    }
+
+    .btn-generate:hover {
+      box-shadow: 0 4px 15px rgba(245,158,11,0.3);
+    }
+
+    /* ─── GENERATED PASSWORD POPUP ─── */
+    .new-password-display {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 10px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .new-password-display.visible {
+      display: flex;
+    }
+
+    .new-password-code {
+      font-family: 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: #10b981;
+      letter-spacing: 2px;
+      flex: 1;
+    }
+
+    .btn-copy {
+      padding: 8px 14px;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 8px;
+      color: #10b981;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: rgba(16,185,129,0.25);
+    }
+
+    .btn-copy.copied {
+      background: rgba(16,185,129,0.3);
+      color: #fff;
+    }
+
+    /* ─── DURATION SELECTOR ─── */
+    .duration-section {
+      background: rgba(30,41,59,0.5);
+      border: 1px solid rgba(148,163,184,0.08);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .duration-section h2 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .duration-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .duration-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(148,163,184,0.15);
+      background: rgba(30,41,59,0.6);
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .duration-btn:hover {
+      background: rgba(59,130,246,0.15);
+      border-color: rgba(59,130,246,0.4);
+    }
+    .duration-btn.active {
+      background: rgba(59,130,246,0.25);
+      border-color: #3b82f6;
+      color: #60a5fa;
+      box-shadow: 0 0 12px rgba(59,130,246,0.15);
+    }
+    .duration-status {
+      margin-top: 10px;
+      font-size: 11px;
+      color: rgba(148,163,184,0.5);
+      text-align: right;
+    }
+
+    /* ─── PASSWORD TABLE ─── */
+    .table-section h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .stat-dot.active { background: #10b981; }
+    .stat-dot.used { background: #64748b; }
+
+    .stat-label { color: rgba(148,163,184,0.6); }
+    .stat-value { color: #e2e8f0; font-weight: 600; }
+
+    .passwords-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .passwords-table thead th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(148,163,184,0.5);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .passwords-table tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.2s;
+    }
+
+    .passwords-table tbody tr:hover {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .passwords-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+    }
+
+    .code-cell {
+      font-family: 'Fira Code', 'Cascadia Code', monospace;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .status-badge.active {
+      background: rgba(16,185,129,0.12);
+      color: #10b981;
+      border: 1px solid rgba(16,185,129,0.2);
+    }
+
+    .status-badge.used {
+      background: rgba(100,116,139,0.12);
+      color: #64748b;
+      border: 1px solid rgba(100,116,139,0.2);
+    }
+
+    .status-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-badge.active .dot { background: #10b981; }
+    .status-badge.used .dot { background: #64748b; }
+
+    .note-cell {
+      color: rgba(148,163,184,0.6);
+      font-style: italic;
+    }
+
+    .date-cell {
+      color: rgba(148,163,184,0.5);
+      font-size: 12px;
+    }
+
+    .ip-cell {
+      color: rgba(148,163,184,0.4);
+      font-size: 12px;
+      font-family: monospace;
+    }
+
+    .btn-delete {
+      padding: 4px 10px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 6px;
+      color: #ef4444;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+      background: rgba(239,68,68,0.2);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: rgba(148,163,184,0.4);
+    }
+
+    .empty-state svg {
+      margin-bottom: 12px;
+      opacity: 0.3;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      .generate-row { flex-direction: column; }
+      .admin-content { padding: 20px 16px; }
+      .passwords-table { font-size: 12px; }
+      .admin-header { padding: 16px; }
+      .stats-bar { gap: 16px; }
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in { animation: fadeIn 0.3s ease; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading { animation: pulse 1.5s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════ LOGIN SCREEN ════════════════ -->
+  <div id="login-screen">
+    <div style="text-align:center">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" style="margin-bottom:12px">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <h1>LUCY Admin</h1>
+      <p>Panel de gestión de contraseñas demo</p>
+    </div>
+
+    <form class="login-form" onsubmit="handleAdminLogin(event)">
+      <input type="password" id="admin-password" placeholder="Contraseña de administrador" autofocus>
+      <div id="login-error" class="error-msg" style="display:none"></div>
+      <button type="submit" class="btn-primary" id="login-btn">Acceder</button>
+    </form>
+
+    <p style="color:rgba(148,163,184,0.3); font-size:10px; margin-top: 24px">
+      Acceso exclusivo para administradores
+    </p>
+  </div>
+
+  <!-- ════════════════ ADMIN PANEL ════════════════ -->
+  <div id="admin-panel">
+    <div class="admin-header">
+      <div>
+        <h1>🔐 LUCY Admin</h1>
+        <span class="subtitle">Gestión de Contraseñas Demo</span>
+      </div>
+      <div class="header-actions">
+        <a href="/medical-database" class="btn-medical">🏥 Medical DB</a>
+        <button class="btn-logout" onclick="handleLogout()">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <!-- Generate Section -->
+      <div class="generate-section">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Generar Nueva Contraseña Demo
+        </h2>
+        <div class="generate-row">
+          <div class="field">
+            <label>Nota (opcional) — Ej: "Cliente Hospital X"</label>
+            <input type="text" id="note-input" placeholder="Para quién es esta contraseña...">
+          </div>
+          <button class="btn-generate" onclick="generatePassword()">
+            Generar
+          </button>
+        </div>
+
+        <div id="new-password-display" class="new-password-display">
+          <div>
+            <div style="font-size:11px; color:rgba(16,185,129,0.7); margin-bottom:4px; text-transform:uppercase; letter-spacing:1px">
+              Contraseña generada
+            </div>
+            <div class="new-password-code" id="new-password-code"></div>
+          </div>
+          <button class="btn-copy" onclick="copyPassword()" id="btn-copy">
+            📋 Copiar
+          </button>
+        </div>
+      </div>
+
+      <!-- Duration Selector -->
+      <div class="duration-section">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Duración de Sesión Demo
+        </h2>
+        <div class="duration-buttons">
+          <button class="duration-btn" data-minutes="5" onclick="setDuration(5)">5 minutos</button>
+          <button class="duration-btn" data-minutes="10" onclick="setDuration(10)">10 minutos</button>
+          <button class="duration-btn" data-minutes="15" onclick="setDuration(15)">15 minutos</button>
+        </div>
+        <div class="duration-status" id="duration-status">Cargando...</div>
+      </div>
+
+      <!-- Passwords Table -->
+      <div class="table-section">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Contraseñas Generadas
+        </h2>
+
+        <div class="stats-bar" id="stats-bar">
+          <div class="stat-item">
+            <div class="stat-dot active"></div>
+            <span class="stat-label">Activas:</span>
+            <span class="stat-value" id="stat-active">0</span>
+          </div>
+          <div class="stat-item">
+            <div class="stat-dot used"></div>
+            <span class="stat-label">Usadas:</span>
+            <span class="stat-value" id="stat-used">0</span>
+          </div>
+        </div>
+
+        <div id="passwords-container">
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <p>No hay contraseñas generadas aún</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── STATE ───
+    let lastGeneratedCode = '';
+
+    // ─── LOGIN ───
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const pwd = document.getElementById('admin-password').value.trim();
+      const errorEl = document.getElementById('login-error');
+      const btnEl = document.getElementById('login-btn');
+
+      if (!pwd) return;
+
+      btnEl.disabled = true;
+      btnEl.textContent = 'Verificando...';
+      errorEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pwd }),
+          credentials: 'include',
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('admin-panel').style.display = 'block';
+          loadPasswords();
+          loadDuration();
+        } else {
+          errorEl.textContent = data.error || 'Contraseña incorrecta';
+          errorEl.style.display = 'block';
+          document.getElementById('admin-password').value = '';
+        }
+      } catch (err) {
+        errorEl.textContent = 'Error de conexión';
+        errorEl.style.display = 'block';
+      } finally {
+        btnEl.disabled = false;
+        btnEl.textContent = 'Acceder';
+      }
+    }
+
+    // ─── CHECK SESSION ON LOAD ───
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/admin/check', { credentials: 'include' });
+        const data = await res.json();
+        if (data.authenticated) {
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('admin-panel').style.display = 'block';
+          loadPasswords();
+          loadDuration();
+        }
+      } catch (e) { /* stay on login */ }
+    }
+    checkSession();
+
+    // ─── LOGOUT ───
+    async function handleLogout() {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      location.reload();
+    }
+
+    // ─── GENERATE PASSWORD ───
+    async function generatePassword() {
+      const note = document.getElementById('note-input').value.trim();
+      
+      try {
+        const res = await fetch('/api/admin/demo-passwords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note }),
+          credentials: 'include',
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          lastGeneratedCode = data.password.code;
+          document.getElementById('new-password-code').textContent = data.password.code;
+          const display = document.getElementById('new-password-display');
+          display.classList.add('visible');
+          display.classList.add('fade-in');
+          document.getElementById('btn-copy').textContent = '📋 Copiar';
+          document.getElementById('btn-copy').classList.remove('copied');
+          document.getElementById('note-input').value = '';
+          loadPasswords();
+        }
+      } catch (err) {
+        alert('Error al generar contraseña');
+      }
+    }
+
+    // ─── COPY PASSWORD ───
+    function copyPassword() {
+      if (!lastGeneratedCode) return;
+      navigator.clipboard.writeText(lastGeneratedCode).then(() => {
+        const btn = document.getElementById('btn-copy');
+        btn.textContent = '✅ Copiada';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '📋 Copiar';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // ─── LOAD PASSWORDS ───
+    async function loadPasswords() {
+      try {
+        const res = await fetch('/api/admin/demo-passwords', { credentials: 'include' });
+        const data = await res.json();
+
+        if (!res.ok) return;
+
+        const passwords = data.passwords || [];
+        const active = passwords.filter(p => p.status === 'active').length;
+        const used = passwords.filter(p => p.status === 'used').length;
+
+        document.getElementById('stat-active').textContent = active;
+        document.getElementById('stat-used').textContent = used;
+
+        const container = document.getElementById('passwords-container');
+
+        if (passwords.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <p>No hay contraseñas generadas aún</p>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = `
+          <table class="passwords-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Estado</th>
+                <th>Nota</th>
+                <th>Creada</th>
+                <th>Usada</th>
+                <th>IP Cliente</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${passwords.map(p => `
+                <tr>
+                  <td class="code-cell" style="color: ${p.status === 'active' ? '#10b981' : '#64748b'}">
+                    ${p.code}
+                  </td>
+                  <td>
+                    <span class="status-badge ${p.status}">
+                      <span class="dot"></span>
+                      ${p.status === 'active' ? 'Activa' : 'Usada'}
+                    </span>
+                  </td>
+                  <td class="note-cell">${p.note || '—'}</td>
+                  <td class="date-cell">${formatDate(p.createdAt)}</td>
+                  <td class="date-cell">${p.usedAt ? formatDate(p.usedAt) : '—'}</td>
+                  <td class="ip-cell">${p.clientIp || '—'}</td>
+                  <td>
+                    <button class="btn-delete" onclick="deletePassword('${p.id}')" title="Eliminar">
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>`;
+      } catch (err) {
+        console.error('Error loading passwords:', err);
+      }
+    }
+
+    // ─── DELETE PASSWORD ───
+    async function deletePassword(id) {
+      if (!confirm('¿Eliminar esta contraseña?')) return;
+
+      try {
+        const res = await fetch(`/api/admin/demo-passwords/${id}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+        if (res.ok) loadPasswords();
+      } catch (err) {
+        alert('Error al eliminar');
+      }
+    }
+
+    // ─── FORMAT DATE ───
+    function formatDate(iso) {
+      const d = new Date(iso);
+      const pad = n => String(n).padStart(2, '0');
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    // ─── DURATION CONTROL ───
+    async function loadDuration() {
+      try {
+        const res = await fetch('/api/admin/demo-duration', { credentials: 'include' });
+        const data = await res.json();
+        if (data.minutes) {
+          highlightDurationBtn(data.minutes);
+          document.getElementById('duration-status').textContent = `Duración actual: ${data.minutes} minutos`;
+        }
+      } catch (e) {
+        document.getElementById('duration-status').textContent = 'Error al cargar duración';
+      }
+    }
+
+    async function setDuration(minutes) {
+      try {
+        const res = await fetch('/api/admin/demo-duration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ minutes }),
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          highlightDurationBtn(minutes);
+          document.getElementById('duration-status').textContent = `✅ Cambiado a ${minutes} minutos`;
+          setTimeout(() => {
+            document.getElementById('duration-status').textContent = `Duración actual: ${minutes} minutos`;
+          }, 2000);
+        }
+      } catch (e) {
+        document.getElementById('duration-status').textContent = 'Error al guardar';
+      }
+    }
+
+    function highlightDurationBtn(minutes) {
+      document.querySelectorAll('.duration-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.minutes) === minutes);
+      });
+    }
+
+    // ─── AUTO-REFRESH EVERY 30s ───
+    setInterval(() => {
+      if (document.getElementById('admin-panel').style.display !== 'none') {
+        loadPasswords();
+      }
+    }, 30000);
+  </script>
+</body>
+</html>

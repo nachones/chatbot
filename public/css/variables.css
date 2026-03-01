@@ -1,25 +1,26 @@
 /* ========================================
    DESIGN TOKENS & VARIABLES
+   Dark Premium Theme (inspired by LUCY Admin)
    ======================================== */
 
 :root {
-    /* Primary Colors - Modern Blue/Purple Gradient */
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --primary-light: #818cf8;
-    --accent: #8b5cf6;
+    /* Primary Colors - Amber/Gold Premium */
+    --primary: #f59e0b;
+    --primary-dark: #d97706;
+    --primary-light: #fbbf24;
+    --accent: #f59e0b;
 
-    /* Neutral Colors */
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
+    /* Neutral Colors - Dark Theme */
+    --gray-50: rgba(255,255,255,0.03);
+    --gray-100: rgba(255,255,255,0.06);
+    --gray-200: rgba(255,255,255,0.1);
+    --gray-300: rgba(255,255,255,0.15);
+    --gray-400: rgba(148,163,184,0.5);
+    --gray-500: rgba(148,163,184,0.6);
+    --gray-600: rgba(148,163,184,0.7);
+    --gray-700: #cbd5e1;
+    --gray-800: #e2e8f0;
+    --gray-900: #f1f5f9;
 
     /* Semantic Colors */
     --success: #10b981;
@@ -27,10 +28,20 @@
     --danger: #ef4444;
     --info: #3b82f6;
 
+    /* Background */
+    --bg-base: #000000;
+    --bg-surface: rgba(255,255,255,0.03);
+    --bg-elevated: rgba(255,255,255,0.06);
+    --bg-card: rgba(30,41,59,0.5);
+    --bg-input: rgba(255,255,255,0.05);
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-default: rgba(255,255,255,0.1);
+    --border-accent: rgba(245,158,11,0.25);
+
     /* Sidebar */
-    --sidebar-bg: #ffffff;
-    --sidebar-text: var(--gray-600);
-    --sidebar-hover: var(--gray-50);
+    --sidebar-bg: rgba(0,0,0,0.6);
+    --sidebar-text: rgba(148,163,184,0.7);
+    --sidebar-hover: rgba(255,255,255,0.05);
     --sidebar-active: var(--primary);
 
     /* Spacing */
@@ -48,9 +59,10 @@
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    /* Shadows - Dark Theme */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 4px 20px rgba(245,158,11,0.3);
 }
